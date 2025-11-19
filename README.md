@@ -50,7 +50,7 @@ docker-compose up -d
 | `/monhoc` | GET | Lấy danh sách tất cả môn học | `id=<MaMon>` |
 | `/sinhvien` | GET | Lấy danh sách tất cả sinh viên | `id=<MaSV>` |
 | `/ctdaotao` | GET | Lấy danh sách chương trình đào tạo | - |
-| `/dangky` | GET | Lấy danh sách đăng ký học | `masv=<MaSV>&mamon=<MaMon>` |
+| `/dangky` | GET | Lấy danh sách đăng ký học | `masv=<MaSV>` (xem môn học), `mamon=<MaMon>` (xem sinh viên), hoặc cả hai |
 
 ## 🧪 Test
 Truy cập UI test hiện đại: `http://localhost:8080/ui.php`

@@ -336,7 +336,8 @@
             </div>
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="callAPI('dangky', 'GET')">Lấy Tất Cả</button>
-                <button class="btn btn-primary" onclick="callAPI('dangky', 'GET', null, 'dangky')">Lấy Theo ID</button>
+                <button class="btn btn-success" onclick="callAPI('dangky', 'GET', null, 'dangky', 'masv')">Xem Môn Học Đã Đăng Ký</button>
+                <button class="btn btn-success" onclick="callAPI('dangky', 'GET', null, 'dangky', 'mamon')">Xem Sinh Viên Đã Đăng Ký</button>
             </div>
             <div id="dangky-result" class="result"></div>
         </div>
@@ -359,7 +360,7 @@
             event.target.classList.add('active');
         }
 
-        async function callAPI(endpoint, method, body = null, module = null) {
+        async function callAPI(endpoint, method, body = null, module = null, queryType = null) {
             const resultDiv = document.getElementById(`${module || endpoint}-result`);
             if (!resultDiv) return;
 
@@ -372,11 +373,24 @@
 
             if (module) {
                 if (module === 'dangky') {
-                    const masv = document.getElementById('dangky-masv').value.trim();
-                    const mamon = document.getElementById('dangky-mamon').value.trim();
-                    if (masv && mamon) {
-                        params.append('masv', masv);
-                        params.append('mamon', mamon);
+                    if (queryType === 'masv') {
+                        const masv = document.getElementById('dangky-masv').value.trim();
+                        if (masv) {
+                            params.append('masv', masv);
+                        }
+                    } else if (queryType === 'mamon') {
+                        const mamon = document.getElementById('dangky-mamon').value.trim();
+                        if (mamon) {
+                            params.append('mamon', mamon);
+                        }
+                    } else {
+                        // Query cả hai nếu có
+                        const masv = document.getElementById('dangky-masv').value.trim();
+                        const mamon = document.getElementById('dangky-mamon').value.trim();
+                        if (masv && mamon) {
+                            params.append('masv', masv);
+                            params.append('mamon', mamon);
+                        }
                     }
                 } else {
                     const idInput = document.getElementById(`${module}-id`);
@@ -403,8 +417,17 @@
                 }
                 const data = await response.json();
 
+                // Calculate count
+                let countText = '';
+                if (Array.isArray(data)) {
+                    const count = data.length;
+                    countText = `<div>📊 Tổng số: <strong>${count}</strong> ${count === 1 ? 'bản ghi' : 'bản ghi'}</div>`;
+                } else if (data && typeof data === 'object') {
+                    countText = `<div>📄 1 bản ghi</div>`;
+                }
+
                 // Format JSON nicely
-                resultDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                resultDiv.innerHTML = `${countText}<pre>${JSON.stringify(data, null, 2)}</pre>`;
                 resultDiv.className = 'result show';
 
             } catch (error) {
