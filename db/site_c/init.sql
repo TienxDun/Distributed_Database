@@ -14,7 +14,7 @@ CREATE TABLE Khoa (
     MaKhoa NVARCHAR(10) PRIMARY KEY,
     TenKhoa NVARCHAR(100) NOT NULL
 );
-ALTER TABLE Khoa ADD CONSTRAINT CK_Khoa_SiteC CHECK (MaKhoa IN ('DLKS', 'LUAT', 'LLCT'));
+ALTER TABLE Khoa ADD CONSTRAINT CK_Khoa_SiteC CHECK (MaKhoa >= 'S');
 GO
 
 -- Tạo bảng MonHoc
@@ -33,6 +33,7 @@ CREATE TABLE CTDaoTao (
     FOREIGN KEY (MaKhoa) REFERENCES Khoa(MaKhoa),
     FOREIGN KEY (MaMH) REFERENCES MonHoc(MaMH)
 );
+ALTER TABLE CTDaoTao ADD CONSTRAINT CK_CTDaoTao_SiteC CHECK (MaKhoa >= 'S');
 GO
 
 -- Tạo bảng SinhVien
@@ -43,7 +44,7 @@ CREATE TABLE SinhVien (
     KhoaHoc INT NOT NULL,
     FOREIGN KEY (MaKhoa) REFERENCES Khoa(MaKhoa)
 );
-ALTER TABLE SinhVien ADD CONSTRAINT CK_SinhVien_SiteC CHECK (MaKhoa IN ('DLKS', 'LUAT', 'LLCT'));
+ALTER TABLE SinhVien ADD CONSTRAINT CK_SinhVien_SiteC CHECK (MaKhoa >= 'S');
 GO
 
 -- Tạo bảng DangKy

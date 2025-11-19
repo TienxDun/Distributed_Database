@@ -1,11 +1,14 @@
 # HUFLIT Distributed Database System
 
 ## 📋 Mô tả
-Hệ thống cơ sở dữ liệu phân tán mô phỏng trường Đại học HUFLIT với 3 sites địa lý, sử dụng SQL Server partitioned views và linked servers.
+Hệ thống cơ sở dữ liệu phân tán mô phỏng trường Đại học HUFLIT với 3 sites địa lý, sử dụng SQL Server partitioned views và linked servers. Dữ liệu được phân vùng theo range alphabetical để hỗ trợ mở rộng dễ dàng.
 
 ## 🏗️ Kiến trúc
 
-- **3 Site Databases**: Site A (NN, CNTT, NVPD), Site B (QHQT, QTKD, KTTC), Site C (DLKS, LUAT, LLCT)
+- **3 Site Databases**:
+  - Site A: Khoa có MaKhoa < 'M' (NN, CNTT, NVPD)
+  - Site B: Khoa có 'M' ≤ MaKhoa < 'S' (QHQT, QTKD, KTTC)
+  - Site C: Khoa có MaKhoa ≥ 'S' (DLKS, LUAT, LLCT)
 - **Global Database**: Tổng hợp dữ liệu từ các sites qua partitioned views
 - **PHP API**: RESTful API để truy cập dữ liệu
 - **Docker**: Containerization cho SQL Server và PHP
@@ -41,20 +44,20 @@ docker-compose up -d
 
 ### Base URL: `http://localhost:8080`
 
-| Endpoint | Method | Mô tả |
-|----------|--------|-------|
-| `/khoa` | GET | Lấy danh sách tất cả khoa |
-| `/monhoc` | GET | Lấy danh sách tất cả môn học |
-| `/sinhvien` | GET | Lấy danh sách tất cả sinh viên |
-| `/ctdaotao` | GET | Lấy danh sách chương trình đào tạo |
-| `/dangky` | GET | Lấy danh sách đăng ký học |
-
-### Query Parameters
-
-- `id=<value>`: Lọc theo ID cụ thể
+| Endpoint | Method | Mô tả | Query Params |
+|----------|--------|-------|--------------|
+| `/khoa` | GET | Lấy danh sách tất cả khoa | `id=<MaKhoa>` |
+| `/monhoc` | GET | Lấy danh sách tất cả môn học | `id=<MaMon>` |
+| `/sinhvien` | GET | Lấy danh sách tất cả sinh viên | `id=<MaSV>` |
+| `/ctdaotao` | GET | Lấy danh sách chương trình đào tạo | - |
+| `/dangky` | GET | Lấy danh sách đăng ký học | `masv=<MaSV>&mamon=<MaMon>` |
 
 ## 🧪 Test
-Truy cập UI test: `http://localhost:8080/ui.php`
+Truy cập UI test hiện đại: `http://localhost:8080/ui.php`
+
+- Giao diện modular với tabs cho từng bảng
+- Input fields để query theo ID cụ thể
+- Hiển thị kết quả JSON format đẹp
 
 ## 📁 Cấu trúc thư mục
 
@@ -65,10 +68,10 @@ cdslpt/
 ├── app/                  # PHP API
 │   ├── public/
 │   │   ├── index.php     # API router
-│   │   └── ui.php        # Test UI
+│   │   └── ui.php        # Test UI hiện đại
 │   └── routes/           # API handlers
 ├── db/                   # SQL scripts
-│   ├── global/           # Global DB schema
+│   ├── global/           # Global DB schema & views
 │   ├── site_a/           # Site A (NN, CNTT, NVPD)
 │   ├── site_b/           # Site B (QHQT, QTKD, KTTC)
 │   └── site_c/           # Site C (DLKS, LUAT, LLCT)
@@ -87,4 +90,5 @@ cdslpt/
 
 - Đảm bảo containers đang chạy trước khi init DB
 - Sử dụng PowerShell với encoding UTF-8 để tránh lỗi font tiếng Việt
-- Dữ liệu mẫu dựa trên các khoa thực tế của trường HUFLIT
+- Phân vùng theo range cho phép thêm khoa mới mà không cần thay đổi schema
+- Triggers đảm bảo tính toàn vẹn dữ liệu phân tán
