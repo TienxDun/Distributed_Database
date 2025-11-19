@@ -1,0 +1,102 @@
+services: 
+  api_php: 
+    build: ./app
+    command: php -S 0.0.0.0:8080 -t public
+    container_name: api_php
+    networks:
+      - huflit-network
+    environment: 
+      - DB_HOST=mssql_global 
+      - DB_PORT=1433 
+      - DB_NAME=Global 
+      - DB_USER=sa 
+      - DB_PASS=${MSSQL_SA_PASSWORD}
+    ports: 
+      - "8080:8080"
+    volumes:
+      - ./app:/var/www/html
+    depends_on: 
+      - mssql_global
+
+  app_php:
+    build: ./app
+    command: php -S 0.0.0.0:8081 -t public
+    container_name: app_php
+    networks:
+      - huflit-network
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./app:/var/www/html
+  
+  mssql_global:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mssql_global
+    networks:
+      - huflit-network
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+      - MSSQL_PID=Developer
+    ports:
+      - "14333:1433"
+    volumes:
+      - ./db/global:/docker-entrypoint-initdb.d
+      - sqlserver_data_global:/var/opt/mssql
+  mssql_site_a:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mssql_site_a
+    networks:
+      - huflit-network
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+      - MSSQL_PID=Developer
+    ports:
+      - "14334:1433"
+    volumes:
+      - ./db/site_a:/docker-entrypoint-initdb.d
+      - sqlserver_data_a:/var/opt/mssql
+
+  mssql_site_b:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mssql_site_b
+    networks:
+      - huflit-network
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+      - MSSQL_PID=Developer
+    ports:
+      - "14335:1433"
+    volumes:
+      - ./db/site_b:/docker-entrypoint-initdb.d
+      - sqlserver_data_b:/var/opt/mssql
+
+  mssql_site_c:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mssql_site_c
+    networks:
+      - huflit-network
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+      - MSSQL_PID=Developer
+    ports:
+      - "14336:1433"
+    volumes:
+      - ./db/site_c:/docker-entrypoint-initdb.d
+      - sqlserver_data_c:/var/opt/mssql
+
+  
+
+volumes:
+  sqlserver_data_a:
+  sqlserver_data_b:
+  sqlserver_data_c:
+  sqlserver_data_global:
+    
+networks:
+    huflit-network:
+        name: huflit-network
+        driver: bridge
