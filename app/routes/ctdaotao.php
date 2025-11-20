@@ -6,16 +6,16 @@ function handleCTDaoTao($method, $query) {
         $pdo = getDBConnection();
         switch ($method) {
             case 'GET':
-                if (isset($query['makhoa']) && isset($query['khoahoc'])) {
+                if (isset($query['khoa']) && isset($query['khoahoc'])) {
                     // Lấy danh sách môn học thuộc chương trình đào tạo cụ thể
-                    $stmt = $pdo->prepare("SELECT m.* FROM CTDaoTao_Global c JOIN MonHoc_Global m ON c.MaMH = m.MaMH WHERE c.MaKhoa = ? AND c.KhoaHoc = ?");
-                    $stmt->execute([$query['makhoa'], $query['khoahoc']]);
+                    $stmt = $pdo->prepare("SELECT m.* FROM CTDaoTao_Global c JOIN MonHoc_Global m ON c.MaMH = m.MaMH JOIN Khoa_Global k ON c.MaKhoa = k.MaKhoa WHERE (k.TenKhoa = ? OR k.MaKhoa = ?) AND c.KhoaHoc = ?");
+                    $stmt->execute([$query['khoa'], $query['khoa'], $query['khoahoc']]);
                     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     sendResponse($result);
-                } elseif (isset($query['makhoa'])) {
+                } elseif (isset($query['khoa'])) {
                     // Lấy tất cả môn học của khoa
-                    $stmt = $pdo->prepare("SELECT m.* FROM CTDaoTao_Global c JOIN MonHoc_Global m ON c.MaMH = m.MaMH WHERE c.MaKhoa = ?");
-                    $stmt->execute([$query['makhoa']]);
+                    $stmt = $pdo->prepare("SELECT m.* FROM CTDaoTao_Global c JOIN MonHoc_Global m ON c.MaMH = m.MaMH JOIN Khoa_Global k ON c.MaKhoa = k.MaKhoa WHERE k.TenKhoa = ? OR k.MaKhoa = ?");
+                    $stmt->execute([$query['khoa'], $query['khoa']]);
                     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     sendResponse($result);
                 } elseif (isset($query['khoahoc'])) {
@@ -24,9 +24,9 @@ function handleCTDaoTao($method, $query) {
                     $stmt->execute([$query['khoahoc']]);
                     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     sendResponse($result);
-                } elseif (isset($query['makhoa']) && isset($query['khoahoc']) && isset($query['mamh'])) {
-                    $stmt = $pdo->prepare("SELECT * FROM CTDaoTao_Global WHERE MaKhoa = ? AND KhoaHoc = ? AND MaMH = ?");
-                    $stmt->execute([$query['makhoa'], $query['khoahoc'], $query['mamh']]);
+                } elseif (isset($query['khoa']) && isset($query['khoahoc']) && isset($query['mamh'])) {
+                    $stmt = $pdo->prepare("SELECT c.* FROM CTDaoTao_Global c JOIN Khoa_Global k ON c.MaKhoa = k.MaKhoa WHERE (k.TenKhoa = ? OR k.MaKhoa = ?) AND c.KhoaHoc = ? AND c.MaMH = ?");
+                    $stmt->execute([$query['khoa'], $query['khoa'], $query['khoahoc'], $query['mamh']]);
                     $result = $stmt->fetch(PDO::FETCH_ASSOC);
                     sendResponse($result ?: ['error' => 'Not found'], $result ? 200 : 404);
                 } else {

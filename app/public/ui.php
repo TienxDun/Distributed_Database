@@ -68,8 +68,8 @@
         <div id="ctdaotao" class="tab-content">
             <h2 class="module-title">Chương Trình Đào Tạo</h2>
             <div class="form-group">
-                <label for="ctdaotao-makhoa">Mã Khoa:</label>
-                <input type="text" id="ctdaotao-makhoa" placeholder="Ví dụ: CNTT, DLKS" onkeydown="if(event.key==='Enter') callAPI('ctdaotao', 'GET', null, 'ctdaotao', 'subjects')">
+                <label for="ctdaotao-khoa">Mã Khoa hoặc Tên Khoa:</label>
+                <input type="text" id="ctdaotao-khoa" placeholder="Ví dụ: CNTT hoặc Công nghệ thông tin" onkeydown="if(event.key==='Enter') callAPI('ctdaotao', 'GET', null, 'ctdaotao', 'subjects')">
             </div>
             <div class="form-group">
                 <label for="ctdaotao-khoahoc">Khóa Học:</label>
@@ -230,12 +230,12 @@
                     }
                 } else if (module === 'ctdaotao') {
                     if (queryType === 'subjects') {
-                        const makhoa = document.getElementById('ctdaotao-makhoa').value.trim();
+                        const khoa = document.getElementById('ctdaotao-khoa').value.trim();
                         const khoahoc = document.getElementById('ctdaotao-khoahoc').value.trim();
-                        if (makhoa) params.append('makhoa', makhoa);
+                        if (khoa) params.append('khoa', khoa);
                         if (khoahoc) params.append('khoahoc', khoahoc);
-                        if (!makhoa && !khoahoc) {
-                            alert('Vui lòng nhập ít nhất Mã Khoa hoặc Khóa Học để xem môn học.');
+                        if (!khoa && !khoahoc) {
+                            alert('Vui lòng nhập ít nhất Mã Khoa/Tên Khoa hoặc Khóa Học để xem môn học.');
                             resultDiv.innerHTML = '';
                             resultDiv.className = 'result';
                             return;
