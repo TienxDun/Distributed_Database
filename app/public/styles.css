@@ -197,6 +197,7 @@ body {
     max-height: 400px;
     overflow-y: auto;
     display: none;
+    overflow-x: auto;
 }
 
 .result.show {
@@ -206,6 +207,35 @@ body {
 .result.error {
     border-left-color: var(--danger);
     background: #fef2f2;
+}
+
+.result table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+}
+
+.result th,
+.result td {
+    border: 1px solid var(--border);
+    padding: 0.5rem;
+    text-align: left;
+}
+
+.result th {
+    background: var(--primary);
+    color: white;
+    font-weight: 600;
+}
+
+.result tbody tr:nth-child(even) {
+    background: #f8fafc;
+}
+
+.result tbody tr:hover {
+    background: #e2e8f0;
 }
 
 .info-text {

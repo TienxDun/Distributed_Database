@@ -147,6 +147,37 @@
     <script>
         const API_BASE = 'http://localhost:8080';
 
+        function createTable(data) {
+            if (!Array.isArray(data)) {
+                if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
+                    // Single object
+                    let table = '<table><thead><tr><th>Thuộc tính</th><th>Giá trị</th></tr></thead><tbody>';
+                    for (let key in data) {
+                        table += `<tr><td>${key}</td><td>${data[key]}</td></tr>`;
+                    }
+                    table += '</tbody></table>';
+                    return table;
+                } else {
+                    return '<p>Không có dữ liệu hoặc định dạng không hỗ trợ</p>';
+                }
+            }
+            if (data.length === 0) {
+                return '<p>Không có dữ liệu</p>';
+            }
+            // Array of objects
+            const headers = Object.keys(data[0]);
+            let table = '<table><thead><tr>';
+            headers.forEach(h => table += `<th>${h}</th>`);
+            table += '</tr></thead><tbody>';
+            data.forEach(row => {
+                table += '<tr>';
+                headers.forEach(h => table += `<td>${row[h] !== null && row[h] !== undefined ? row[h] : ''}</td>`);
+                table += '</tr>';
+            });
+            table += '</tbody></table>';
+            return table;
+        }
+
         function showTab(tabName) {
             // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(tab => {
@@ -281,8 +312,8 @@
                     countText = `<div style="background: #e0f2fe; color: var(--text); padding: 0.5rem 1rem; border-radius: 6px; margin-bottom: 1rem; display: inline-block; font-weight: 600; font-size: 0.9rem;">📄 1 bản ghi</div>`;
                 }
 
-                // Format JSON nicely
-                resultDiv.innerHTML = `${countText}<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                // Format as table
+                resultDiv.innerHTML = `${countText}${createTable(data)}`;
                 resultDiv.className = 'result show';
 
             } catch (error) {
