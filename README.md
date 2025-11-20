@@ -59,6 +59,13 @@ Truy cập `http://localhost:8081/ui.php` để test API với giao diện web h
 cdslpt/
 ├── docker-compose.yml
 ├── init_databases.ps1
+├── README.md
+├── ARCHITECTURE.md
 ├── app/ (PHP API)
+│   ├── public/
+│   │   ├── index.php
+│   │   ├── ui.php
+│   │   └── styles.css
+│   └── routes/
 └── db/ (SQL scripts cho 3 sites + global)
 ```
