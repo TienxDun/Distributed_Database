@@ -9,7 +9,7 @@ Hệ thống cơ sở dữ liệu phân tán mô phỏng Đại học Ngoại th
 ## 🏗️ Kiến trúc
 
 - **3 Site Databases**: Phân vùng theo range alphabetical (A-M, M-S, S-Z)
-- **Global Database**: Tổng hợp dữ liệu qua partitioned views
+- **Global Database**: Tổng hợp dữ liệu qua partitioned views (HUFLIT)
 - **PHP REST API**: Truy cập dữ liệu phân tán
 - **Docker**: Containerization hoàn chỉnh
 

@@ -60,6 +60,7 @@ Hệ thống HUFLIT Distributed Database là một ứng dụng web mô phỏng 
 #### Global Database
 
 - **Chức năng**: Tổng hợp dữ liệu từ 3 sites
+- **Tên Database**: HUFLIT
 - **Linked Servers**: Kết nối đến mssql_site_a, mssql_site_b, mssql_site_c
 - **Partitioned Views**:
   - `Khoa_Global = UNION ALL` từ 3 sites

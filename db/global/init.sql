@@ -1,12 +1,12 @@
--- Tạo lại database Global nếu đã tồn tại
-DROP DATABASE IF EXISTS Global;
+-- Tạo lại database HUFLIT nếu đã tồn tại
+DROP DATABASE IF EXISTS HUFLIT;
 GO
 
--- Tạo database Global với collation hỗ trợ tiếng Việt
-CREATE DATABASE Global COLLATE Vietnamese_CI_AS;
+-- Tạo database HUFLIT với collation hỗ trợ tiếng Việt
+CREATE DATABASE HUFLIT COLLATE Vietnamese_CI_AS;
 GO
 
-USE Global;
+USE HUFLIT;
 GO
 
 -- Tạo linked servers đến các sites

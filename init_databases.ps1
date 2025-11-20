@@ -30,9 +30,9 @@ Write-Host "6. Seed dữ liệu Site C..." -ForegroundColor Yellow
 sqlcmd -S localhost,14336 -U sa -P "Your@STROng!Pass#Word" -f 65001 -i db\site_c\seed.sql
 if ($LASTEXITCODE -ne 0) { Write-Host "Lỗi khi seed Site C!" -ForegroundColor Red; exit 1 }
 
-Write-Host "7. Khởi tạo Global Database với Linked Servers..." -ForegroundColor Yellow
+Write-Host "7. Khởi tạo HUFLIT Database với Linked Servers..." -ForegroundColor Yellow
 sqlcmd -S localhost,14333 -U sa -P "Your@STROng!Pass#Word" -f 65001 -i db\global\init.sql
-if ($LASTEXITCODE -ne 0) { Write-Host "Lỗi khi khởi tạo Global!" -ForegroundColor Red; exit 1 }
+if ($LASTEXITCODE -ne 0) { Write-Host "Lỗi khi khởi tạo HUFLIT!" -ForegroundColor Red; exit 1 }
 
 Write-Host "=== Hoàn thành khởi tạo Database HUFLIT ===" -ForegroundColor Green
 Write-Host "Bạn có thể test API tại: http://localhost:8080" -ForegroundColor Cyan

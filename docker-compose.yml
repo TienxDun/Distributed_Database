@@ -8,7 +8,7 @@ services:
     environment: 
       - DB_HOST=mssql_global 
       - DB_PORT=1433 
-      - DB_NAME=Global 
+      - DB_NAME=HUFLIT 
       - DB_USER=sa 
       - DB_PASS=${MSSQL_SA_PASSWORD}
     ports: 
