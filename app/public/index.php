@@ -19,6 +19,7 @@ $routes = [
     '/sinhvien' => 'sinhvien',
     '/dangky' => 'dangky',
     '/ctdaotao' => 'ctdaotao',
+    '/global' => 'global',
 ];
 
 $method = $_SERVER['REQUEST_METHOD'];

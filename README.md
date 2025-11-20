@@ -26,24 +26,28 @@ docker-compose up -d
 
 ## 📡 API Endpoints
 
-| Endpoint | Method | Mô tả | Ví dụ |
-|----------|--------|-------|-------|
-| `/khoa` | GET | Danh sách tất cả khoa | `/khoa` |
-| `/khoa?id=<id>` | GET | Chi tiết khoa theo ID | `/khoa?id=CNTT` |
-| `/monhoc` | GET | Danh sách tất cả môn học | `/monhoc` |
-| `/monhoc?id=<id>` | GET | Chi tiết môn học theo ID | `/monhoc?id=MH001` |
-| `/sinhvien` | GET | Danh sách tất cả sinh viên | `/sinhvien` |
-| `/sinhvien?id=<id>` | GET | Chi tiết sinh viên theo ID | `/sinhvien?id=SV001` |
-| `/ctdaotao` | GET | Danh sách tất cả CTDaoTao | `/ctdaotao` |
-| `/ctdaotao?makhoa=<id>` | GET | Môn học của khoa | `/ctdaotao?makhoa=CNTT` |
-| `/ctdaotao?khoahoc=<year>` | GET | Môn học của khóa học | `/ctdaotao?khoahoc=2018` |
-| `/ctdaotao?makhoa=<id>&khoahoc=<year>` | GET | Môn học của CTDaoTao cụ thể | `/ctdaotao?makhoa=CNTT&khoahoc=2018` |
-| `/dangky` | GET | Danh sách tất cả đăng ký | `/dangky` |
-| `/dangky?masv=<id>` | GET | Đăng ký của sinh viên | `/dangky?masv=SV001` |
+| Endpoint | Method | Mô tả |
+|----------|--------|-------|
+| `/khoa` | GET | Danh sách tất cả khoa |
+| `/khoa?id=<id>` | GET | Chi tiết khoa theo ID |
+| `/monhoc` | GET | Danh sách tất cả môn học |
+| `/monhoc?id=<id>` | GET | Chi tiết môn học theo ID |
+| `/sinhvien` | GET | Danh sách tất cả sinh viên |
+| `/sinhvien?id=<id>` | GET | Chi tiết sinh viên theo ID |
+| `/ctdaotao` | GET | Danh sách tất cả CTDaoTao |
+| `/ctdaotao?makhoa=<id>` | GET | Môn học theo khoa |
+| `/ctdaotao?khoahoc=<year>` | GET | Môn học theo khóa học |
+| `/ctdaotao?makhoa=<id>&khoahoc=<year>` | GET | Môn học theo CTDaoTao cụ thể |
+| `/dangky` | GET | Danh sách tất cả đăng ký |
+| `/dangky?masv=<id>` | GET | Đăng ký của sinh viên |
+| `/global?type=1&masv=<id>` | GET | Môn học sinh viên đã học đạt ≥5 |
+| `/global?type=2&tenkhoa=<name>` | GET | Khóa học của một khoa |
+| `/global?type=3&masv=<id>` | GET | Môn học bắt buộc của sinh viên |
+| `/global?type=4` | GET | Sinh viên đủ điều kiện tốt nghiệp |
 
 ## 🧪 Test
 
-Truy cập `http://localhost:8081/ui.php` để test API với giao diện web.
+Truy cập `http://localhost:8081/ui.php` để test API với giao diện web hiện đại.
 
 ## 📁 Cấu trúc
 
@@ -51,7 +55,6 @@ Truy cập `http://localhost:8081/ui.php` để test API với giao diện web.
 cdslpt/
 ├── docker-compose.yml
 ├── init_databases.ps1
-├── README.md
 ├── app/ (PHP API)
 └── db/ (SQL scripts cho 3 sites + global)
 ```

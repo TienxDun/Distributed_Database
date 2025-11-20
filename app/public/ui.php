@@ -241,6 +241,49 @@
             100% { transform: rotate(360deg); }
         }
 
+        .query-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .query-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .query-card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .query-card h3::before {
+            content: '🔍';
+        }
+
+        .query-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .query-card .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .query-card .btn {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 1rem;
@@ -263,6 +306,10 @@
             .btn-group {
                 justify-content: center;
             }
+
+            .query-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -279,6 +326,7 @@
             <button class="tab-btn" onclick="showTab('sinhvien')">Sinh Viên</button>
             <button class="tab-btn" onclick="showTab('ctdaotao')">CT Đào Tạo</button>
             <button class="tab-btn" onclick="showTab('dangky')">Đăng Ký</button>
+            <button class="tab-btn" onclick="showTab('global')">Truy Vấn Toàn Cục</button>
         </div>
 
         <!-- Khoa Module -->
@@ -350,9 +398,56 @@
             </div>
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="callAPI('dangky', 'GET')">Lấy Tất Cả</button>
-                <button class="btn btn-success" onclick="callAPI('dangky', 'GET', null, 'dangky', 'masv')">Xem Môn Học Đã Đăng Ký</button>
+                <button class="btn btn-success" onclick="callAPI('dangky', 'GET', null, 'dangky', 'masv')">🔍 Xem Môn Học Đã Đăng Ký</button>
             </div>
             <div id="dangky-result" class="result"></div>
+        </div>
+
+        <!-- Global Queries Module -->
+        <div id="global" class="tab-content">
+            <h2 class="module-title">Truy Vấn Toàn Cục</h2>
+            <div class="query-grid">
+                <!-- Form 1 -->
+                <div class="query-card">
+                    <h3>Các môn học sinh viên đã học và đạt từ điểm 5 trở lên</h3>
+                    <div class="form-group">
+                        <label for="global-masv-1">Mã Sinh Viên:</label>
+                        <input type="text" id="global-masv-1" placeholder="Ví dụ: SV001">
+                    </div>
+                    <button class="btn btn-primary" onclick="callAPI('global', 'GET', null, 'global', '1')">Truy Vấn</button>
+                    <div id="global-result-1" class="result"></div>
+                </div>
+
+                <!-- Form 2 -->
+                <div class="query-card">
+                    <h3>Các khóa học của một khoa</h3>
+                    <div class="form-group">
+                        <label for="global-tenkhoa-2">Tên Khoa:</label>
+                        <input type="text" id="global-tenkhoa-2" placeholder="Ví dụ: Công nghệ thông tin">
+                    </div>
+                    <button class="btn btn-primary" onclick="callAPI('global', 'GET', null, 'global', '2')">Truy Vấn</button>
+                    <div id="global-result-2" class="result"></div>
+                </div>
+
+                <!-- Form 3 -->
+                <div class="query-card">
+                    <h3>Các môn học bắt buộc của sinh viên</h3>
+                    <div class="form-group">
+                        <label for="global-masv-3">Mã Sinh Viên:</label>
+                        <input type="text" id="global-masv-3" placeholder="Ví dụ: SV001">
+                    </div>
+                    <button class="btn btn-primary" onclick="callAPI('global', 'GET', null, 'global', '3')">Truy Vấn</button>
+                    <div id="global-result-3" class="result"></div>
+                </div>
+
+                <!-- Form 4 -->
+                <div class="query-card">
+                    <h3>Danh sách sinh viên đủ điều kiện tốt nghiệp</h3>
+                    <p class="info-text">Sinh viên đã hoàn thành tất cả môn trong CTDT và đạt điểm ≥5.</p>
+                    <button class="btn btn-primary" onclick="callAPI('global', 'GET', null, 'global', '4')">Truy Vấn</button>
+                    <div id="global-result-4" class="result"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -374,7 +469,11 @@
         }
 
         async function callAPI(endpoint, method, body = null, module = null, queryType = null) {
-            const resultDiv = document.getElementById(`${module || endpoint}-result`);
+            let resultDivId = `${module || endpoint}-result`;
+            if (module === 'global') {
+                resultDivId = `global-result-${queryType}`;
+            }
+            const resultDiv = document.getElementById(resultDivId);
             if (!resultDiv) return;
 
             // Show loading
@@ -417,6 +516,43 @@
                             resultDiv.className = 'result';
                             return;
                         }
+                    }
+                } else if (module === 'global') {
+                    if (queryType === '1') {
+                        const masv = document.getElementById('global-masv-1').value.trim();
+                        if (masv) {
+                            params.append('type', '1');
+                            params.append('masv', masv);
+                        } else {
+                            alert('Vui lòng nhập Mã Sinh Viên');
+                            resultDiv.innerHTML = '';
+                            resultDiv.className = 'result';
+                            return;
+                        }
+                    } else if (queryType === '2') {
+                        const tenkhoa = document.getElementById('global-tenkhoa-2').value.trim();
+                        if (tenkhoa) {
+                            params.append('type', '2');
+                            params.append('tenkhoa', tenkhoa);
+                        } else {
+                            alert('Vui lòng nhập Tên Khoa');
+                            resultDiv.innerHTML = '';
+                            resultDiv.className = 'result';
+                            return;
+                        }
+                    } else if (queryType === '3') {
+                        const masv = document.getElementById('global-masv-3').value.trim();
+                        if (masv) {
+                            params.append('type', '3');
+                            params.append('masv', masv);
+                        } else {
+                            alert('Vui lòng nhập Mã Sinh Viên');
+                            resultDiv.innerHTML = '';
+                            resultDiv.className = 'result';
+                            return;
+                        }
+                    } else if (queryType === '4') {
+                        params.append('type', '4');
                     }
                 } else {
                     const idInput = document.getElementById(`${module}-id`);
