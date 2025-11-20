@@ -290,7 +290,7 @@
             </div>
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="callAPI('khoa', 'GET')">Lấy Tất Cả</button>
-                <button class="btn btn-primary" onclick="callAPI('khoa', 'GET', null, 'khoa')">Lấy Theo ID</button>
+                <button class="btn btn-success" onclick="callAPI('khoa', 'GET', null, 'khoa')">Lấy Theo ID</button>
             </div>
             <div id="khoa-result" class="result"></div>
         </div>
@@ -304,7 +304,7 @@
             </div>
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="callAPI('monhoc', 'GET')">Lấy Tất Cả</button>
-                <button class="btn btn-primary" onclick="callAPI('monhoc', 'GET', null, 'monhoc')">Lấy Theo ID</button>
+                <button class="btn btn-success" onclick="callAPI('monhoc', 'GET', null, 'monhoc')">Lấy Theo ID</button>
             </div>
             <div id="monhoc-result" class="result"></div>
         </div>
@@ -318,7 +318,7 @@
             </div>
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="callAPI('sinhvien', 'GET')">Lấy Tất Cả</button>
-                <button class="btn btn-primary" onclick="callAPI('sinhvien', 'GET', null, 'sinhvien')">Lấy Theo ID</button>
+                <button class="btn btn-success" onclick="callAPI('sinhvien', 'GET', null, 'sinhvien')">Lấy Theo ID</button>
             </div>
             <div id="sinhvien-result" class="result"></div>
         </div>
@@ -336,7 +336,7 @@
             </div>
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="callAPI('ctdaotao', 'GET')">Lấy Tất Cả</button>
-                <button class="btn btn-primary" onclick="callAPI('ctdaotao', 'GET', null, 'ctdaotao', 'subjects')">Xem Môn Học</button>
+                <button class="btn btn-success" onclick="callAPI('ctdaotao', 'GET', null, 'ctdaotao', 'subjects')">Xem Môn Học</button>
             </div>
             <div id="ctdaotao-result" class="result"></div>
         </div>
@@ -350,7 +350,7 @@
             </div>
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="callAPI('dangky', 'GET')">Lấy Tất Cả</button>
-                <button class="btn btn-success" onclick="callAPI('dangky', 'GET', null, 'dangky', 'masv')">🔍 Xem Môn Học Đã Đăng Ký</button>
+                <button class="btn btn-success" onclick="callAPI('dangky', 'GET', null, 'dangky', 'masv')">Xem Môn Học Đã Đăng Ký</button>
             </div>
             <div id="dangky-result" class="result"></div>
         </div>
