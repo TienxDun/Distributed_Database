@@ -17,7 +17,8 @@ Hệ thống cơ sở dữ liệu phân tán mô phỏng Đại học Ngoại th
 
 Dựa trên 11 khoa HUFLIT thực tế: CNTT, NN, DLKS, KTTC, LLCT, NVPD, QHQT, QTKD, SLCT, SUAT, TLKS
 
-- **Tổng**: 53 môn học, 264 CTDaoTao, 88 sinh viên, 264 DangKy (2018-2025)
+- **Tổng**: 53 môn học, 264 CTDaoTao, 88 sinh viên (22DH-25DH), 264 DangKy (2022-2025)
+- **Mã sinh viên**: xxDHxxxxxx (VD: 25DH000001 - khóa 2025, 24DH000002 - khóa 2024)
 
 ## 🚀 Cài đặt
 
@@ -39,13 +40,13 @@ docker-compose up -d
 | `/sinhvien` | GET | Danh sách tất cả sinh viên |
 | `/sinhvien?id=<id>` | GET | Chi tiết sinh viên theo ID |
 | `/ctdaotao` | GET | Danh sách tất cả CTDaoTao |
-| `/ctdaotao?makhoa=<id>` | GET | Môn học theo khoa |
+| `/ctdaotao?khoa=<name_or_code>` | GET | Môn học theo khoa (tên hoặc mã) |
 | `/ctdaotao?khoahoc=<year>` | GET | Môn học theo khóa học |
-| `/ctdaotao?makhoa=<id>&khoahoc=<year>` | GET | Môn học theo CTDaoTao cụ thể |
+| `/ctdaotao?khoa=<name_or_code>&khoahoc=<year>` | GET | Môn học theo CTDaoTao cụ thể |
 | `/dangky` | GET | Danh sách tất cả đăng ký |
 | `/dangky?masv=<id>` | GET | Đăng ký của sinh viên |
 | `/global?type=1&masv=<id>` | GET | Môn học sinh viên đã học đạt ≥5 |
-| `/global?type=2&tenkhoa=<name>` | GET | Khóa học của một khoa |
+| `/global?type=2&query=<name_or_code>` | GET | Khóa học của một khoa (theo tên hoặc mã) |
 | `/global?type=3&masv=<id>` | GET | Môn học bắt buộc của sinh viên |
 | `/global?type=4` | GET | Sinh viên đủ điều kiện tốt nghiệp |
 
