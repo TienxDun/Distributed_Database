@@ -27,7 +27,7 @@
             <h2 class="module-title">Quản lý Khoa</h2>
             <div class="form-group">
                 <label for="khoa-id">Mã Khoa:</label>
-                <input type="text" id="khoa-id" placeholder="Ví dụ: CNTT, NN, LUAT">
+                <input type="text" id="khoa-id" placeholder="Ví dụ: CNTT, NN, LUAT" onkeydown="if(event.key==='Enter') callAPI('khoa', 'GET', null, 'khoa')">
             </div>
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="callAPI('khoa', 'GET')">Lấy Tất Cả</button>
@@ -41,7 +41,7 @@
             <h2 class="module-title">Quản lý Môn Học</h2>
             <div class="form-group">
                 <label for="monhoc-id">Mã Môn Học:</label>
-                <input type="text" id="monhoc-id" placeholder="Ví dụ: MH001, MH002">
+                <input type="text" id="monhoc-id" placeholder="Ví dụ: MH001, MH002" onkeydown="if(event.key==='Enter') callAPI('monhoc', 'GET', null, 'monhoc')">
             </div>
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="callAPI('monhoc', 'GET')">Lấy Tất Cả</button>
@@ -55,7 +55,7 @@
             <h2 class="module-title">Quản lý Sinh Viên</h2>
             <div class="form-group">
                 <label for="sinhvien-id">Mã Sinh Viên:</label>
-                <input type="text" id="sinhvien-id" placeholder="Ví dụ: SV001, SV002">
+                <input type="text" id="sinhvien-id" placeholder="Ví dụ: SV001, SV002" onkeydown="if(event.key==='Enter') callAPI('sinhvien', 'GET', null, 'sinhvien')">
             </div>
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="callAPI('sinhvien', 'GET')">Lấy Tất Cả</button>
@@ -69,11 +69,11 @@
             <h2 class="module-title">Chương Trình Đào Tạo</h2>
             <div class="form-group">
                 <label for="ctdaotao-makhoa">Mã Khoa:</label>
-                <input type="text" id="ctdaotao-makhoa" placeholder="Ví dụ: CNTT, DLKS">
+                <input type="text" id="ctdaotao-makhoa" placeholder="Ví dụ: CNTT, DLKS" onkeydown="if(event.key==='Enter') callAPI('ctdaotao', 'GET', null, 'ctdaotao', 'subjects')">
             </div>
             <div class="form-group">
                 <label for="ctdaotao-khoahoc">Khóa Học:</label>
-                <input type="number" id="ctdaotao-khoahoc" placeholder="Ví dụ: 2018, 2019">
+                <input type="number" id="ctdaotao-khoahoc" placeholder="Ví dụ: 2018, 2019" onkeydown="if(event.key==='Enter') callAPI('ctdaotao', 'GET', null, 'ctdaotao', 'subjects')">
             </div>
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="callAPI('ctdaotao', 'GET')">Lấy Tất Cả</button>
@@ -87,11 +87,11 @@
             <h2 class="module-title">Đăng Ký Học Phần</h2>
             <div class="form-group">
                 <label for="dangky-masv">Mã Sinh Viên:</label>
-                <input type="text" id="dangky-masv" placeholder="Ví dụ: SV001, SV002, SV003..." required>
+                <input type="text" id="dangky-masv" placeholder="Ví dụ: SV001, SV002, SV003..." required onkeydown="if(event.key==='Enter') callAPI('dangky', 'GET', null, 'dangky', 'masv')">
             </div>
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="callAPI('dangky', 'GET')">Lấy Tất Cả</button>
-                <button class="btn btn-success" onclick="callAPI('dangky', 'GET', null, 'dangky', 'masv')">🔍 Xem Môn Học Đã Đăng Ký</button>
+                <button class="btn btn-success" onclick="callAPI('dangky', 'GET', null, 'dangky', 'masv')">Xem Môn Học Đã Đăng Ký</button>
             </div>
             <div id="dangky-result" class="result"></div>
         </div>
@@ -105,7 +105,7 @@
                     <h3>Các môn học sinh viên đã học và đạt từ điểm 5 trở lên</h3>
                     <div class="form-group">
                         <label for="global-masv-1">Mã Sinh Viên:</label>
-                        <input type="text" id="global-masv-1" placeholder="Ví dụ: SV001">
+                        <input type="text" id="global-masv-1" placeholder="Ví dụ: SV001" onkeydown="if(event.key==='Enter') callAPI('global', 'GET', null, 'global', '1')">
                     </div>
                     <button class="btn btn-primary" onclick="callAPI('global', 'GET', null, 'global', '1')">Truy Vấn</button>
                     <div id="global-result-1" class="result"></div>
@@ -116,7 +116,7 @@
                     <h3>Các khóa học của một khoa</h3>
                     <div class="form-group">
                         <label for="global-tenkhoa-2">Tên Khoa:</label>
-                        <input type="text" id="global-tenkhoa-2" placeholder="Ví dụ: Công nghệ thông tin">
+                        <input type="text" id="global-tenkhoa-2" placeholder="Ví dụ: Công nghệ thông tin" onkeydown="if(event.key==='Enter') callAPI('global', 'GET', null, 'global', '2')">
                     </div>
                     <button class="btn btn-primary" onclick="callAPI('global', 'GET', null, 'global', '2')">Truy Vấn</button>
                     <div id="global-result-2" class="result"></div>
@@ -127,7 +127,7 @@
                     <h3>Các môn học bắt buộc của sinh viên</h3>
                     <div class="form-group">
                         <label for="global-masv-3">Mã Sinh Viên:</label>
-                        <input type="text" id="global-masv-3" placeholder="Ví dụ: SV001">
+                        <input type="text" id="global-masv-3" placeholder="Ví dụ: SV001" onkeydown="if(event.key==='Enter') callAPI('global', 'GET', null, 'global', '3')">
                     </div>
                     <button class="btn btn-primary" onclick="callAPI('global', 'GET', null, 'global', '3')">Truy Vấn</button>
                     <div id="global-result-3" class="result"></div>

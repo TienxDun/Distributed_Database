@@ -6,7 +6,7 @@ Hệ thống HUFLIT Distributed Database là một ứng dụng web mô phỏng 
 
 ## Kiến trúc tổng thể
 
-```
+```text
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   Site A        │    │   Site B        │    │   Site C        │
 │ (MaKhoa < 'M')  │    │ (MaKhoa 'M'-'S')│    │ (MaKhoa >= 'S') │
