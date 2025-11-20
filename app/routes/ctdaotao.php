@@ -6,7 +6,25 @@ function handleCTDaoTao($method, $query) {
         $pdo = getDBConnection();
         switch ($method) {
             case 'GET':
-                if (isset($query['makhoa']) && isset($query['khoahoc']) && isset($query['mamh'])) {
+                if (isset($query['makhoa']) && isset($query['khoahoc'])) {
+                    // Lấy danh sách môn học thuộc chương trình đào tạo cụ thể
+                    $stmt = $pdo->prepare("SELECT m.* FROM CTDaoTao_Global c JOIN MonHoc_Global m ON c.MaMH = m.MaMH WHERE c.MaKhoa = ? AND c.KhoaHoc = ?");
+                    $stmt->execute([$query['makhoa'], $query['khoahoc']]);
+                    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    sendResponse($result);
+                } elseif (isset($query['makhoa'])) {
+                    // Lấy tất cả môn học của khoa
+                    $stmt = $pdo->prepare("SELECT m.* FROM CTDaoTao_Global c JOIN MonHoc_Global m ON c.MaMH = m.MaMH WHERE c.MaKhoa = ?");
+                    $stmt->execute([$query['makhoa']]);
+                    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    sendResponse($result);
+                } elseif (isset($query['khoahoc'])) {
+                    // Lấy tất cả môn học của khóa học
+                    $stmt = $pdo->prepare("SELECT m.* FROM CTDaoTao_Global c JOIN MonHoc_Global m ON c.MaMH = m.MaMH WHERE c.KhoaHoc = ?");
+                    $stmt->execute([$query['khoahoc']]);
+                    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    sendResponse($result);
+                } elseif (isset($query['makhoa']) && isset($query['khoahoc']) && isset($query['mamh'])) {
                     $stmt = $pdo->prepare("SELECT * FROM CTDaoTao_Global WHERE MaKhoa = ? AND KhoaHoc = ? AND MaMH = ?");
                     $stmt->execute([$query['makhoa'], $query['khoahoc'], $query['mamh']]);
                     $result = $stmt->fetch(PDO::FETCH_ASSOC);
