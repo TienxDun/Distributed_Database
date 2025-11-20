@@ -33,13 +33,42 @@ function handleDangKy($method, $query) {
                 }
                 break;
             case 'POST':
-                sendResponse(['error' => 'CRUD not supported on global views'], 405);
+                // Create new DangKy via trigger
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!isset($data['MaSV']) || !isset($data['MaMon'])) {
+                    sendResponse(['error' => 'Missing required fields: MaSV, MaMon'], 400);
+                    break;
+                }
+                // DiemThi is optional - use null if not provided or empty
+                $diemThi = (isset($data['DiemThi']) && $data['DiemThi'] !== '') ? $data['DiemThi'] : null;
+                $stmt = $pdo->prepare("INSERT INTO DangKy_Global (MaSV, MaMon, DiemThi) VALUES (?, ?, ?)");
+                $stmt->execute([$data['MaSV'], $data['MaMon'], $diemThi]);
+                sendResponse(['message' => 'DangKy created successfully'], 201);
                 break;
             case 'PUT':
-                sendResponse(['error' => 'CRUD not supported on global views'], 405);
+                // Update DangKy via trigger (only DiemThi can be updated)
+                if (!isset($query['masv']) || !isset($query['mamon'])) {
+                    sendResponse(['error' => 'Missing required parameters: masv, mamon'], 400);
+                    break;
+                }
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!isset($data['DiemThi'])) {
+                    sendResponse(['error' => 'Missing required field: DiemThi'], 400);
+                    break;
+                }
+                $stmt = $pdo->prepare("UPDATE DangKy_Global SET DiemThi = ? WHERE MaSV = ? AND MaMon = ?");
+                $stmt->execute([$data['DiemThi'], $query['masv'], $query['mamon']]);
+                sendResponse(['message' => 'DiemThi updated successfully']);
                 break;
             case 'DELETE':
-                sendResponse(['error' => 'CRUD not supported on global views'], 405);
+                // Delete DangKy via trigger
+                if (!isset($query['masv']) || !isset($query['mamon'])) {
+                    sendResponse(['error' => 'Missing required parameters: masv, mamon'], 400);
+                    break;
+                }
+                $stmt = $pdo->prepare("DELETE FROM DangKy_Global WHERE MaSV = ? AND MaMon = ?");
+                $stmt->execute([$query['masv'], $query['mamon']]);
+                sendResponse(['message' => 'DangKy deleted successfully']);
                 break;
             default:
                 sendResponse(['error' => 'Method not allowed'], 405);

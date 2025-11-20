@@ -1,58 +1,58 @@
 # HUFLIT Distributed Database System
 
-Hệ thống cơ sở dữ liệu phân tán mô phỏng Đại học Ngoại thương TP.HCM với 3 sites địa lý, sử dụng SQL Server partitioned views và linked servers.
-
-## 📖 Documentation
-
-- [Architecture](ARCHITECTURE.md) - Chi tiết kiến trúc hệ thống
+Hệ thống cơ sở dữ liệu phân tán với 3 sites địa lý, sử dụng SQL Server partitioned views, linked servers và INSTEAD OF triggers.
 
 ## 🏗️ Kiến trúc
 
-- **3 Site Databases**: Phân vùng theo range alphabetical (A-M, M-S, S-Z)
-- **Global Database**: Tổng hợp dữ liệu qua partitioned views (HUFLIT)
-- **PHP REST API**: Truy cập dữ liệu phân tán
-- **Docker**: Containerization hoàn chỉnh
+- **3 Site Databases**: Phân vùng theo MaKhoa (A-M, M-S, S-Z)
+- **Global Database**: Tổng hợp qua partitioned views + INSTEAD OF triggers
+- **PHP REST API**: Full CRUD operations
+- **Docker**: 6 containers (1 global + 3 sites + 2 PHP)
 
-## 📊 Dữ liệu mẫu
-
-Dựa trên 11 khoa HUFLIT thực tế: CNTT, NN, DLKS, KTTC, LLCT, NVPD, QHQT, QTKD, SLCT, SUAT, TLKS
-
-- **Tổng**: 53 môn học, 264 CTDaoTao, 88 sinh viên (22DH-25DH), 264 DangKy (2022-2025)
-- **Mã sinh viên**: xxDHxxxxxx (VD: 25DH000001 - khóa 2025, 24DH000002 - khóa 2024)
-
-## 🚀 Cài đặt
+## 🚀 Quick Start
 
 ```bash
-git clone <repository-url>
-cd cdslpt
 docker-compose up -d
 .\init_databases.ps1
 ```
 
+**Web UI**: http://localhost:8081/ui.php  
+**API**: http://localhost:8080
+
+## ✨ Features
+
+### Full CRUD Interface
+- ✅ **Create**: Modal forms với validation
+- ✅ **Read**: Xem tất cả hoặc tìm theo ID
+- ✅ **Update**: Sửa thông tin, cho phép chuyển khoa sinh viên
+- ✅ **Delete**: Xóa với constraint checking
+- ✅ **Triggers**: Tự động sync MonHoc across 3 sites
+- ✅ **Enter to Submit**: Tất cả forms hỗ trợ phím Enter
+
+### Distributed Transactions
+- MonHoc sync across all 3 sites
+- SinhVien site migration khi đổi khoa
+- DangKy tự động route đến đúng site
+- Foreign key validation via triggers
+
 ## 📡 API Endpoints
 
-| Endpoint | Method | Mô tả |
-|----------|--------|-------|
-| `/khoa` | GET | Danh sách tất cả khoa |
-| `/khoa?id=<id>` | GET | Chi tiết khoa theo ID |
-| `/monhoc` | GET | Danh sách tất cả môn học |
-| `/monhoc?id=<id>` | GET | Chi tiết môn học theo ID |
-| `/sinhvien` | GET | Danh sách tất cả sinh viên |
-| `/sinhvien?id=<id>` | GET | Chi tiết sinh viên theo ID |
-| `/ctdaotao` | GET | Danh sách tất cả CTDaoTao |
-| `/ctdaotao?khoa=<name_or_code>` | GET | Môn học theo khoa (tên hoặc mã) |
-| `/ctdaotao?khoahoc=<year>` | GET | Môn học theo khóa học |
-| `/ctdaotao?khoa=<name_or_code>&khoahoc=<year>` | GET | Môn học theo CTDaoTao cụ thể |
-| `/dangky` | GET | Danh sách tất cả đăng ký |
-| `/dangky?masv=<id>` | GET | Đăng ký của sinh viên |
-| `/global?type=1&masv=<id>` | GET | Môn học sinh viên đã học đạt ≥5 |
-| `/global?type=2&query=<name_or_code>` | GET | Khóa học của một khoa (theo tên hoặc mã) |
-| `/global?type=3&masv=<id>` | GET | Môn học bắt buộc của sinh viên |
-| `/global?type=4` | GET | Sinh viên đủ điều kiện tốt nghiệp |
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| GET/POST/PUT/DELETE | `/khoa` | Quản lý khoa |
+| GET/POST/PUT/DELETE | `/monhoc` | Quản lý môn học (sync 3 sites) |
+| GET/POST/PUT/DELETE | `/sinhvien` | Quản lý sinh viên (cho phép chuyển khoa) |
+| GET/POST/DELETE | `/ctdaotao` | Quản lý CTĐT |
+| GET/POST/PUT/DELETE | `/dangky` | Quản lý đăng ký (PUT chỉ DiemThi) |
+| GET | `/global?type=1-4` | Truy vấn toàn cục |
 
-## 🧪 Test
+## 🧪 Testing
 
-Truy cập `http://localhost:8081/ui.php` để test API với giao diện web hiện đại.
+**Web UI**: `http://localhost:8081/ui.php`
+- 5 modules CRUD: Khoa, Môn Học, Sinh Viên, CT Đào Tạo, Đăng Ký
+- Truy vấn toàn cục: 4 queries đặc biệt
+- Modal forms với error handling
+- Action buttons (Edit/Delete) trên mỗi row
 
 ## 📁 Cấu trúc
 

@@ -35,13 +35,29 @@ function handleCTDaoTao($method, $query) {
                 }
                 break;
             case 'POST':
-                sendResponse(['error' => 'CRUD not supported on global views'], 405);
+                // Create new CTDaoTao via trigger
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!isset($data['MaKhoa']) || !isset($data['KhoaHoc']) || !isset($data['MaMH'])) {
+                    sendResponse(['error' => 'Missing required fields: MaKhoa, KhoaHoc, MaMH'], 400);
+                    break;
+                }
+                $stmt = $pdo->prepare("INSERT INTO CTDaoTao_Global (MaKhoa, KhoaHoc, MaMH) VALUES (?, ?, ?)");
+                $stmt->execute([$data['MaKhoa'], $data['KhoaHoc'], $data['MaMH']]);
+                sendResponse(['message' => 'CTDaoTao created successfully'], 201);
                 break;
             case 'PUT':
-                sendResponse(['error' => 'CRUD not supported on global views'], 405);
+                // UPDATE not allowed for composite primary key
+                sendResponse(['error' => 'Update not allowed. Delete and create new record instead.'], 405);
                 break;
             case 'DELETE':
-                sendResponse(['error' => 'CRUD not supported on global views'], 405);
+                // Delete CTDaoTao via trigger
+                if (!isset($query['khoa']) || !isset($query['khoahoc']) || !isset($query['monhoc'])) {
+                    sendResponse(['error' => 'Missing required parameters: khoa, khoahoc, monhoc'], 400);
+                    break;
+                }
+                $stmt = $pdo->prepare("DELETE FROM CTDaoTao_Global WHERE MaKhoa = ? AND KhoaHoc = ? AND MaMH = ?");
+                $stmt->execute([$query['khoa'], $query['khoahoc'], $query['monhoc']]);
+                sendResponse(['message' => 'CTDaoTao deleted successfully']);
                 break;
             default:
                 sendResponse(['error' => 'Method not allowed'], 405);

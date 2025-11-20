@@ -17,13 +17,40 @@ function handleKhoa($method, $query) {
                 }
                 break;
             case 'POST':
-                sendResponse(['error' => 'CRUD not supported on global views'], 405);
+                // Create new Khoa via trigger
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!isset($data['MaKhoa']) || !isset($data['TenKhoa'])) {
+                    sendResponse(['error' => 'Missing required fields: MaKhoa, TenKhoa'], 400);
+                    break;
+                }
+                $stmt = $pdo->prepare("INSERT INTO Khoa_Global (MaKhoa, TenKhoa) VALUES (?, ?)");
+                $stmt->execute([$data['MaKhoa'], $data['TenKhoa']]);
+                sendResponse(['message' => 'Khoa created successfully', 'MaKhoa' => $data['MaKhoa']], 201);
                 break;
             case 'PUT':
-                sendResponse(['error' => 'CRUD not supported on global views'], 405);
+                // Update Khoa via trigger
+                if (!isset($query['id'])) {
+                    sendResponse(['error' => 'Missing required parameter: id'], 400);
+                    break;
+                }
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!isset($data['TenKhoa'])) {
+                    sendResponse(['error' => 'Missing required field: TenKhoa'], 400);
+                    break;
+                }
+                $stmt = $pdo->prepare("UPDATE Khoa_Global SET TenKhoa = ? WHERE MaKhoa = ?");
+                $stmt->execute([$data['TenKhoa'], $query['id']]);
+                sendResponse(['message' => 'Khoa updated successfully']);
                 break;
             case 'DELETE':
-                sendResponse(['error' => 'CRUD not supported on global views'], 405);
+                // Delete Khoa via trigger
+                if (!isset($query['id'])) {
+                    sendResponse(['error' => 'Missing required parameter: id'], 400);
+                    break;
+                }
+                $stmt = $pdo->prepare("DELETE FROM Khoa_Global WHERE MaKhoa = ?");
+                $stmt->execute([$query['id']]);
+                sendResponse(['message' => 'Khoa deleted successfully']);
                 break;
             default:
                 sendResponse(['error' => 'Method not allowed'], 405);

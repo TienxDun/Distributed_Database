@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HUFLIT Distributed Database API</title>
+    <title>HUFLIT Distributed Database - CRUD Interface</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>🎓 HUFLIT Distributed Database</h1>
-            <p>API Testing Interface - Hệ thống Cơ sở dữ liệu Phân tán</p>
+            <p>Full CRUD Interface - Hệ thống Cơ sở dữ liệu Phân tán</p>
         </div>
 
         <div class="tabs">
@@ -25,74 +25,104 @@
         <!-- Khoa Module -->
         <div id="khoa" class="tab-content active">
             <h2 class="module-title">Quản lý Khoa</h2>
+            
+            <div id="khoa-alert" class="alert"></div>
+            
             <div class="form-group">
                 <label for="khoa-id">Mã Khoa:</label>
-                <input type="text" id="khoa-id" placeholder="Ví dụ: CNTT, NN, LUAT" onkeydown="if(event.key==='Enter') callAPI('khoa', 'GET', null, 'khoa')">
+                <input type="text" id="khoa-id" placeholder="Ví dụ: CNTT, NN, LUAT" onkeydown="if(event.key==='Enter') loadDataById('khoa')">
             </div>
+            
             <div class="btn-group">
-                <button class="btn btn-primary" onclick="callAPI('khoa', 'GET')">Lấy Tất Cả</button>
-                <button class="btn btn-success" onclick="callAPI('khoa', 'GET', null, 'khoa')">Xem theo ID</button>
+                <button class="btn btn-add" onclick="openCreateModal('khoa')">Thêm Khoa Mới</button>
+                <button class="btn btn-primary" onclick="loadData('khoa')">Tải Danh Sách</button>
+                <button class="btn btn-success" onclick="loadDataById('khoa')">Xem theo ID</button>
             </div>
+            
             <div id="khoa-result" class="result"></div>
         </div>
 
         <!-- MonHoc Module -->
         <div id="monhoc" class="tab-content">
             <h2 class="module-title">Quản lý Môn Học</h2>
+            
+            <div id="monhoc-alert" class="alert"></div>
+            
             <div class="form-group">
                 <label for="monhoc-id">Mã Môn Học:</label>
-                <input type="text" id="monhoc-id" placeholder="Ví dụ: MH001, MH002" onkeydown="if(event.key==='Enter') callAPI('monhoc', 'GET', null, 'monhoc')">
+                <input type="text" id="monhoc-id" placeholder="Ví dụ: MH001, MH002" onkeydown="if(event.key==='Enter') loadDataById('monhoc')">
             </div>
+            
             <div class="btn-group">
-                <button class="btn btn-primary" onclick="callAPI('monhoc', 'GET')">Lấy Tất Cả</button>
-                <button class="btn btn-success" onclick="callAPI('monhoc', 'GET', null, 'monhoc')">Xem theo ID</button>
+                <button class="btn btn-add" onclick="openCreateModal('monhoc')">Thêm Môn Học Mới</button>
+                <button class="btn btn-primary" onclick="loadData('monhoc')">Tải Danh Sách</button>
+                <button class="btn btn-success" onclick="loadDataById('monhoc')">Xem theo ID</button>
             </div>
+            
             <div id="monhoc-result" class="result"></div>
         </div>
 
         <!-- SinhVien Module -->
         <div id="sinhvien" class="tab-content">
             <h2 class="module-title">Quản lý Sinh Viên</h2>
+            
+            <div id="sinhvien-alert" class="alert"></div>
+            
             <div class="form-group">
                 <label for="sinhvien-id">Mã Sinh Viên:</label>
-                <input type="text" id="sinhvien-id" placeholder="Ví dụ: 25DH000001, 24DH000002" onkeydown="if(event.key==='Enter') callAPI('sinhvien', 'GET', null, 'sinhvien')">
+                <input type="text" id="sinhvien-id" placeholder="Ví dụ: 25DH000001, 24DH000002" onkeydown="if(event.key==='Enter') loadDataById('sinhvien')">
             </div>
+            
             <div class="btn-group">
-                <button class="btn btn-primary" onclick="callAPI('sinhvien', 'GET')">Lấy Tất Cả</button>
-                <button class="btn btn-success" onclick="callAPI('sinhvien', 'GET', null, 'sinhvien')">Xem theo ID</button>
+                <button class="btn btn-add" onclick="openCreateModal('sinhvien')">Thêm Sinh Viên Mới</button>
+                <button class="btn btn-primary" onclick="loadData('sinhvien')">Tải Danh Sách</button>
+                <button class="btn btn-success" onclick="loadDataById('sinhvien')">Xem theo ID</button>
             </div>
+            
             <div id="sinhvien-result" class="result"></div>
         </div>
 
         <!-- CTDaoTao Module -->
         <div id="ctdaotao" class="tab-content">
             <h2 class="module-title">Chương Trình Đào Tạo</h2>
+            
+            <div id="ctdaotao-alert" class="alert"></div>
+            
             <div class="form-group">
                 <label for="ctdaotao-khoa">Mã Khoa hoặc Tên Khoa:</label>
-                <input type="text" id="ctdaotao-khoa" placeholder="Ví dụ: CNTT hoặc Công nghệ thông tin" onkeydown="if(event.key==='Enter') callAPI('ctdaotao', 'GET', null, 'ctdaotao', 'subjects')">
+                <input type="text" id="ctdaotao-khoa" placeholder="Ví dụ: CNTT hoặc Công nghệ thông tin" onkeydown="if(event.key==='Enter') loadCTDaoTaoByFilter()">
             </div>
             <div class="form-group">
                 <label for="ctdaotao-khoahoc">Khóa Học:</label>
-                <input type="number" id="ctdaotao-khoahoc" placeholder="Ví dụ: 2018, 2019" onkeydown="if(event.key==='Enter') callAPI('ctdaotao', 'GET', null, 'ctdaotao', 'subjects')">
+                <input type="number" id="ctdaotao-khoahoc" placeholder="Ví dụ: 2018, 2019" onkeydown="if(event.key==='Enter') loadCTDaoTaoByFilter()">
             </div>
+            
             <div class="btn-group">
-                <button class="btn btn-primary" onclick="callAPI('ctdaotao', 'GET')">Lấy Tất Cả</button>
-                <button class="btn btn-success" onclick="callAPI('ctdaotao', 'GET', null, 'ctdaotao', 'subjects')">Xem Môn Học</button>
+                <button class="btn btn-add" onclick="openCreateModal('ctdaotao')">Thêm Môn Vào CTĐT</button>
+                <button class="btn btn-primary" onclick="loadData('ctdaotao')">Tải Danh Sách</button>
+                <button class="btn btn-success" onclick="loadCTDaoTaoByFilter()">Xem Môn Học</button>
             </div>
+            
             <div id="ctdaotao-result" class="result"></div>
         </div>
 
         <!-- DangKy Module -->
         <div id="dangky" class="tab-content">
             <h2 class="module-title">Đăng Ký Học Phần</h2>
+            
+            <div id="dangky-alert" class="alert"></div>
+            
             <div class="form-group">
                 <label for="dangky-masv">Mã Sinh Viên:</label>
-                <input type="text" id="dangky-masv" placeholder="Ví dụ: 25DH000001, 24DH000002, 23DH000003..." required onkeydown="if(event.key==='Enter') callAPI('dangky', 'GET', null, 'dangky', 'masv')">
+                <input type="text" id="dangky-masv" placeholder="Ví dụ: 25DH000001, 24DH000002" onkeydown="if(event.key==='Enter') loadDangKyByMaSV()">
             </div>
+            
             <div class="btn-group">
-                <button class="btn btn-primary" onclick="callAPI('dangky', 'GET')">Lấy Tất Cả</button>
-                <button class="btn btn-success" onclick="callAPI('dangky', 'GET', null, 'dangky', 'masv')">Xem Môn Học Đã Đăng Ký</button>
+                <button class="btn btn-add" onclick="openCreateModal('dangky')">Đăng Ký Môn Học</button>
+                <button class="btn btn-primary" onclick="loadData('dangky')">Tải Danh Sách</button>
+                <button class="btn btn-success" onclick="loadDangKyByMaSV()">Xem Môn Học Đã Đăng Ký</button>
             </div>
+            
             <div id="dangky-result" class="result"></div>
         </div>
 
@@ -100,242 +130,651 @@
         <div id="global" class="tab-content">
             <h2 class="module-title">Truy Vấn Toàn Cục</h2>
             <div class="query-grid">
-                <!-- Form 1 -->
                 <div class="query-card">
                     <h3>Các môn học sinh viên đã học và đạt từ điểm 5 trở lên</h3>
                     <div class="form-group">
                         <label for="global-masv-1">Mã Sinh Viên:</label>
-                        <input type="text" id="global-masv-1" placeholder="Ví dụ: 25DH000001" onkeydown="if(event.key==='Enter') callAPI('global', 'GET', null, 'global', '1')">
+                        <input type="text" id="global-masv-1" placeholder="Ví dụ: 25DH000001" onkeydown="if(event.key==='Enter') callGlobalQuery(1)">
                     </div>
-                    <button class="btn btn-primary" onclick="callAPI('global', 'GET', null, 'global', '1')">Truy Vấn</button>
+                    <button class="btn btn-primary" onclick="callGlobalQuery(1)">Truy Vấn</button>
                     <div id="global-result-1" class="result"></div>
                 </div>
 
-                <!-- Form 2 -->
                 <div class="query-card">
                     <h3>Các khóa học của một khoa</h3>
                     <div class="form-group">
                         <label for="global-query-2">Tên Khoa hoặc Mã Khoa:</label>
-                        <input type="text" id="global-query-2" placeholder="Ví dụ: Công nghệ thông tin hoặc CNTT" onkeydown="if(event.key==='Enter') callAPI('global', 'GET', null, 'global', '2')">
+                        <input type="text" id="global-query-2" placeholder="Ví dụ: CNTT" onkeydown="if(event.key==='Enter') callGlobalQuery(2)">
                     </div>
-                    <button class="btn btn-primary" onclick="callAPI('global', 'GET', null, 'global', '2')">Truy Vấn</button>
+                    <button class="btn btn-primary" onclick="callGlobalQuery(2)">Truy Vấn</button>
                     <div id="global-result-2" class="result"></div>
                 </div>
 
-                <!-- Form 3 -->
                 <div class="query-card">
                     <h3>Các môn học bắt buộc của sinh viên</h3>
                     <div class="form-group">
                         <label for="global-masv-3">Mã Sinh Viên:</label>
-                        <input type="text" id="global-masv-3" placeholder="Ví dụ: 25DH000001" onkeydown="if(event.key==='Enter') callAPI('global', 'GET', null, 'global', '3')">
+                        <input type="text" id="global-masv-3" placeholder="Ví dụ: 25DH000001" onkeydown="if(event.key==='Enter') callGlobalQuery(3)">
                     </div>
-                    <button class="btn btn-primary" onclick="callAPI('global', 'GET', null, 'global', '3')">Truy Vấn</button>
+                    <button class="btn btn-primary" onclick="callGlobalQuery(3)">Truy Vấn</button>
                     <div id="global-result-3" class="result"></div>
                 </div>
 
-                <!-- Form 4 -->
                 <div class="query-card">
                     <h3>Danh sách sinh viên đủ điều kiện tốt nghiệp</h3>
                     <p class="info-text">Sinh viên đã hoàn thành tất cả môn trong CTDT và đạt điểm ≥5.</p>
-                    <button class="btn btn-primary" onclick="callAPI('global', 'GET', null, 'global', '4')">Truy Vấn</button>
+                    <button class="btn btn-primary" onclick="callGlobalQuery(4)">Truy Vấn</button>
                     <div id="global-result-4" class="result"></div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Generic Modal for Create/Edit -->
+    <div id="crudModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Modal Title</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="modalAlert" class="alert" style="display: none; margin-bottom: 1rem;"></div>
+                <form id="crudForm" onsubmit="event.preventDefault(); submitForm();">
+                    <div id="formFields"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" type="button" onclick="closeModal()">Hủy</button>
+                <button class="btn btn-success" type="submit" id="submitBtn" form="crudForm">Lưu</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_BASE = 'http://localhost:8080';
+        let currentModule = '';
+        let currentAction = ''; // 'create' or 'edit'
+        let editingId = null;
 
-        function createTable(data) {
-            if (!Array.isArray(data)) {
-                if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
-                    // Single object
-                    let table = '<table><thead><tr><th>Thuộc tính</th><th>Giá trị</th></tr></thead><tbody>';
-                    for (let key in data) {
-                        table += `<tr><td>${key}</td><td>${data[key]}</td></tr>`;
-                    }
-                    table += '</tbody></table>';
-                    return table;
-                } else {
-                    return '<p>Không có dữ liệu hoặc định dạng không hỗ trợ</p>';
-                }
+        // Tab navigation
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Load data when switching tabs (except global)
+            if (tabName !== 'global') {
+                loadData(tabName);
             }
-            if (data.length === 0) {
+        }
+
+        // Show alert message
+        function showAlert(module, message, type = 'success') {
+            const alertDiv = document.getElementById(`${module}-alert`);
+            alertDiv.className = `alert alert-${type} show`;
+            alertDiv.textContent = message;
+            
+            setTimeout(() => {
+                alertDiv.classList.remove('show');
+            }, 5000);
+        }
+
+        // Create table with action buttons
+        function createTableWithActions(data, module) {
+            if (!Array.isArray(data) || data.length === 0) {
                 return '<p>Không có dữ liệu</p>';
             }
-            // Array of objects
+
             const headers = Object.keys(data[0]);
             let table = '<table><thead><tr>';
             headers.forEach(h => table += `<th>${h}</th>`);
-            table += '</tr></thead><tbody>';
+            table += '<th>Thao tác</th></tr></thead><tbody>';
+            
             data.forEach(row => {
                 table += '<tr>';
-                headers.forEach(h => table += `<td>${row[h] !== null && row[h] !== undefined ? row[h] : ''}</td>`);
-                table += '</tr>';
+                headers.forEach(h => {
+                    table += `<td>${row[h] !== null && row[h] !== undefined ? row[h] : ''}</td>`;
+                });
+                
+                // Action buttons
+                table += '<td class="action-buttons">';
+                
+                if (module === 'khoa') {
+                    table += `<button class="btn-edit" onclick='openEditModal("${module}", ${JSON.stringify(row)})'>✏️ Sửa</button>`;
+                    table += `<button class="btn-delete" onclick='deleteRecord("${module}", "${row.MaKhoa}")'>🗑️ Xóa</button>`;
+                } else if (module === 'monhoc') {
+                    table += `<button class="btn-edit" onclick='openEditModal("${module}", ${JSON.stringify(row)})'>✏️ Sửa</button>`;
+                    table += `<button class="btn-delete" onclick='deleteRecord("${module}", "${row.MaMH}")'>🗑️ Xóa</button>`;
+                } else if (module === 'sinhvien') {
+                    table += `<button class="btn-edit" onclick='openEditModal("${module}", ${JSON.stringify(row)})'>✏️ Sửa</button>`;
+                    table += `<button class="btn-delete" onclick='deleteRecord("${module}", "${row.MaSV}")'>🗑️ Xóa</button>`;
+                } else if (module === 'ctdaotao') {
+                    table += `<button class="btn-delete" onclick='deleteCTDaoTao("${row.MaKhoa}", "${row.KhoaHoc}", "${row.MaMH}")'>🗑️ Xóa</button>`;
+                } else if (module === 'dangky') {
+                    table += `<button class="btn-edit" onclick='openEditModal("${module}", ${JSON.stringify(row)})'>✏️ Cập nhật điểm</button>`;
+                    table += `<button class="btn-delete" onclick='deleteDangKy("${row.MaSV}", "${row.MaMon}")'>🗑️ Xóa</button>`;
+                }
+                
+                table += '</td></tr>';
             });
+            
             table += '</tbody></table>';
             return table;
         }
 
-        function showTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-
-            // Show selected tab
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        async function callAPI(endpoint, method, body = null, module = null, queryType = null) {
-            let resultDivId = `${module || endpoint}-result`;
-            if (module === 'global') {
-                resultDivId = `global-result-${queryType}`;
-            }
-            const resultDiv = document.getElementById(resultDivId);
-            if (!resultDiv) return;
-
-            // Show loading
+        // Load data for a module
+        async function loadData(module) {
+            const resultDiv = document.getElementById(`${module}-result`);
             resultDiv.innerHTML = '<div class="loading"></div> Đang tải...';
             resultDiv.className = 'result show';
 
-            let url = API_BASE + '/' + endpoint;
-            const params = new URLSearchParams();
-
-            if (module) {
-                if (module === 'dangky') {
-                    if (queryType === 'masv') {
-                        const masv = document.getElementById('dangky-masv').value.trim();
-                        if (masv) {
-                            params.append('masv', masv);
-                        }
-                    } else if (queryType === 'mamon') {
-                        const mamon = document.getElementById('dangky-mamon').value.trim();
-                        if (mamon) {
-                            params.append('mamon', mamon);
-                        }
-                    } else {
-                        // Query cả hai nếu có
-                        const masv = document.getElementById('dangky-masv').value.trim();
-                        const mamon = document.getElementById('dangky-mamon').value.trim();
-                        if (masv && mamon) {
-                            params.append('masv', masv);
-                            params.append('mamon', mamon);
-                        }
-                    }
-                } else if (module === 'ctdaotao') {
-                    if (queryType === 'subjects') {
-                        const khoa = document.getElementById('ctdaotao-khoa').value.trim();
-                        const khoahoc = document.getElementById('ctdaotao-khoahoc').value.trim();
-                        if (khoa) params.append('khoa', khoa);
-                        if (khoahoc) params.append('khoahoc', khoahoc);
-                        if (!khoa && !khoahoc) {
-                            alert('Vui lòng nhập ít nhất Mã Khoa/Tên Khoa hoặc Khóa Học để xem môn học.');
-                            resultDiv.innerHTML = '';
-                            resultDiv.className = 'result';
-                            return;
-                        }
-                    }
-                } else if (module === 'global') {
-                    if (queryType === '1') {
-                        const masv = document.getElementById('global-masv-1').value.trim();
-                        if (masv) {
-                            params.append('type', '1');
-                            params.append('masv', masv);
-                        } else {
-                            alert('Vui lòng nhập Mã Sinh Viên');
-                            resultDiv.innerHTML = '';
-                            resultDiv.className = 'result';
-                            return;
-                        }
-                    } else if (queryType === '2') {
-                        const query = document.getElementById('global-query-2').value.trim();
-                        if (query) {
-                            params.append('type', '2');
-                            params.append('query', query);
-                        } else {
-                            alert('Vui lòng nhập Tên Khoa hoặc Mã Khoa');
-                            resultDiv.innerHTML = '';
-                            resultDiv.className = 'result';
-                            return;
-                        }
-                    } else if (queryType === '3') {
-                        const masv = document.getElementById('global-masv-3').value.trim();
-                        if (masv) {
-                            params.append('type', '3');
-                            params.append('masv', masv);
-                        } else {
-                            alert('Vui lòng nhập Mã Sinh Viên');
-                            resultDiv.innerHTML = '';
-                            resultDiv.className = 'result';
-                            return;
-                        }
-                    } else if (queryType === '4') {
-                        params.append('type', '4');
-                    }
-                } else {
-                    const idInput = document.getElementById(`${module}-id`);
-                    if (idInput && idInput.value.trim()) {
-                        params.append('id', idInput.value.trim());
-                    }
-                }
-            }
-
-            if (params.toString()) {
-                url += '?' + params.toString();
-            }
-
-            const options = { method };
-            if (body) {
-                options.headers = { 'Content-Type': 'application/json' };
-                options.body = JSON.stringify(body);
-            }
-
             try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
+                const response = await fetch(`${API_BASE}/${module}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
                 const data = await response.json();
-
-                // Calculate count
-                let countText = '';
-                if (Array.isArray(data)) {
-                    const count = data.length;
-                    countText = `<div style="background: #e0f2fe; color: var(--text); padding: 0.5rem 1rem; border-radius: 6px; margin-bottom: 1rem; display: inline-block; font-weight: 600; font-size: 0.9rem;">📊 Tổng số: <strong>${count}</strong> ${count === 1 ? 'bản ghi' : 'bản ghi'}</div>`;
-                } else if (data && typeof data === 'object') {
-                    countText = `<div style="background: #e0f2fe; color: var(--text); padding: 0.5rem 1rem; border-radius: 6px; margin-bottom: 1rem; display: inline-block; font-weight: 600; font-size: 0.9rem;">📄 1 bản ghi</div>`;
-                }
-
-                // Format as table
-                resultDiv.innerHTML = `${countText}${createTable(data)}`;
-                resultDiv.className = 'result show';
-
+                const count = Array.isArray(data) ? data.length : 0;
+                const countText = `<div style="background: #e0f2fe; color: #1e293b; padding: 0.5rem 1rem; border-radius: 6px; margin-bottom: 1rem; display: inline-block; font-weight: 600;">📊 Tổng số: ${count} bản ghi</div>`;
+                
+                resultDiv.innerHTML = countText + createTableWithActions(data, module);
             } catch (error) {
-                resultDiv.innerHTML = `<strong>Lỗi:</strong> ${error.message}<br><br>
-                <strong>Khắc phục:</strong><br>
-                • Kiểm tra container API đang chạy<br>
-                • Kiểm tra kết nối mạng<br>
-                • Kiểm tra endpoint và tham số<br>
-                • Kiểm tra kết nối database`;
+                resultDiv.innerHTML = `<strong>Lỗi:</strong> ${error.message}`;
                 resultDiv.className = 'result show error';
             }
         }
 
-        // Auto-focus first input on tab change
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                setTimeout(() => {
-                    const activeTab = document.querySelector('.tab-content.active');
-                    const firstInput = activeTab.querySelector('input');
-                    if (firstInput) firstInput.focus();
-                }, 100);
+        // Load data by ID (for khoa, monhoc, sinhvien)
+        async function loadDataById(module) {
+            const idInput = document.getElementById(`${module}-id`);
+            const id = idInput ? idInput.value.trim() : '';
+            
+            if (!id) {
+                showAlert(module, '⚠️ Vui lòng nhập ID để tìm kiếm', 'error');
+                return;
+            }
+
+            const resultDiv = document.getElementById(`${module}-result`);
+            resultDiv.innerHTML = '<div class="loading"></div> Đang tải...';
+            resultDiv.className = 'result show';
+
+            try {
+                const response = await fetch(`${API_BASE}/${module}?id=${encodeURIComponent(id)}`);
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error('Không tìm thấy dữ liệu');
+                    }
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Convert single object to array for table display
+                const dataArray = Array.isArray(data) ? data : [data];
+                const countText = `<div style="background: #e0f2fe; color: #1e293b; padding: 0.5rem 1rem; border-radius: 6px; margin-bottom: 1rem; display: inline-block; font-weight: 600;">📄 Kết quả tìm kiếm: ${dataArray.length} bản ghi</div>`;
+                
+                resultDiv.innerHTML = countText + createTableWithActions(dataArray, module);
+            } catch (error) {
+                resultDiv.innerHTML = `<strong>Lỗi:</strong> ${error.message}`;
+                resultDiv.className = 'result show error';
+            }
+        }
+
+        // Load CTDaoTao by filter (khoa and/or khoahoc)
+        async function loadCTDaoTaoByFilter() {
+            const khoaInput = document.getElementById('ctdaotao-khoa');
+            const khoahocInput = document.getElementById('ctdaotao-khoahoc');
+            const khoa = khoaInput ? khoaInput.value.trim() : '';
+            const khoahoc = khoahocInput ? khoahocInput.value.trim() : '';
+            
+            if (!khoa && !khoahoc) {
+                showAlert('ctdaotao', '⚠️ Vui lòng nhập ít nhất Mã Khoa/Tên Khoa hoặc Khóa Học', 'error');
+                return;
+            }
+
+            const resultDiv = document.getElementById('ctdaotao-result');
+            resultDiv.innerHTML = '<div class="loading"></div> Đang tải...';
+            resultDiv.className = 'result show';
+
+            try {
+                const params = new URLSearchParams();
+                if (khoa) params.append('khoa', khoa);
+                if (khoahoc) params.append('khoahoc', khoahoc);
+                
+                const response = await fetch(`${API_BASE}/ctdaotao?${params.toString()}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const data = await response.json();
+                const count = Array.isArray(data) ? data.length : 0;
+                const countText = `<div style="background: #e0f2fe; color: #1e293b; padding: 0.5rem 1rem; border-radius: 6px; margin-bottom: 1rem; display: inline-block; font-weight: 600;">📊 Kết quả: ${count} môn học</div>`;
+                
+                resultDiv.innerHTML = countText + createTableWithActions(data, 'ctdaotao');
+            } catch (error) {
+                resultDiv.innerHTML = `<strong>Lỗi:</strong> ${error.message}`;
+                resultDiv.className = 'result show error';
+            }
+        }
+
+        // Load DangKy by MaSV
+        async function loadDangKyByMaSV() {
+            const masvInput = document.getElementById('dangky-masv');
+            const masv = masvInput ? masvInput.value.trim() : '';
+            
+            if (!masv) {
+                showAlert('dangky', '⚠️ Vui lòng nhập Mã Sinh Viên', 'error');
+                return;
+            }
+
+            const resultDiv = document.getElementById('dangky-result');
+            resultDiv.innerHTML = '<div class="loading"></div> Đang tải...';
+            resultDiv.className = 'result show';
+
+            try {
+                const response = await fetch(`${API_BASE}/dangky?masv=${encodeURIComponent(masv)}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const data = await response.json();
+                const count = Array.isArray(data) ? data.length : 0;
+                const countText = `<div style="background: #e0f2fe; color: #1e293b; padding: 0.5rem 1rem; border-radius: 6px; margin-bottom: 1rem; display: inline-block; font-weight: 600;">📊 Sinh viên đã đăng ký: ${count} môn học</div>`;
+                
+                resultDiv.innerHTML = countText + createTableWithActions(data, 'dangky');
+            } catch (error) {
+                resultDiv.innerHTML = `<strong>Lỗi:</strong> ${error.message}`;
+                resultDiv.className = 'result show error';
+            }
+        }
+
+        // Open create modal
+        function openCreateModal(module) {
+            currentModule = module;
+            currentAction = 'create';
+            editingId = null;
+            
+            document.getElementById('modalTitle').textContent = getModalTitle(module, 'create');
+            document.getElementById('formFields').innerHTML = getFormFields(module, {});
+            hideModalAlert();
+            document.getElementById('crudModal').classList.add('show');
+        }
+
+        // Open edit modal
+        function openEditModal(module, data) {
+            currentModule = module;
+            currentAction = 'edit';
+            
+            if (module === 'khoa') editingId = data.MaKhoa;
+            else if (module === 'monhoc') editingId = data.MaMH;
+            else if (module === 'sinhvien') editingId = data.MaSV;
+            else if (module === 'dangky') editingId = { masv: data.MaSV, mamon: data.MaMon };
+            
+            document.getElementById('modalTitle').textContent = getModalTitle(module, 'edit');
+            document.getElementById('formFields').innerHTML = getFormFields(module, data);
+            hideModalAlert();
+            document.getElementById('crudModal').classList.add('show');
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('crudModal').classList.remove('show');
+            document.getElementById('crudForm').reset();
+            hideModalAlert();
+        }
+
+        // Show alert in modal
+        function showModalAlert(message, type = 'error') {
+            const alertDiv = document.getElementById('modalAlert');
+            alertDiv.textContent = message;
+            alertDiv.className = 'alert alert-' + type;
+            alertDiv.style.display = 'block';
+            
+            // Scroll to top of modal to see alert
+            const modalContent = document.querySelector('.modal-content');
+            if (modalContent) {
+                modalContent.scrollTop = 0;
+            }
+        }
+
+        // Hide modal alert
+        function hideModalAlert() {
+            const alertDiv = document.getElementById('modalAlert');
+            alertDiv.style.display = 'none';
+            alertDiv.className = 'alert';
+        }
+
+        // Get modal title
+        function getModalTitle(module, action) {
+            const titles = {
+                khoa: { create: '➕ Thêm Khoa Mới', edit: '✏️ Sửa Thông Tin Khoa' },
+                monhoc: { create: '➕ Thêm Môn Học Mới', edit: '✏️ Sửa Thông Tin Môn Học' },
+                sinhvien: { create: '➕ Thêm Sinh Viên Mới', edit: '✏️ Sửa Thông Tin Sinh Viên' },
+                ctdaotao: { create: '➕ Thêm Môn Vào CTĐT', edit: '' },
+                dangky: { create: '➕ Đăng Ký Môn Học', edit: '✏️ Cập Nhật Điểm Thi' }
+            };
+            return titles[module][action];
+        }
+
+        // Get form fields for each module
+        function getFormFields(module, data = {}) {
+            let fields = '';
+            
+            if (module === 'khoa') {
+                fields = `
+                    <div class="form-group">
+                        <label>Mã Khoa <span class="required">*</span></label>
+                        <input type="text" id="field-MaKhoa" value="${data.MaKhoa || ''}" maxlength="10" ${currentAction === 'edit' ? 'readonly' : ''} required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tên Khoa <span class="required">*</span></label>
+                        <input type="text" id="field-TenKhoa" value="${data.TenKhoa || ''}" required>
+                    </div>
+                `;
+            } else if (module === 'monhoc') {
+                fields = `
+                    <div class="form-group">
+                        <label>Mã Môn Học <span class="required">*</span></label>
+                        <input type="text" id="field-MaMH" value="${data.MaMH || ''}" maxlength="10" ${currentAction === 'edit' ? 'readonly' : ''} required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tên Môn Học <span class="required">*</span></label>
+                        <input type="text" id="field-TenMH" value="${data.TenMH || ''}" required>
+                    </div>
+                `;
+            } else if (module === 'sinhvien') {
+                fields = `
+                    <div class="form-group">
+                        <label>Mã Sinh Viên <span class="required">*</span></label>
+                        <input type="text" id="field-MaSV" value="${data.MaSV || ''}" maxlength="20" ${currentAction === 'edit' ? 'readonly' : ''} required>
+                    </div>
+                    <div class="form-group">
+                        <label>Họ Tên <span class="required">*</span></label>
+                        <input type="text" id="field-HoTen" value="${data.HoTen || ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mã Khoa <span class="required">*</span></label>
+                        <input type="text" id="field-MaKhoa" value="${data.MaKhoa || ''}" maxlength="10" required>
+                        <small style="color: #64748b;">Ví dụ: CNTT, NN, LUAT</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Khóa Học <span class="required">*</span></label>
+                        <input type="number" id="field-KhoaHoc" value="${data.KhoaHoc || ''}" min="2015" max="2030" required>
+                        <small style="color: #64748b;">Năm nhập học (2015-2030)</small>
+                    </div>
+                `;
+            } else if (module === 'ctdaotao') {
+                fields = `
+                    <div class="form-group">
+                        <label>Mã Khoa <span class="required">*</span></label>
+                        <input type="text" id="field-MaKhoa" value="${data.MaKhoa || ''}" maxlength="10" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Khóa Học <span class="required">*</span></label>
+                        <input type="number" id="field-KhoaHoc" value="${data.KhoaHoc || ''}" min="2015" max="2030" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mã Môn Học <span class="required">*</span></label>
+                        <input type="text" id="field-MaMH" value="${data.MaMH || ''}" maxlength="10" required>
+                    </div>
+                `;
+            } else if (module === 'dangky') {
+                if (currentAction === 'create') {
+                    fields = `
+                        <div class="form-group">
+                            <label>Mã Sinh Viên <span class="required">*</span></label>
+                            <input type="text" id="field-MaSV" value="${data.MaSV || ''}" maxlength="20" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Mã Môn Học <span class="required">*</span></label>
+                            <input type="text" id="field-MaMon" value="${data.MaMon || ''}" maxlength="10" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Điểm Thi</label>
+                            <input type="number" id="field-DiemThi" value="${data.DiemThi || ''}" min="0" max="10" step="0.01">
+                            <small style="color: #64748b;">Để trống nếu chưa có điểm</small>
+                        </div>
+                    `;
+                } else {
+                    fields = `
+                        <div class="form-group">
+                            <label>Mã Sinh Viên</label>
+                            <input type="text" value="${data.MaSV}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Mã Môn Học</label>
+                            <input type="text" value="${data.MaMon}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Điểm Thi <span class="required">*</span></label>
+                            <input type="number" id="field-DiemThi" value="${data.DiemThi || ''}" min="0" max="10" step="0.01" required>
+                        </div>
+                    `;
+                }
+            }
+            
+            return fields;
+        }
+
+        // Submit form
+        async function submitForm() {
+            const formData = {};
+            
+            // Collect form data
+            document.querySelectorAll('#formFields input').forEach(input => {
+                if (input.id.startsWith('field-')) {
+                    const fieldName = input.id.replace('field-', '');
+                    const value = input.value.trim();
+                    
+                    // Only add non-empty values, or skip optional fields
+                    if (value !== '') {
+                        formData[fieldName] = value;
+                    } else if (input.required) {
+                        // Keep empty string for required fields (will be validated below)
+                        formData[fieldName] = value;
+                    }
+                    // For optional fields with empty value, don't include in formData (send as undefined/null)
+                }
             });
+
+            // Validate required fields
+            try {
+                let hasValidationError = false;
+                document.querySelectorAll('#formFields input[required]').forEach(input => {
+                    if (input.id.startsWith('field-')) {
+                        const fieldName = input.id.replace('field-', '');
+                        if (!formData[fieldName] || formData[fieldName].trim() === '') {
+                            showModalAlert(`⚠️ Vui lòng nhập ${fieldName}`, 'error');
+                            hasValidationError = true;
+                        }
+                    }
+                });
+                
+                if (hasValidationError) {
+                    return;
+                }
+            } catch (validationError) {
+                return;
+            }
+
+            // Hide any previous alerts
+            hideModalAlert();
+
+            // Determine method and URL
+            let method, url;
+            
+            if (currentAction === 'create') {
+                method = 'POST';
+                url = `${API_BASE}/${currentModule}`;
+            } else {
+                method = 'PUT';
+                if (currentModule === 'dangky') {
+                    url = `${API_BASE}/${currentModule}?masv=${editingId.masv}&mamon=${editingId.mamon}`;
+                } else {
+                    url = `${API_BASE}/${currentModule}?id=${editingId}`;
+                }
+            }
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Có lỗi xảy ra');
+                }
+
+                const result = await response.json();
+                showAlert(currentModule, result.message || 'Thành công!', 'success');
+                closeModal();
+                loadData(currentModule);
+            } catch (error) {
+                showModalAlert(`❌ ${error.message}`, 'error');
+            }
+        }
+
+        // Delete record
+        async function deleteRecord(module, id) {
+            if (!confirm(`Bạn có chắc muốn xóa bản ghi này?`)) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/${module}?id=${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Có lỗi xảy ra');
+                }
+
+                const result = await response.json();
+                showAlert(module, result.message || 'Xóa thành công!', 'success');
+                loadData(module);
+            } catch (error) {
+                showAlert(module, `Lỗi: ${error.message}`, 'error');
+            }
+        }
+
+        // Delete CTDaoTao
+        async function deleteCTDaoTao(maKhoa, khoaHoc, maMH) {
+            if (!confirm(`Xóa môn ${maMH} khỏi CTĐT khoa ${maKhoa} khóa ${khoaHoc}?`)) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/ctdaotao?khoa=${maKhoa}&khoahoc=${khoaHoc}&monhoc=${maMH}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Có lỗi xảy ra');
+                }
+
+                const result = await response.json();
+                showAlert('ctdaotao', result.message || 'Xóa thành công!', 'success');
+                loadData('ctdaotao');
+            } catch (error) {
+                showAlert('ctdaotao', `Lỗi: ${error.message}`, 'error');
+            }
+        }
+
+        // Delete DangKy
+        async function deleteDangKy(maSV, maMon) {
+            if (!confirm(`Hủy đăng ký môn ${maMon} của sinh viên ${maSV}?`)) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/dangky?masv=${maSV}&mamon=${maMon}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Có lỗi xảy ra');
+                }
+
+                const result = await response.json();
+                showAlert('dangky', result.message || 'Xóa thành công!', 'success');
+                loadData('dangky');
+            } catch (error) {
+                showAlert('dangky', `Lỗi: ${error.message}`, 'error');
+            }
+        }
+
+        // Global queries
+        async function callGlobalQuery(type) {
+            const resultDiv = document.getElementById(`global-result-${type}`);
+            resultDiv.innerHTML = '<div class="loading"></div> Đang tải...';
+            resultDiv.className = 'result show';
+
+            let params = new URLSearchParams();
+            params.append('type', type);
+
+            if (type === 1 || type === 3) {
+                const masv = document.getElementById(`global-masv-${type}`).value.trim();
+                if (!masv) {
+                    alert('Vui lòng nhập Mã Sinh Viên');
+                    resultDiv.innerHTML = '';
+                    return;
+                }
+                params.append('masv', masv);
+            } else if (type === 2) {
+                const query = document.getElementById('global-query-2').value.trim();
+                if (!query) {
+                    alert('Vui lòng nhập Tên Khoa hoặc Mã Khoa');
+                    resultDiv.innerHTML = '';
+                    return;
+                }
+                params.append('query', query);
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/global?${params}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const data = await response.json();
+                const count = Array.isArray(data) ? data.length : 0;
+                const countText = `<div style="background: #e0f2fe; color: #1e293b; padding: 0.5rem 1rem; border-radius: 6px; margin-bottom: 1rem; display: inline-block; font-weight: 600;">📊 Kết quả: ${count} bản ghi</div>`;
+                
+                resultDiv.innerHTML = countText + createSimpleTable(data);
+            } catch (error) {
+                resultDiv.innerHTML = `<strong>Lỗi:</strong> ${error.message}`;
+                resultDiv.className = 'result show error';
+            }
+        }
+
+        // Create simple table (no actions)
+        function createSimpleTable(data) {
+            if (!Array.isArray(data) || data.length === 0) {
+                return '<p>Không có dữ liệu</p>';
+            }
+
+            const headers = Object.keys(data[0]);
+            let table = '<table><thead><tr>';
+            headers.forEach(h => table += `<th>${h}</th>`);
+            table += '</tr></thead><tbody>';
+            
+            data.forEach(row => {
+                table += '<tr>';
+                headers.forEach(h => {
+                    table += `<td>${row[h] !== null && row[h] !== undefined ? row[h] : ''}</td>`;
+                });
+                table += '</tr>';
+            });
+            
+            table += '</tbody></table>';
+            return table;
+        }
+
+        // Load initial data on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadData('khoa');
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (event) => {
+            const modal = document.getElementById('crudModal');
+            if (event.target === modal) {
+                closeModal();
+            }
         });
     </script>
 </body>

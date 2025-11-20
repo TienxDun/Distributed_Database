@@ -17,13 +17,40 @@ function handleSinhVien($method, $query) {
                 }
                 break;
             case 'POST':
-                sendResponse(['error' => 'CRUD not supported on global views'], 405);
+                // Create new SinhVien via trigger
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!isset($data['MaSV']) || !isset($data['HoTen']) || !isset($data['MaKhoa']) || !isset($data['KhoaHoc'])) {
+                    sendResponse(['error' => 'Missing required fields: MaSV, HoTen, MaKhoa, KhoaHoc'], 400);
+                    break;
+                }
+                $stmt = $pdo->prepare("INSERT INTO SinhVien_Global (MaSV, HoTen, MaKhoa, KhoaHoc) VALUES (?, ?, ?, ?)");
+                $stmt->execute([$data['MaSV'], $data['HoTen'], $data['MaKhoa'], $data['KhoaHoc']]);
+                sendResponse(['message' => 'SinhVien created successfully', 'MaSV' => $data['MaSV']], 201);
                 break;
             case 'PUT':
-                sendResponse(['error' => 'CRUD not supported on global views'], 405);
+                // Update SinhVien via trigger (allows MaKhoa change = move between sites)
+                if (!isset($query['id'])) {
+                    sendResponse(['error' => 'Missing required parameter: id'], 400);
+                    break;
+                }
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!isset($data['HoTen']) || !isset($data['MaKhoa']) || !isset($data['KhoaHoc'])) {
+                    sendResponse(['error' => 'Missing required fields: HoTen, MaKhoa, KhoaHoc'], 400);
+                    break;
+                }
+                $stmt = $pdo->prepare("UPDATE SinhVien_Global SET HoTen = ?, MaKhoa = ?, KhoaHoc = ? WHERE MaSV = ?");
+                $stmt->execute([$data['HoTen'], $data['MaKhoa'], $data['KhoaHoc'], $query['id']]);
+                sendResponse(['message' => 'SinhVien updated successfully']);
                 break;
             case 'DELETE':
-                sendResponse(['error' => 'CRUD not supported on global views'], 405);
+                // Delete SinhVien via trigger
+                if (!isset($query['id'])) {
+                    sendResponse(['error' => 'Missing required parameter: id'], 400);
+                    break;
+                }
+                $stmt = $pdo->prepare("DELETE FROM SinhVien_Global WHERE MaSV = ?");
+                $stmt->execute([$query['id']]);
+                sendResponse(['message' => 'SinhVien deleted successfully']);
                 break;
             default:
                 sendResponse(['error' => 'Method not allowed'], 405);

@@ -41,12 +41,9 @@ UNION ALL
 SELECT * FROM [SITE_C].SiteC.dbo.Khoa;
 GO
 
+-- MonHoc is synced across all 3 sites, so we only need to query from one site to avoid duplicates
 CREATE VIEW MonHoc_Global AS
-SELECT * FROM [SITE_A].SiteA.dbo.MonHoc
-UNION ALL
-SELECT * FROM [SITE_B].SiteB.dbo.MonHoc
-UNION ALL
-SELECT * FROM [SITE_C].SiteC.dbo.MonHoc;
+SELECT * FROM [SITE_A].SiteA.dbo.MonHoc;
 GO
 
 CREATE VIEW CTDaoTao_Global AS

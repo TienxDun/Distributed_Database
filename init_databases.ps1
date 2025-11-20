@@ -64,6 +64,10 @@ Write-Host "7. Khởi tạo HUFLIT Database với Linked Servers..." -Foreground
 sqlcmd -S localhost,14333 -U sa -P "Your@STROng!Pass#Word" -f 65001 -i db\global\init.sql
 if ($LASTEXITCODE -ne 0) { Write-Host "Lỗi khi khởi tạo HUFLIT!" -ForegroundColor Red; exit 1 }
 
+Write-Host "8. Tạo INSTEAD OF Triggers cho Global Views..." -ForegroundColor Yellow
+sqlcmd -S localhost,14333 -U sa -P "Your@STROng!Pass#Word" -f 65001 -i db\global\triggers.sql
+if ($LASTEXITCODE -ne 0) { Write-Host "Lỗi khi tạo triggers!" -ForegroundColor Red; exit 1 }
+
 Write-Host ""
 Write-Host "=== Hoàn thành khởi tạo Database HUFLIT ===" -ForegroundColor Green
 
