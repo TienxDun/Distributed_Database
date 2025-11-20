@@ -2,6 +2,10 @@
 
 Hệ thống cơ sở dữ liệu phân tán mô phỏng Đại học Ngoại thương TP.HCM với 3 sites địa lý, sử dụng SQL Server partitioned views và linked servers.
 
+## 📖 Documentation
+
+- [Architecture](ARCHITECTURE.md) - Chi tiết kiến trúc hệ thống
+
 ## 🏗️ Kiến trúc
 
 - **3 Site Databases**: Phân vùng theo range alphabetical (A-M, M-S, S-Z)
