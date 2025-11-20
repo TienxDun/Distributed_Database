@@ -20,14 +20,14 @@ function handleGlobal($method, $query) {
                             sendResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
                             break;
                         case '2': // Các khóa học của một khoa
-                            if (!isset($query['tenkhoa'])) {
-                                sendResponse(['error' => 'Missing tenkhoa parameter'], 400);
+                            if (!isset($query['query'])) {
+                                sendResponse(['error' => 'Missing query parameter'], 400);
                             }
                             $stmt = $pdo->prepare("SELECT DISTINCT c.KhoaHoc
                                                     FROM CTDaoTao_Global c
                                                     JOIN Khoa_Global k ON c.MaKhoa = k.MaKhoa
-                                                    WHERE k.TenKhoa = ?");
-                            $stmt->execute([$query['tenkhoa']]);
+                                                    WHERE k.TenKhoa = ? OR k.MaKhoa = ?");
+                            $stmt->execute([$query['query'], $query['query']]);
                             sendResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
                             break;
                         case '3': // Các môn học bắt buộc của sinh viên

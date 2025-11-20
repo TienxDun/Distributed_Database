@@ -31,7 +31,7 @@
             </div>
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="callAPI('khoa', 'GET')">Lấy Tất Cả</button>
-                <button class="btn btn-success" onclick="callAPI('khoa', 'GET', null, 'khoa')">Lấy Theo ID</button>
+                <button class="btn btn-success" onclick="callAPI('khoa', 'GET', null, 'khoa')">Xem theo ID</button>
             </div>
             <div id="khoa-result" class="result"></div>
         </div>
@@ -45,7 +45,7 @@
             </div>
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="callAPI('monhoc', 'GET')">Lấy Tất Cả</button>
-                <button class="btn btn-success" onclick="callAPI('monhoc', 'GET', null, 'monhoc')">Lấy Theo ID</button>
+                <button class="btn btn-success" onclick="callAPI('monhoc', 'GET', null, 'monhoc')">Xem theo ID</button>
             </div>
             <div id="monhoc-result" class="result"></div>
         </div>
@@ -59,7 +59,7 @@
             </div>
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="callAPI('sinhvien', 'GET')">Lấy Tất Cả</button>
-                <button class="btn btn-success" onclick="callAPI('sinhvien', 'GET', null, 'sinhvien')">Lấy Theo ID</button>
+                <button class="btn btn-success" onclick="callAPI('sinhvien', 'GET', null, 'sinhvien')">Xem theo ID</button>
             </div>
             <div id="sinhvien-result" class="result"></div>
         </div>
@@ -115,8 +115,8 @@
                 <div class="query-card">
                     <h3>Các khóa học của một khoa</h3>
                     <div class="form-group">
-                        <label for="global-tenkhoa-2">Tên Khoa:</label>
-                        <input type="text" id="global-tenkhoa-2" placeholder="Ví dụ: Công nghệ thông tin" onkeydown="if(event.key==='Enter') callAPI('global', 'GET', null, 'global', '2')">
+                        <label for="global-query-2">Tên Khoa hoặc Mã Khoa:</label>
+                        <input type="text" id="global-query-2" placeholder="Ví dụ: Công nghệ thông tin hoặc CNTT" onkeydown="if(event.key==='Enter') callAPI('global', 'GET', null, 'global', '2')">
                     </div>
                     <button class="btn btn-primary" onclick="callAPI('global', 'GET', null, 'global', '2')">Truy Vấn</button>
                     <div id="global-result-2" class="result"></div>
@@ -254,12 +254,12 @@
                             return;
                         }
                     } else if (queryType === '2') {
-                        const tenkhoa = document.getElementById('global-tenkhoa-2').value.trim();
-                        if (tenkhoa) {
+                        const query = document.getElementById('global-query-2').value.trim();
+                        if (query) {
                             params.append('type', '2');
-                            params.append('tenkhoa', tenkhoa);
+                            params.append('query', query);
                         } else {
-                            alert('Vui lòng nhập Tên Khoa');
+                            alert('Vui lòng nhập Tên Khoa hoặc Mã Khoa');
                             resultDiv.innerHTML = '';
                             resultDiv.className = 'result';
                             return;
