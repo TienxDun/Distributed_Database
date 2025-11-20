@@ -55,7 +55,7 @@
             <h2 class="module-title">Quản lý Sinh Viên</h2>
             <div class="form-group">
                 <label for="sinhvien-id">Mã Sinh Viên:</label>
-                <input type="text" id="sinhvien-id" placeholder="Ví dụ: SV001, SV002" onkeydown="if(event.key==='Enter') callAPI('sinhvien', 'GET', null, 'sinhvien')">
+                <input type="text" id="sinhvien-id" placeholder="Ví dụ: 25DH000001, 24DH000002" onkeydown="if(event.key==='Enter') callAPI('sinhvien', 'GET', null, 'sinhvien')">
             </div>
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="callAPI('sinhvien', 'GET')">Lấy Tất Cả</button>
@@ -87,7 +87,7 @@
             <h2 class="module-title">Đăng Ký Học Phần</h2>
             <div class="form-group">
                 <label for="dangky-masv">Mã Sinh Viên:</label>
-                <input type="text" id="dangky-masv" placeholder="Ví dụ: SV001, SV002, SV003..." required onkeydown="if(event.key==='Enter') callAPI('dangky', 'GET', null, 'dangky', 'masv')">
+                <input type="text" id="dangky-masv" placeholder="Ví dụ: 25DH000001, 24DH000002, 23DH000003..." required onkeydown="if(event.key==='Enter') callAPI('dangky', 'GET', null, 'dangky', 'masv')">
             </div>
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="callAPI('dangky', 'GET')">Lấy Tất Cả</button>
@@ -105,7 +105,7 @@
                     <h3>Các môn học sinh viên đã học và đạt từ điểm 5 trở lên</h3>
                     <div class="form-group">
                         <label for="global-masv-1">Mã Sinh Viên:</label>
-                        <input type="text" id="global-masv-1" placeholder="Ví dụ: SV001" onkeydown="if(event.key==='Enter') callAPI('global', 'GET', null, 'global', '1')">
+                        <input type="text" id="global-masv-1" placeholder="Ví dụ: 25DH000001" onkeydown="if(event.key==='Enter') callAPI('global', 'GET', null, 'global', '1')">
                     </div>
                     <button class="btn btn-primary" onclick="callAPI('global', 'GET', null, 'global', '1')">Truy Vấn</button>
                     <div id="global-result-1" class="result"></div>
@@ -127,7 +127,7 @@
                     <h3>Các môn học bắt buộc của sinh viên</h3>
                     <div class="form-group">
                         <label for="global-masv-3">Mã Sinh Viên:</label>
-                        <input type="text" id="global-masv-3" placeholder="Ví dụ: SV001" onkeydown="if(event.key==='Enter') callAPI('global', 'GET', null, 'global', '3')">
+                        <input type="text" id="global-masv-3" placeholder="Ví dụ: 25DH000001" onkeydown="if(event.key==='Enter') callAPI('global', 'GET', null, 'global', '3')">
                     </div>
                     <button class="btn btn-primary" onclick="callAPI('global', 'GET', null, 'global', '3')">Truy Vấn</button>
                     <div id="global-result-3" class="result"></div>
