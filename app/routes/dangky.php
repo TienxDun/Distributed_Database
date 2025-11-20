@@ -6,13 +6,7 @@ function handleDangKy($method, $query) {
         $pdo = getDBConnection();
         switch ($method) {
             case 'GET':
-                if (isset($query['masv']) && isset($query['mamon'])) {
-                    // Lấy record cụ thể
-                    $stmt = $pdo->prepare("SELECT * FROM DangKy_Global WHERE MaSV = ? AND MaMon = ?");
-                    $stmt->execute([$query['masv'], $query['mamon']]);
-                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-                    sendResponse($result ?: ['error' => 'Not found'], $result ? 200 : 404);
-                } elseif (isset($query['masv'])) {
+                if (isset($query['masv'])) {
                     // Lấy tất cả môn học mà sinh viên đăng ký
                     $stmt = $pdo->prepare("SELECT dk.*, mh.TenMH, sv.HoTen FROM DangKy_Global dk 
                                           JOIN MonHoc_Global mh ON dk.MaMon = mh.MaMH 

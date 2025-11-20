@@ -34,41 +34,41 @@ GO
 
 -- Tạo views toàn cục
 CREATE VIEW Khoa_Global AS
-SELECT * FROM [SITE_A].Global.dbo.Khoa
+SELECT * FROM [SITE_A].SiteA.dbo.Khoa
 UNION ALL
-SELECT * FROM [SITE_B].Global.dbo.Khoa
+SELECT * FROM [SITE_B].SiteB.dbo.Khoa
 UNION ALL
-SELECT * FROM [SITE_C].Global.dbo.Khoa;
+SELECT * FROM [SITE_C].SiteC.dbo.Khoa;
 GO
 
 CREATE VIEW MonHoc_Global AS
-SELECT * FROM [SITE_A].Global.dbo.MonHoc
+SELECT * FROM [SITE_A].SiteA.dbo.MonHoc
 UNION ALL
-SELECT * FROM [SITE_B].Global.dbo.MonHoc
+SELECT * FROM [SITE_B].SiteB.dbo.MonHoc
 UNION ALL
-SELECT * FROM [SITE_C].Global.dbo.MonHoc;
+SELECT * FROM [SITE_C].SiteC.dbo.MonHoc;
 GO
 
 CREATE VIEW CTDaoTao_Global AS
-SELECT * FROM [SITE_A].Global.dbo.CTDaoTao
+SELECT * FROM [SITE_A].SiteA.dbo.CTDaoTao
 UNION ALL
-SELECT * FROM [SITE_B].Global.dbo.CTDaoTao
+SELECT * FROM [SITE_B].SiteB.dbo.CTDaoTao
 UNION ALL
-SELECT * FROM [SITE_C].Global.dbo.CTDaoTao;
+SELECT * FROM [SITE_C].SiteC.dbo.CTDaoTao;
 GO
 
 CREATE VIEW SinhVien_Global AS
-SELECT * FROM [SITE_A].Global.dbo.SinhVien
+SELECT * FROM [SITE_A].SiteA.dbo.SinhVien
 UNION ALL
-SELECT * FROM [SITE_B].Global.dbo.SinhVien
+SELECT * FROM [SITE_B].SiteB.dbo.SinhVien
 UNION ALL
-SELECT * FROM [SITE_C].Global.dbo.SinhVien;
+SELECT * FROM [SITE_C].SiteC.dbo.SinhVien;
 GO
 
 CREATE VIEW DangKy_Global AS
-SELECT * FROM [SITE_A].Global.dbo.DangKy
+SELECT * FROM [SITE_A].SiteA.dbo.DangKy
 UNION ALL
-SELECT * FROM [SITE_B].Global.dbo.DangKy
+SELECT * FROM [SITE_B].SiteB.dbo.DangKy
 UNION ALL
-SELECT * FROM [SITE_C].Global.dbo.DangKy;
+SELECT * FROM [SITE_C].SiteC.dbo.DangKy;
 GO

@@ -215,6 +215,17 @@
             background: #fef2f2;
         }
 
+        .info-text {
+            background: #e0f2fe;
+            color: var(--text);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
         .loading {
             display: inline-block;
             width: 20px;
@@ -324,20 +335,13 @@
         <!-- DangKy Module -->
         <div id="dangky" class="tab-content">
             <h2 class="module-title">Đăng Ký Học Phần</h2>
-            <div class="form-row">
-                <div class="form-group" style="flex: 1;">
-                    <label for="dangky-masv">Mã Sinh Viên:</label>
-                    <input type="text" id="dangky-masv" placeholder="Ví dụ: SV001">
-                </div>
-                <div class="form-group" style="flex: 1;">
-                    <label for="dangky-mamon">Mã Môn Học:</label>
-                    <input type="text" id="dangky-mamon" placeholder="Ví dụ: MH001">
-                </div>
+            <div class="form-group">
+                <label for="dangky-masv">Mã Sinh Viên:</label>
+                <input type="text" id="dangky-masv" placeholder="Ví dụ: SV001, SV002, SV003..." required>
             </div>
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="callAPI('dangky', 'GET')">Lấy Tất Cả</button>
-                <button class="btn btn-success" onclick="callAPI('dangky', 'GET', null, 'dangky', 'masv')">Xem Môn Học Đã Đăng Ký</button>
-                <button class="btn btn-success" onclick="callAPI('dangky', 'GET', null, 'dangky', 'mamon')">Xem Sinh Viên Đã Đăng Ký</button>
+                <button class="btn btn-success" onclick="callAPI('dangky', 'GET', null, 'dangky', 'masv')">🔍 Xem Môn Học Đã Đăng Ký</button>
             </div>
             <div id="dangky-result" class="result"></div>
         </div>
@@ -392,6 +396,13 @@
                             params.append('mamon', mamon);
                         }
                     }
+                } else if (module === 'ctdaotao') {
+                    if (queryType === 'program') {
+                        const makhoa = document.getElementById('ctdaotao-makhoa').value.trim();
+                        if (makhoa) {
+                            params.append('makhoa', makhoa);
+                        }
+                    }
                 } else {
                     const idInput = document.getElementById(`${module}-id`);
                     if (idInput && idInput.value.trim()) {
@@ -421,9 +432,9 @@
                 let countText = '';
                 if (Array.isArray(data)) {
                     const count = data.length;
-                    countText = `<div>📊 Tổng số: <strong>${count}</strong> ${count === 1 ? 'bản ghi' : 'bản ghi'}</div>`;
+                    countText = `<div style="background: #e0f2fe; color: var(--text); padding: 0.5rem 1rem; border-radius: 6px; margin-bottom: 1rem; display: inline-block; font-weight: 600; font-size: 0.9rem;">📊 Tổng số: <strong>${count}</strong> ${count === 1 ? 'bản ghi' : 'bản ghi'}</div>`;
                 } else if (data && typeof data === 'object') {
-                    countText = `<div>📄 1 bản ghi</div>`;
+                    countText = `<div style="background: #e0f2fe; color: var(--text); padding: 0.5rem 1rem; border-radius: 6px; margin-bottom: 1rem; display: inline-block; font-weight: 600; font-size: 0.9rem;">📄 1 bản ghi</div>`;
                 }
 
                 // Format JSON nicely

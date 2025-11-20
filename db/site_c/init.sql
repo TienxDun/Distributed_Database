@@ -1,12 +1,12 @@
--- Tạo lại database Global nếu đã tồn tại
-DROP DATABASE IF EXISTS Global;
+-- Tạo lại database SiteC nếu đã tồn tại
+DROP DATABASE IF EXISTS SiteC;
 GO
 
--- Tạo database Global với collation hỗ trợ tiếng Việt
-CREATE DATABASE Global COLLATE Vietnamese_CI_AS;
+-- Tạo database SiteC với collation hỗ trợ tiếng Việt
+CREATE DATABASE SiteC COLLATE Vietnamese_CI_AS;
 GO
 
-USE Global;
+USE SiteC;
 GO
 
 -- Tạo bảng Khoa
