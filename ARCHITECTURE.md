@@ -1,186 +1,178 @@
-# HUFLIT Distributed Database System - Architecture
+# 🏗️ Kiến Trúc Hệ Thống
 
-## Tổng quan
+<div align="center">
 
-Hệ thống HUFLIT Distributed Database là một ứng dụng web mô phỏng cơ sở dữ liệu phân tán cho Trường Đại họcc HUFLIT. Hệ thống sử dụng kiến trúc phân tán với 3 sites địa lý, tổng hợp dữ liệu qua SQL Server linked servers và partitioned views. Ứng dụng cung cấp REST API và giao diện web để truy vấn dữ liệu phân tán.
+**HUFLIT Distributed Database System Architecture**
 
-## Kiến trúc tổng thể
+[![SQL Server](https://img.shields.io/badge/SQL%20Server-2022-red?logo=microsoftsqlserver)](https://www.microsoft.com/sql-server)
+[![Linked Servers](https://img.shields.io/badge/Linked-Servers-orange)](https://docs.microsoft.com/sql-server)
+[![Partitioned Views](https://img.shields.io/badge/Partitioned-Views-blue)](https://docs.microsoft.com/sql-server)
+
+</div>
+
+---
+
+## 📋 Tổng quan
+
+> Hệ thống CSDL phân tán 3 sites cho Trường ĐH HUFLIT, sử dụng **SQL Server Linked Servers** và **Partitioned Views**.
+
+## 🗺️ Sơ đồ tổng thể
 
 ```text
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Site A        │    │   Site B        │    │   Site C        │
-│ (MaKhoa < 'M')  │    │ (MaKhoa 'M'-'S')│    │ (MaKhoa >= 'S') │
-│                 │    │                 │    │                 │
-│ - Khoa          │    │ - Khoa          │    │ - Khoa          │
-│ - CTDaoTao      │    │ - CTDaoTao      │    │ - CTDaoTao      │
-│ - MonHoc        │    │ - MonHoc        │    │ - MonHoc        │
-│ - SinhVien      │    │ - SinhVien      │    │ - SinhVien      │
-│ - DangKy        │    │ - DangKy        │    │ - DangKy        │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         └───────────────────────┼───────────────────────┘
-                                 │
-                    ┌─────────────────┐
-                    │   Global DB     │
-                    │                 │
-                    │ - Linked Servers│
-                    │ - Partitioned   │
-                    │   Views         │
-                    └─────────────────┘
-                                 │
-                    ┌─────────────────┐
-                    │   PHP API       │
-                    │   (RESTful)     │
-                    └─────────────────┘
-                                 │
-                    ┌─────────────────┐
-                    │   Web UI        │
-                    │   (HTML/CSS/JS) │
-                    └─────────────────┘
+┌──────────┐  ┌──────────┐  ┌──────────┐
+│  Site A  │  │  Site B  │  │  Site C  │
+│  < 'M'   │  │ 'M'-'S'  │  │  >= 'S'  │
+└────┬─────┘  └────┬─────┘  └────┬─────┘
+     └─────────────┼─────────────┘
+                   │
+              ┌────┴─────┐
+              │ Global   │ Linked Servers
+              │ Database │ + Views + Triggers
+              └────┬─────┘
+                   │
+              ┌────┴─────┐
+              │ PHP API  │ REST
+              └────┬─────┘
+                   │
+              ┌────┴─────┐
+              │  Web UI  │ HTML/CSS/JS
+              └──────────┘
 ```
 
-## Components
+## 🔧 Components
 
-### 1. Database Layer
+### 🗄️ 1. Database Layer (SQL Server 2022)
 
-#### Sites Database (3 instances)
+#### **3 Sites** - Horizontal Partitioning
 
-- **Công nghệ**: SQL Server 2022
-- **Phân vùng**: Theo range alphabetical trên MaKhoa
-  - Site A: MaKhoa < 'M' (CNTT, DLKS, KTTC, LLCT)
-  - Site B: MaKhoa >= 'M' và < 'S' (NVPD, QHQT, QTKD)
-  - Site C: MaKhoa >= 'S' (SLCT, SUAT, TLKS)
-- **Bảng chính**:
-  - `Khoa`: MaKhoa (PK), TenKhoa
-  - `MonHoc`: MaMH (PK), TenMH
-  - `CTDaoTao`: MaKhoa, KhoaHoc, MaMH (PK composite)
-  - `SinhVien`: MaSV (PK), HoTen, MaKhoa, KhoaHoc
-  - `DangKy`: MaSV, MaMon (PK composite), DiemThi
+| Site | Range | Khoa |
+|------|-------|------|
+| 🟦 **Site A** | `MaKhoa < 'M'` | CNTT, DLKS, KTTC, LLCT |
+| 🟩 **Site B** | `'M' ≤ MaKhoa < 'S'` | NN, NVPD, QHQT, QTKD |
+| 🟪 **Site C** | `MaKhoa ≥ 'S'` | SLCT, SUAT, TLKS |
 
-#### Global Database
+**📊 Bảng**: `Khoa`, `MonHoc`, `CTDaoTao`, `SinhVien`, `DangKy`
 
-- **Chức năng**: Tổng hợp dữ liệu từ 3 sites
-- **Tên Database**: HUFLIT
-- **Linked Servers**: Kết nối đến mssql_site_a, mssql_site_b, mssql_site_c
-- **Partitioned Views**:
-  - `Khoa_Global = UNION ALL` từ 3 sites
-  - `MonHoc_Global = UNION ALL` từ 3 sites
-  - `CTDaoTao_Global = UNION ALL` từ 3 sites
-  - `SinhVien_Global = UNION ALL` từ 3 sites
-  - `DangKy_Global = UNION ALL` từ 3 sites
+#### **🌐 Global Database**
 
-### 2. API Layer
+```sql
+-- Linked Servers
+SITE_A, SITE_B, SITE_C (MSOLEDBSQL)
 
-#### PHP REST API
+-- Partitioned Views
+<Table>_Global = UNION ALL từ 3 sites
 
-- **Framework**: Native PHP (không framework)
-- **Server**: Built-in PHP server (`php -S`)
-- **Endpoints**:
-  - `/khoa`: CRUD Khoa
-  - `/monhoc`: CRUD MonHoc
-  - `/sinhvien`: CRUD SinhVien
-  - `/ctdaotao`: CTDaoTao + queries môn học
-  - `/dangky`: DangKy
-  - `/global`: Truy vấn toàn cục phức tạp
-- **Connection**: PDO với SQL Server (sqlsrv driver)
-- **Authentication**: Không có (dev environment)
-- **Error Handling**: JSON responses với status codes
+-- INSTEAD OF Triggers
+Route INSERT/UPDATE/DELETE → Sites
+```
 
-#### Routing
+### 🔌 2. API Layer (PHP 8.x)
 
-- File: `app/public/index.php`
-- Map URL paths to handler files in `app/routes/`
-- Support query parameters cho filtering
+```php
+✓ Native PHP + PDO/sqlsrv
+✓ REST endpoints: /khoa, /monhoc, /sinhvien, /ctdaotao, /dangky, /global
+✓ JSON responses
+⚠ No auth (dev only)
+```
 
-### 3. Presentation Layer
+### 🎨 3. Presentation Layer
 
-#### Web UI
+```javascript
+✓ HTML5 + CSS3 + Vanilla JS
+✓ AJAX calls, Modal forms
+✓ Tabbed interface
+✓ Responsive design
+```
 
-- **Technologies**: HTML5, CSS3, Vanilla JavaScript
-- **Features**:
-  - Tabbed interface cho các modules
-  - Form inputs với validation
-  - AJAX calls đến API
-  - Responsive design
-  - Real-time results display
-- **Styling**: Custom CSS với CSS Variables
-- **Icons**: Unicode emojis
+### 🐳 4. Infrastructure (Docker Compose)
 
-### 4. Infrastructure Layer
+| Container | Port | Mô tả |
+|-----------|------|-------|
+| `mssql_global` | 14333 | Global Database |
+| `mssql_site_a` | 14334 | Site A Database |
+| `mssql_site_b` | 14335 | Site B Database |
+| `mssql_site_c` | 14336 | Site C Database |
+| `api_php` | 8080 | REST API Server |
+| `app_php` | 8081 | Web UI Server |
 
-#### Docker Compose
+**Network**: `huflit-network`
 
-- **Services**:
-  - `mssql_global`: SQL Server cho Global DB
-  - `mssql_site_a/b/c`: SQL Server cho 3 sites
-  - `api_php`: PHP API server (port 8080)
-  - `app_php`: PHP UI server (port 8081)
-- **Networks**: `huflit-network` cho internal communication
-- **Volumes**: Persistent data cho SQL Server
+## 🔄 Data Flow
 
-## Data Flow
+### Initialization
+```mermaid
+Docker Compose → Containers → init_databases.ps1 → Create DB → Seed Data
+```
 
-1. **Initialization**:
-   - Docker Compose khởi động containers
-   - `init_databases.ps1` chạy scripts tạo DB và insert data
+### CRUD Operations
+```mermaid
+UI → AJAX → API → Global DB → Partitioned Views → INSTEAD OF Triggers → Route to Sites → JSON Response
+```
 
-2. **Query Execution**:
-   - User nhập data vào Web UI
-   - JavaScript gửi AJAX request đến API (localhost:8080)
-   - API connect đến Global DB qua PDO
-   - Global DB query partitioned views (internally UNION from sites)
-   - Results trả về JSON → display trên UI
+### ⚡ Đặc biệt
 
-3. **Complex Queries**:
-   - `/global` endpoint xử lý JOIN và subqueries
-   - Sử dụng Global views cho cross-site data
+| Entity | Behavior |
+|--------|----------|
+| 📚 **MonHoc** | INSERT/UPDATE/DELETE → **Sync 3 sites** |
+| 👨‍🎓 **SinhVien** | UPDATE MaKhoa → **Delete old site + Insert new site** |
+| 📝 **DangKy** | JOIN SinhVien_Global → **Determine target site** |
 
-## Deployment
+---
 
-### Prerequisites
+## 🚀 Deployment
 
-- Docker & Docker Compose
-- PowerShell (cho init script)
+### Quick Start
 
-### Steps
-
-```bash
-git clone <repo>
-cd cdslpt
+```powershell
+# 1. Start containers
 docker-compose up -d
+
+# 2. Initialize databases
 .\init_databases.ps1
+
+# 3. Access
+# API:  http://localhost:8080
+# UI:   http://localhost:8081/ui.php
 ```
 
-### Ports
+### Port Mapping
 
-- API: `http://localhost:8080`
-- UI: `http://localhost:8081`
+| Service | Port | URL |
+|---------|------|-----|
+| 🔌 API | 8080 | http://localhost:8080 |
+| 🖥️ UI | 8081 | http://localhost:8081/ui.php |
+| 🗄️ Global DB | 14333 | localhost,14333 |
+| 🗄️ Site A | 14334 | localhost,14334 |
+| 🗄️ Site B | 14335 | localhost,14335 |
+| 🗄️ Site C | 14336 | localhost,14336 |
 
-## Security Considerations
+---
 
-- **Development Only**: Không có authentication/authorization
-- **Network**: Internal Docker network
-- **Data**: Sample data, không sensitive
-- **Production**: Cần thêm SSL, auth, input validation
+## ⚠️ Lưu ý
 
-## Scalability
+### Development Environment
+```diff
++ Sample data
++ No authentication
++ No SSL/HTTPS
++ Docker internal network
+```
 
-- **Horizontal**: Thêm sites mới với range partitioning
-- **Vertical**: Upgrade SQL Server instances
-- **Load Balancing**: Nginx reverse proxy cho API
-- **Caching**: Redis cho frequent queries
+### Production Requirements
+```diff
+! JWT authentication
+! HTTPS/TLS encryption
+! Input validation & sanitization
+! Monitoring & logging
+! Automated backups
+! Rate limiting
+! CORS configuration
+```
 
-## Monitoring & Maintenance
+---
 
-- **Logs**: Docker logs, SQL Server logs
-- **Backup**: SQL Server backup scripts
-- **Updates**: Schema changes qua migration scripts
-- **Testing**: Manual qua UI, API tests với Postman
+<div align="center">
 
-## Future Enhancements
+**[⬅️ Back to README](README.md)**
 
-- Implement authentication (JWT)
-- Add GraphQL API
-- Real-time updates với WebSockets
-- Advanced analytics dashboard
-- Multi-region deployment
+</div>

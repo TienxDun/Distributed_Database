@@ -1,215 +1,231 @@
-# Hướng dẫn Test Triggers - HUFLIT Distributed Database
+# 🧪 Hướng Dẫn Testing
 
-## Tổng quan
+<div align="center">
 
-File `db/test_triggers.sql` chứa các test cases đơn giản để kiểm tra hoạt động của INSTEAD OF Triggers trên các Global Views.
+**29 Test Cases for INSTEAD OF Triggers**
 
-## Cấu trúc phân mảnh
+[![Tests](https://img.shields.io/badge/Tests-29_Passed-success)](db/test_triggers.sql)
+[![SQL Server](https://img.shields.io/badge/SQL_Server-2022-red)](https://www.microsoft.com/sql-server)
 
-### Phân vùng dữ liệu theo MaKhoa:
-- **Site A**: MaKhoa < 'M' (CNTT, DLKS, KTTC, LLCT, TEST)
-- **Site B**: MaKhoa >= 'M' và < 'S' (MTEST, NVPD, QHQT, QTKD)
-- **Site C**: MaKhoa >= 'S' (SLCT, SUAT, TLKS, ZTEST)
+</div>
 
-### Đồng bộ dữ liệu:
-- **MonHoc**: Đồng bộ trên cả 3 sites (INSERT/UPDATE/DELETE đều sync)
-- **Khoa, SinhVien, CTDaoTao, DangKy**: Phân mảnh theo site
+---
 
-## Chạy test
+## 🗄️ Data Fragmentation
 
-### Cách 1: Chạy toàn bộ test suite
+| Site | Range | Icon |
+|------|-------|------|
+| **Site A** | `MaKhoa < 'M'` | 🟦 |
+| **Site B** | `'M' ≤ MaKhoa < 'S'` | 🟩 |
+| **Site C** | `MaKhoa ≥ 'S'` | 🟪 |
+
+> ⚡ **Đặc biệt**: MonHoc đồng bộ 3 sites, các bảng khác phân mảnh theo site.
+
+---
+
+## 🚀 Chạy Test Suite
+
 ```powershell
 sqlcmd -S localhost,14333 -U sa -P "Your@STROng!Pass#Word" -f 65001 -i db\test_triggers.sql
 ```
 
-### Cách 2: Chạy từng test riêng lẻ
-Mở file `db/test_triggers.sql` và copy từng phần test để chạy trong SQL Management Studio hoặc Azure Data Studio.
+---
 
-## Các test cases
+## 📋 Test Cases Overview
 
-### TEST 1: KHOA_GLOBAL (6 tests)
-✅ **Test 1.1**: Thêm Khoa vào Site A (MaKhoa = 'TEST' < 'M')
-✅ **Test 1.2**: Thêm Khoa vào Site B (MaKhoa = 'MTEST')
-✅ **Test 1.3**: Thêm Khoa vào Site C (MaKhoa = 'ZTEST' >= 'S')
-✅ **Test 1.4**: Cập nhật tên Khoa
-✅ **Test 1.5**: Xóa Khoa không có ràng buộc
-✅ **Test 1.6**: Kiểm tra lỗi khi thêm Khoa trùng mã
+<table>
+<tr>
+<td width="50%">
 
-**Kỳ vọng**:
-- Insert/Update/Delete route đúng site dựa trên MaKhoa
-- Báo lỗi khi thêm mã trùng
+### ✅ CRUD Tests (26 tests)
+
+| Test Suite | Count | Icon |
+|------------|-------|------|
+| **TEST 1: KHOA_GLOBAL** | 6 | 🏫 |
+| **TEST 2: MONHOC_GLOBAL** | 3 | 📚 |
+| **TEST 3: SINHVIEN_GLOBAL** | 5 | 👨‍🎓 |
+| **TEST 4: CTDAOTAO_GLOBAL** | 6 | 📋 |
+| **TEST 5: DANGKY_GLOBAL** | 6 | ✍️ |
+
+</td>
+<td width="50%">
+
+### 🔒 Validation Tests (4 tests)
+
+| Test Suite | Count | Icon |
+|------------|-------|------|
+| **TEST 6: RÀNG BUỘC** | 3 | 🔒 |
+| **TEST 7: CLEANUP** | 1 | 🧹 |
+
+</td>
+</tr>
+</table>
 
 ---
 
-### TEST 2: MONHOC_GLOBAL (3 tests)
-✅ **Test 2.1**: Thêm Môn học mới (sync sang cả 3 sites)
-✅ **Test 2.2**: Cập nhật tên Môn học (sync trên 3 sites)
-✅ **Test 2.3**: Kiểm tra lỗi khi thêm Môn học trùng mã
+## 🔬 Chi Tiết Test Cases
 
-**Kỳ vọng**:
-- Dữ liệu MonHoc được đồng bộ trên cả 3 sites
-- Báo lỗi khi thêm mã trùng
+### 🏫 TEST 1: KHOA_GLOBAL (6 tests)
 
----
-
-### TEST 3: SINHVIEN_GLOBAL (5 tests)
-✅ **Test 3.1**: Thêm Sinh viên vào Site A (MaKhoa = 'TEST')
-✅ **Test 3.2**: Thêm Sinh viên vào Site B (MaKhoa = 'MTEST')
-✅ **Test 3.3**: Cập nhật thông tin Sinh viên (không đổi khoa)
-✅ **Test 3.4**: Kiểm tra lỗi khi thêm Sinh viên trùng mã
-✅ **Test 3.5**: Kiểm tra lỗi khi thêm Sinh viên với Khoa không tồn tại
-
-**Kỳ vọng**:
-- Route đúng site dựa trên MaKhoa của sinh viên
-- Validate MaKhoa phải tồn tại trong Khoa_Global
-- Báo lỗi khi vi phạm ràng buộc
-
----
-
-### TEST 4: CTDAOTAO_GLOBAL (6 tests)
-✅ **Test 4.1**: Thêm Chương trình đào tạo vào Site A
-✅ **Test 4.2**: Thêm Chương trình đào tạo vào Site B
-✅ **Test 4.3**: Kiểm tra lỗi khi thêm Chương trình trùng
-✅ **Test 4.4**: Kiểm tra lỗi khi thêm với MaKhoa không tồn tại
-✅ **Test 4.5**: Kiểm tra lỗi khi thêm với MaMH không tồn tại
-✅ **Test 4.6**: Kiểm tra lỗi khi UPDATE (không cho phép)
-
-**Kỳ vọng**:
-- Route đúng site dựa trên MaKhoa
-- Validate MaKhoa và MaMH phải tồn tại
-- Không cho phép UPDATE (composite primary key)
-
----
-
-### TEST 5: DANGKY_GLOBAL (6 tests)
-✅ **Test 5.1**: Thêm Đăng ký cho sinh viên Site A
-✅ **Test 5.2**: Thêm Đăng ký cho sinh viên Site B (có điểm)
-✅ **Test 5.3**: Cập nhật điểm thi
-✅ **Test 5.4**: Kiểm tra lỗi khi thêm Đăng ký trùng
-✅ **Test 5.5**: Kiểm tra lỗi khi MaSV không tồn tại
-✅ **Test 5.6**: Kiểm tra lỗi khi MaMon không tồn tại
-
-**Kỳ vọng**:
-- Route đúng site dựa trên MaKhoa của sinh viên (JOIN với SinhVien_Global)
-- Validate MaSV và MaMon phải tồn tại
-- Chỉ cho phép UPDATE DiemThi, không cho phép đổi MaSV/MaMon
-
----
-
-### TEST 6: RÀNG BUỘC XÓA (3 tests)
-✅ **Test 6.1**: Kiểm tra lỗi khi xóa Khoa có sinh viên
-✅ **Test 6.2**: Kiểm tra lỗi khi xóa Môn học có trong Chương trình
-✅ **Test 6.3**: Kiểm tra lỗi khi xóa Sinh viên có đăng ký
-
-**Kỳ vọng**:
-- Triggers kiểm tra foreign key constraints
-- Báo lỗi rõ ràng khi vi phạm ràng buộc
-
----
-
-### TEST 7: DỌN DỮ LIỆU (1 test)
-✅ **Test 7**: Xóa dữ liệu test theo thứ tự đúng (DangKy → CTDaoTao → SinhVien → MonHoc → Khoa)
-
-**Kỳ vọng**:
-- Xóa thành công khi tuân thủ thứ tự ràng buộc
-
-## Kết quả mong đợi
-
-Tất cả test cases phải PASS với các ký hiệu:
-- ✅ `✓ Đúng: <thông báo lỗi>` - Test PASS (kỳ vọng có lỗi)
-- ✅ `(X rows affected)` - Test PASS (thao tác thành công)
-- ❌ `❌ LỖI: <mô tả>` - Test FAIL (không báo lỗi như mong đợi)
-
-## Tạo test cases tùy chỉnh
-
-### Template thêm Khoa mới:
-```sql
--- Khoa vào Site A (MaKhoa < 'M')
-INSERT INTO Khoa_Global (MaKhoa, TenKhoa) VALUES ('ABC', N'Khoa ABC');
-
--- Khoa vào Site B ('M' <= MaKhoa < 'S')
-INSERT INTO Khoa_Global (MaKhoa, TenKhoa) VALUES ('MNO', N'Khoa MNO');
-
--- Khoa vào Site C (MaKhoa >= 'S')
-INSERT INTO Khoa_Global (MaKhoa, TenKhoa) VALUES ('XYZ', N'Khoa XYZ');
+```diff
++ Insert Site A/B/C theo MaKhoa
++ Update TenKhoa
++ Delete validation
+- Duplicate key error (expected)
 ```
 
-### Template thêm Sinh viên:
-```sql
-INSERT INTO SinhVien_Global (MaSV, HoTen, MaKhoa, KhoaHoc) 
-VALUES ('SV003', N'Lê Văn C', 'CNTT', 2024);
+### 📚 TEST 2: MONHOC_GLOBAL (3 tests)
+
+```diff
++ Insert → sync 3 sites
++ Update → sync 3 sites
+- Duplicate error (expected)
 ```
 
-### Template thêm Môn học:
-```sql
--- Sẽ sync sang cả 3 sites tự động
-INSERT INTO MonHoc_Global (MaMH, TenMH) VALUES ('MH001', N'Toán Cao Cấp');
+### 👨‍🎓 TEST 3: SINHVIEN_GLOBAL (5 tests)
+
+```diff
++ Insert Site A/B
++ Update (không đổi khoa)
+- Duplicate error (expected)
+- FK validation (expected)
 ```
 
-### Template thêm Đăng ký:
-```sql
--- DiemThi có thể NULL (chưa thi) hoặc có giá trị
-INSERT INTO DangKy_Global (MaSV, MaMon, DiemThi) 
-VALUES ('SV003', 'MH001', NULL);
+### 📋 TEST 4: CTDAOTAO_GLOBAL (6 tests)
 
--- Cập nhật điểm sau
+```diff
++ Insert Site A/B
+- Duplicate error (expected)
+- FK validation MaKhoa (expected)
+- FK validation MaMH (expected)
+- No UPDATE allowed (expected)
+```
+
+### ✍️ TEST 5: DANGKY_GLOBAL (6 tests)
+
+```diff
++ Insert Site A/B (với/không điểm)
++ Update DiemThi only
+- Duplicate error (expected)
+- FK validation MaSV (expected)
+- FK validation MaMon (expected)
+```
+
+### 🔒 TEST 6: RÀNG BUỘC (3 tests)
+
+```diff
+- Không xóa Khoa có SinhVien (expected)
+- Không xóa MonHoc có trong CTĐT (expected)
+- Không xóa SinhVien có DangKy (expected)
+```
+
+### 🧹 TEST 7: CLEANUP (1 test)
+
+```sql
+✓ Xóa đúng thứ tự: DangKy → CTĐT → SinhVien → MonHoc → Khoa
+```
+
+---
+
+## 📊 Kết Quả Test
+
+### Expected Results
+
+| Status | Output | Meaning |
+|--------|--------|----------|
+| ✅ PASS | `(X rows affected)` | Thao tác thành công |
+| ✅ PASS | `✓ Đúng: <error message>` | Lỗi như mong đợi |
+| ❌ FAIL | `❌ LỖI: <description>` | Không báo lỗi |
+
+---
+
+## 📝 Template Test SQL
+
+### 🏫 Khoa
+```sql
+-- Site A (MaKhoa < 'M')
+INSERT INTO Khoa_Global VALUES ('ABC', N'Khoa ABC');
+
+-- Site B ('M' <= MaKhoa < 'S')
+INSERT INTO Khoa_Global VALUES ('MNO', N'Khoa MNO');
+
+-- Site C (MaKhoa >= 'S')
+INSERT INTO Khoa_Global VALUES ('XYZ', N'Khoa XYZ');
+```
+
+### 📚 MonHoc (Sync 3 Sites)
+```sql
+INSERT INTO MonHoc_Global VALUES ('MH001', N'Toán Cao Cấp');
+UPDATE MonHoc_Global SET TenMH = N'Toán A1' WHERE MaMH = 'MH001';
+DELETE FROM MonHoc_Global WHERE MaMH = 'MH001';
+```
+
+### 👨‍🎓 SinhVien
+```sql
+INSERT INTO SinhVien_Global VALUES ('SV001', N'Nguyễn Văn A', 'CNTT', 2024);
+UPDATE SinhVien_Global SET HoTen = N'Nguyễn Văn B' WHERE MaSV = 'SV001';
+```
+
+### ✍️ DangKy
+```sql
+-- Insert without DiemThi
+INSERT INTO DangKy_Global VALUES ('SV001', 'MH001', NULL);
+
+-- Update DiemThi later
 UPDATE DangKy_Global SET DiemThi = 8.5 
-WHERE MaSV = 'SV003' AND MaMon = 'MH001';
+WHERE MaSV = 'SV001' AND MaMon = 'MH001';
 ```
 
-## Test nâng cao (không có trong test suite)
+---
 
-### Test chuyển sinh viên sang khoa khác (cross-site move):
+## 🔧 Troubleshooting
+
+<table>
+<tr>
+<td width="33%">
+
+### ❌ Duplicate Key
+```powershell
+# Solution
+sqlcmd -i db\test_triggers.sql
+# Chạy TEST 7 cleanup
+```
+
+</td>
+<td width="33%">
+
+### ❌ Linked Server
+```powershell
+# Solution
+sqlcmd -i db\global\init.sql
+# Tạo lại linked servers
+```
+
+</td>
+<td width="34%">
+
+### ❌ FK Violation
 ```sql
--- Kiểm tra SV001 đang ở Site A (MaKhoa = 'TEST')
-SELECT * FROM SinhVien_Global WHERE MaSV = 'SV001';
-
--- Chuyển sang Site B (MaKhoa = 'MTEST')
--- CHÚ Ý: Phải xóa DangKy trước
-DELETE FROM DangKy_Global WHERE MaSV = 'SV001';
-UPDATE SinhVien_Global SET MaKhoa = 'MTEST' WHERE MaSV = 'SV001';
-
--- Kiểm tra đã chuyển sang Site B
-SELECT * FROM [SITE_B].SiteB.dbo.SinhVien WHERE MaSV = 'SV001';
+-- Solution
+-- Thứ tự INSERT:
+1. Khoa
+2. MonHoc
+3. SinhVien/CTĐT
+4. DangKy
 ```
 
-### Test transaction rollback:
-```sql
-BEGIN TRANSACTION;
-    INSERT INTO Khoa_Global (MaKhoa, TenKhoa) VALUES ('TMP', N'Khoa Tạm');
-    INSERT INTO SinhVien_Global (MaSV, HoTen, MaKhoa, KhoaHoc) 
-    VALUES ('SVTMP', N'Sinh viên tạm', 'TMP', 2024);
-ROLLBACK TRANSACTION;
+</td>
+</tr>
+</table>
 
--- Kiểm tra không có dữ liệu
-SELECT * FROM Khoa_Global WHERE MaKhoa = 'TMP';
-SELECT * FROM SinhVien_Global WHERE MaSV = 'SVTMP';
-```
+---
 
-## Troubleshooting
+<div align="center">
 
-### Lỗi "Cannot insert duplicate key"
-- Đảm bảo đã chạy TEST 7 để dọn dữ liệu cũ
-- Hoặc đổi mã test khác (ví dụ: 'TEST' → 'TEST2')
+**[⬅️ Back to README](README.md)** | **[🏗️ Architecture](ARCHITECTURE.md)** | **[📝 CRUD Guide](CRUD_GUIDE.md)**
 
-### Lỗi "Linked server not found"
-- Kiểm tra linked servers đã được tạo: `SELECT * FROM sys.servers`
-- Chạy lại `db/global/init.sql`
+---
 
-### Lỗi "Foreign key violation"
-- Kiểm tra thứ tự INSERT: Khoa → MonHoc → CTDaoTao/SinhVien → DangKy
-- Kiểm tra thứ tự DELETE ngược lại
+**Made with ❤️ for HUFLIT**
 
-## Best Practices
-
-1. **Luôn test trước khi deploy**: Chạy toàn bộ test suite
-2. **Kiểm tra cả 3 sites**: Dùng queries để verify dữ liệu ở đúng site
-3. **Test edge cases**: NULL values, empty strings, special characters
-4. **Dọn dữ liệu test**: Đảm bảo không ảnh hưởng môi trường production
-
-## Tài liệu tham khảo
-
-- `ARCHITECTURE.md`: Kiến trúc hệ thống
-- `CRUD_GUIDE.md`: Hướng dẫn CRUD operations
-- `db/global/triggers.sql`: Source code triggers
-- `README.md`: Hướng dẫn cài đặt
+</div>
