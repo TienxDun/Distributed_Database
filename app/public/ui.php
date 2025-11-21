@@ -289,7 +289,9 @@
             headers.forEach(h => {
                 // Skip Site column if toggle is off
                 if (h === 'Site' && !showSiteColumn) return;
-                table += `<th>${h}</th>`;
+                // Add special class for Site header
+                const headerClass = h === 'Site' ? ' class="site-header"' : '';
+                table += `<th${headerClass}>${h}</th>`;
             });
             table += '<th>Thao tác</th></tr></thead><tbody>';
             
@@ -560,6 +562,7 @@
                     <div class="form-group">
                         <label>Mã Khoa <span class="required">*</span></label>
                         <input type="text" id="field-MaKhoa" value="${data.MaKhoa || ''}" maxlength="10" ${currentAction === 'edit' ? 'readonly' : ''} required>
+                        ${currentAction === 'edit' ? '<small style="color: #64748b;">🔒 Mã khoa không thể chỉnh sửa</small>' : '<small style="color: #64748b;">Ví dụ: CNTT, NN, LUAT</small>'}
                     </div>
                     <div class="form-group">
                         <label>Tên Khoa <span class="required">*</span></label>
@@ -571,6 +574,7 @@
                     <div class="form-group">
                         <label>Mã Môn Học <span class="required">*</span></label>
                         <input type="text" id="field-MaMH" value="${data.MaMH || ''}" maxlength="10" ${currentAction === 'edit' ? 'readonly' : ''} required>
+                        ${currentAction === 'edit' ? '<small style="color: #64748b;">🔒 Mã môn học không thể chỉnh sửa</small>' : '<small style="color: #64748b;">Ví dụ: MH001, MH002</small>'}
                     </div>
                     <div class="form-group">
                         <label>Tên Môn Học <span class="required">*</span></label>
@@ -582,6 +586,7 @@
                     <div class="form-group">
                         <label>Mã Sinh Viên <span class="required">*</span></label>
                         <input type="text" id="field-MaSV" value="${data.MaSV || ''}" maxlength="20" ${currentAction === 'edit' ? 'readonly' : ''} required>
+                        ${currentAction === 'edit' ? '<small style="color: #64748b;">🔒 Mã sinh viên không thể chỉnh sửa</small>' : '<small style="color: #64748b;">Ví dụ: 25DH000001, 24DH000002</small>'}
                     </div>
                     <div class="form-group">
                         <label>Họ Tên <span class="required">*</span></label>
@@ -619,15 +624,17 @@
                         <div class="form-group">
                             <label>Mã Sinh Viên <span class="required">*</span></label>
                             <input type="text" id="field-MaSV" value="${data.MaSV || ''}" maxlength="20" required>
+                            <small style="color: #64748b;">Ví dụ: 25DH000001, 24DH000002</small>
                         </div>
                         <div class="form-group">
                             <label>Mã Môn Học <span class="required">*</span></label>
                             <input type="text" id="field-MaMon" value="${data.MaMon || ''}" maxlength="10" required>
+                            <small style="color: #64748b;">Ví dụ: MH001, MH002</small>
                         </div>
                         <div class="form-group">
                             <label>Điểm Thi</label>
                             <input type="number" id="field-DiemThi" value="${data.DiemThi || ''}" min="0" max="10" step="0.01">
-                            <small style="color: #64748b;">Để trống nếu chưa có điểm</small>
+                            <small style="color: #64748b;">Để trống nếu chưa có điểm (0-10)</small>
                         </div>
                     `;
                 } else {
@@ -635,14 +642,17 @@
                         <div class="form-group">
                             <label>Mã Sinh Viên</label>
                             <input type="text" value="${data.MaSV}" readonly>
+                            <small style="color: #64748b;">🔒 Mã sinh viên không thể chỉnh sửa</small>
                         </div>
                         <div class="form-group">
                             <label>Mã Môn Học</label>
                             <input type="text" value="${data.MaMon}" readonly>
+                            <small style="color: #64748b;">🔒 Mã môn học không thể chỉnh sửa</small>
                         </div>
                         <div class="form-group">
                             <label>Điểm Thi <span class="required">*</span></label>
                             <input type="number" id="field-DiemThi" value="${data.DiemThi || ''}" min="0" max="10" step="0.01" required>
+                            <small style="color: #64748b;">Nhập điểm từ 0 đến 10</small>
                         </div>
                     `;
                 }
@@ -877,7 +887,9 @@
             headers.forEach(h => {
                 // Skip Site column if toggle is off
                 if (h === 'Site' && !showSiteColumn) return;
-                table += `<th>${h}</th>`;
+                // Add special class for Site header
+                const headerClass = h === 'Site' ? ' class="site-header"' : '';
+                table += `<th${headerClass}>${h}</th>`;
             });
             table += '</tr></thead><tbody>';
             
