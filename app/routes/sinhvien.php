@@ -7,12 +7,26 @@ function handleSinhVien($method, $query) {
         switch ($method) {
             case 'GET':
                 if (isset($query['id'])) {
-                    $stmt = $pdo->prepare("SELECT * FROM SinhVien_Global WHERE MaSV = ?");
+                    $stmt = $pdo->prepare("
+                        SELECT MaSV, HoTen, MaKhoa, KhoaHoc,
+                            CASE 
+                                WHEN MaKhoa < 'M' THEN 'Site A'
+                                WHEN MaKhoa >= 'M' AND MaKhoa < 'S' THEN 'Site B'
+                                ELSE 'Site C'
+                            END AS Site
+                        FROM SinhVien_Global WHERE MaSV = ?");
                     $stmt->execute([$query['id']]);
                     $result = $stmt->fetch(PDO::FETCH_ASSOC);
                     sendResponse($result ?: ['error' => 'Not found'], $result ? 200 : 404);
                 } else {
-                    $stmt = $pdo->query("SELECT * FROM SinhVien_Global");
+                    $stmt = $pdo->query("
+                        SELECT MaSV, HoTen, MaKhoa, KhoaHoc,
+                            CASE 
+                                WHEN MaKhoa < 'M' THEN 'Site A'
+                                WHEN MaKhoa >= 'M' AND MaKhoa < 'S' THEN 'Site B'
+                                ELSE 'Site C'
+                            END AS Site
+                        FROM SinhVien_Global");
                     sendResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
                 }
                 break;

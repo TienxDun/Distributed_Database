@@ -30,7 +30,14 @@ function handleCTDaoTao($method, $query) {
                     $result = $stmt->fetch(PDO::FETCH_ASSOC);
                     sendResponse($result ?: ['error' => 'Not found'], $result ? 200 : 404);
                 } else {
-                    $stmt = $pdo->query("SELECT * FROM CTDaoTao_Global");
+                    $stmt = $pdo->query("
+                        SELECT MaKhoa, KhoaHoc, MaMH,
+                            CASE 
+                                WHEN MaKhoa < 'M' THEN 'Site A'
+                                WHEN MaKhoa >= 'M' AND MaKhoa < 'S' THEN 'Site B'
+                                ELSE 'Site C'
+                            END AS Site
+                        FROM CTDaoTao_Global");
                     sendResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
                 }
                 break;

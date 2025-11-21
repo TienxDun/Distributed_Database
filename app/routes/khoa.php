@@ -7,12 +7,26 @@ function handleKhoa($method, $query) {
         switch ($method) {
             case 'GET':
                 if (isset($query['id'])) {
-                    $stmt = $pdo->prepare("SELECT * FROM Khoa_Global WHERE MaKhoa = ?");
+                    $stmt = $pdo->prepare("
+                        SELECT MaKhoa, TenKhoa,
+                            CASE 
+                                WHEN MaKhoa < 'M' THEN 'Site A'
+                                WHEN MaKhoa >= 'M' AND MaKhoa < 'S' THEN 'Site B'
+                                ELSE 'Site C'
+                            END AS Site
+                        FROM Khoa_Global WHERE MaKhoa = ?");
                     $stmt->execute([$query['id']]);
                     $result = $stmt->fetch(PDO::FETCH_ASSOC);
                     sendResponse($result ?: ['error' => 'Not found'], $result ? 200 : 404);
                 } else {
-                    $stmt = $pdo->query("SELECT * FROM Khoa_Global");
+                    $stmt = $pdo->query("
+                        SELECT MaKhoa, TenKhoa,
+                            CASE 
+                                WHEN MaKhoa < 'M' THEN 'Site A'
+                                WHEN MaKhoa >= 'M' AND MaKhoa < 'S' THEN 'Site B'
+                                ELSE 'Site C'
+                            END AS Site
+                        FROM Khoa_Global");
                     sendResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
                 }
                 break;

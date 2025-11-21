@@ -518,6 +518,44 @@ input.error {
     margin-left: 0.25rem;
 }
 
+/* Site badges styling */
+table td.site-a {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
+    color: #1e40af !important;
+    font-weight: 700;
+    text-align: center;
+    padding: 0.75rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(30, 64, 175, 0.1);
+}
+
+table td.site-b {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%) !important;
+    color: #065f46 !important;
+    font-weight: 700;
+    text-align: center;
+    padding: 0.75rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(6, 95, 70, 0.1);
+}
+
+table td.site-c {
+    background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%) !important;
+    color: #9f1239 !important;
+    font-weight: 700;
+    text-align: center;
+    padding: 0.75rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(159, 18, 57, 0.1);
+}
+
+/* Site column header styling */
+table th:nth-last-child(2) {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    font-weight: 700;
+    color: var(--primary);
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 1rem;

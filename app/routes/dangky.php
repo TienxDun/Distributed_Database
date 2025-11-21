@@ -8,10 +8,17 @@ function handleDangKy($method, $query) {
             case 'GET':
                 if (isset($query['masv'])) {
                     // Lấy tất cả môn học mà sinh viên đăng ký
-                    $stmt = $pdo->prepare("SELECT dk.*, mh.TenMH, sv.HoTen FROM DangKy_Global dk 
-                                          JOIN MonHoc_Global mh ON dk.MaMon = mh.MaMH 
-                                          JOIN SinhVien_Global sv ON dk.MaSV = sv.MaSV 
-                                          WHERE dk.MaSV = ?");
+                    $stmt = $pdo->prepare("
+                        SELECT dk.MaSV, dk.MaMon, dk.DiemThi, mh.TenMH, sv.HoTen, sv.MaKhoa,
+                            CASE 
+                                WHEN sv.MaKhoa < 'M' THEN 'Site A'
+                                WHEN sv.MaKhoa >= 'M' AND sv.MaKhoa < 'S' THEN 'Site B'
+                                ELSE 'Site C'
+                            END AS Site
+                        FROM DangKy_Global dk 
+                        JOIN MonHoc_Global mh ON dk.MaMon = mh.MaMH 
+                        JOIN SinhVien_Global sv ON dk.MaSV = sv.MaSV 
+                        WHERE dk.MaSV = ?");
                     $stmt->execute([$query['masv']]);
                     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     sendResponse($results);
@@ -26,9 +33,16 @@ function handleDangKy($method, $query) {
                     sendResponse($results);
                 } else {
                     // Lấy tất cả đăng ký
-                    $stmt = $pdo->query("SELECT dk.*, sv.HoTen, mh.TenMH FROM DangKy_Global dk 
-                                        JOIN SinhVien_Global sv ON dk.MaSV = sv.MaSV 
-                                        JOIN MonHoc_Global mh ON dk.MaMon = mh.MaMH");
+                    $stmt = $pdo->query("
+                        SELECT dk.MaSV, dk.MaMon, dk.DiemThi, sv.HoTen, mh.TenMH, sv.MaKhoa,
+                            CASE 
+                                WHEN sv.MaKhoa < 'M' THEN 'Site A'
+                                WHEN sv.MaKhoa >= 'M' AND sv.MaKhoa < 'S' THEN 'Site B'
+                                ELSE 'Site C'
+                            END AS Site
+                        FROM DangKy_Global dk 
+                        JOIN SinhVien_Global sv ON dk.MaSV = sv.MaSV 
+                        JOIN MonHoc_Global mh ON dk.MaMon = mh.MaMH");
                     sendResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
                 }
                 break;

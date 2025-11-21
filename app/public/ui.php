@@ -11,6 +11,12 @@
         <div class="header">
             <h1>🎓 HUFLIT Distributed Database</h1>
             <p>Full CRUD Interface - Hệ thống Cơ sở dữ liệu Phân tán</p>
+            <div style="margin-top: 1rem;">
+                <label style="display: inline-flex; align-items: center; cursor: pointer; font-size: 0.95rem; color: var(--secondary);">
+                    <input type="checkbox" id="toggleSiteColumn" checked onchange="toggleSiteColumnVisibility()" style="margin-right: 0.5rem; cursor: pointer; width: 18px; height: 18px;">
+                    <span style="font-weight: 500;">🗺️ Hiển thị cột Site (phân mảnh dữ liệu)</span>
+                </label>
+            </div>
         </div>
 
         <div class="tabs">
@@ -195,6 +201,7 @@
         let currentModule = '';
         let currentAction = ''; // 'create' or 'edit'
         let editingId = null;
+        let showSiteColumn = true; // Global flag for Site column visibility
 
         // Tab navigation
         function showTab(tabName) {
@@ -221,6 +228,17 @@
             }, 5000);
         }
 
+        // Toggle Site column visibility
+        function toggleSiteColumnVisibility() {
+            showSiteColumn = document.getElementById('toggleSiteColumn').checked;
+            
+            // Reload current module data to apply changes
+            const activeTab = document.querySelector('.tab-content.active');
+            if (activeTab && activeTab.id !== 'global') {
+                loadData(activeTab.id);
+            }
+        }
+
         // Create table with action buttons
         function createTableWithActions(data, module) {
             if (!Array.isArray(data) || data.length === 0) {
@@ -229,13 +247,30 @@
 
             const headers = Object.keys(data[0]);
             let table = '<table><thead><tr>';
-            headers.forEach(h => table += `<th>${h}</th>`);
+            headers.forEach(h => {
+                // Skip Site column if toggle is off
+                if (h === 'Site' && !showSiteColumn) return;
+                table += `<th>${h}</th>`;
+            });
             table += '<th>Thao tác</th></tr></thead><tbody>';
             
             data.forEach(row => {
                 table += '<tr>';
                 headers.forEach(h => {
-                    table += `<td>${row[h] !== null && row[h] !== undefined ? row[h] : ''}</td>`;
+                    // Skip Site column if toggle is off
+                    if (h === 'Site' && !showSiteColumn) return;
+                    
+                    const value = row[h] !== null && row[h] !== undefined ? row[h] : '';
+                    let cellClass = '';
+                    
+                    // Add class for Site column
+                    if (h === 'Site') {
+                        if (value === 'Site A') cellClass = ' class="site-a"';
+                        else if (value === 'Site B') cellClass = ' class="site-b"';
+                        else if (value === 'Site C') cellClass = ' class="site-c"';
+                    }
+                    
+                    table += `<td${cellClass}>${value}</td>`;
                 });
                 
                 // Action buttons
@@ -749,13 +784,30 @@
 
             const headers = Object.keys(data[0]);
             let table = '<table><thead><tr>';
-            headers.forEach(h => table += `<th>${h}</th>`);
+            headers.forEach(h => {
+                // Skip Site column if toggle is off
+                if (h === 'Site' && !showSiteColumn) return;
+                table += `<th>${h}</th>`;
+            });
             table += '</tr></thead><tbody>';
             
             data.forEach(row => {
                 table += '<tr>';
                 headers.forEach(h => {
-                    table += `<td>${row[h] !== null && row[h] !== undefined ? row[h] : ''}</td>`;
+                    // Skip Site column if toggle is off
+                    if (h === 'Site' && !showSiteColumn) return;
+                    
+                    const value = row[h] !== null && row[h] !== undefined ? row[h] : '';
+                    let cellClass = '';
+                    
+                    // Add class for Site column
+                    if (h === 'Site') {
+                        if (value === 'Site A') cellClass = ' class="site-a"';
+                        else if (value === 'Site B') cellClass = ' class="site-b"';
+                        else if (value === 'Site C') cellClass = ' class="site-c"';
+                    }
+                    
+                    table += `<td${cellClass}>${value}</td>`;
                 });
                 table += '</tr>';
             });
