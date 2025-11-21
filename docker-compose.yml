@@ -100,4 +100,3 @@ networks:
     huflit-network:
         name: huflit-network
         driver: bridge
-        external: true
