@@ -40,9 +40,10 @@ export async function deleteRecord(module, id) {
     try {
         const result = await apiDelete(`/${module}?id=${id}`);
         showAlert(module, result.message || 'Xóa thành công!', 'success');
-        loadData(module);
+        await loadData(module);
     } catch (error) {
         showAlert(module, `Lỗi: ${error.message}`, 'error');
+    } finally {
         hideLoading();
     }
 }
@@ -67,9 +68,10 @@ export async function deleteCTDaoTao(maKhoa, khoaHoc, maMH) {
         });
         const result = await apiDelete(`/ctdaotao${queryString}`);
         showAlert('ctdaotao', result.message || 'Xóa thành công!', 'success');
-        loadData('ctdaotao');
+        await loadData('ctdaotao');
     } catch (error) {
         showAlert('ctdaotao', `Lỗi: ${error.message}`, 'error');
+    } finally {
         hideLoading();
     }
 }
@@ -92,9 +94,10 @@ export async function deleteDangKy(maSV, maMon) {
         });
         const result = await apiDelete(`/dangky${queryString}`);
         showAlert('dangky', result.message || 'Xóa thành công!', 'success');
-        loadData('dangky');
+        await loadData('dangky');
     } catch (error) {
         showAlert('dangky', `Lỗi: ${error.message}`, 'error');
+    } finally {
         hideLoading();
     }
 }
