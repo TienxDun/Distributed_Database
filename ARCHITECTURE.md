@@ -100,12 +100,12 @@ Route INSERT/UPDATE/DELETE → Sites
 ## 🔄 Data Flow
 
 ### Initialization
-```mermaid
+```
 Docker Compose → Containers → init_databases.ps1 → Create DB → Seed Data
 ```
 
 ### CRUD Operations
-```mermaid
+```
 UI → AJAX → API → Global DB → Partitioned Views → INSTEAD OF Triggers → Route to Sites → JSON Response
 ```
 
@@ -146,30 +146,6 @@ docker-compose up -d
 | 🗄️ Site B | 14335 | localhost,14335 |
 | 🗄️ Site C | 14336 | localhost,14336 |
 
----
-
-## ⚠️ Lưu ý
-
-### Development Environment
-```diff
-+ Sample data
-+ No authentication
-+ No SSL/HTTPS
-+ Docker internal network
-```
-
-### Production Requirements
-```diff
-! JWT authentication
-! HTTPS/TLS encryption
-! Input validation & sanitization
-! Monitoring & logging
-! Automated backups
-! Rate limiting
-! CORS configuration
-```
-
----
 
 <div align="center">
 

@@ -7,6 +7,14 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <div class="loading-text">Đang xử lý...</div>
+        </div>
+    </div>
+
     <div class="container">
         <div class="header">
             <h1>🎓 HUFLIT Distributed Database</h1>
@@ -202,6 +210,37 @@
         let currentAction = ''; // 'create' or 'edit'
         let editingId = null;
         let showSiteColumn = true; // Global flag for Site column visibility
+        let isLoading = false; // Global loading state
+
+        // Show/hide loading overlay
+        function showLoading(message = 'Đang xử lý...') {
+            const overlay = document.getElementById('loadingOverlay');
+            const text = overlay.querySelector('.loading-text');
+            text.textContent = message;
+            overlay.classList.add('show');
+            isLoading = true;
+        }
+
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.remove('show');
+            isLoading = false;
+        }
+
+        // Set button loading state
+        function setButtonLoading(button, loading) {
+            if (loading) {
+                button.classList.add('loading');
+                button.disabled = true;
+                button.dataset.originalText = button.textContent;
+            } else {
+                button.classList.remove('loading');
+                button.disabled = false;
+                if (button.dataset.originalText) {
+                    button.textContent = button.dataset.originalText;
+                }
+            }
+        }
 
         // Tab navigation
         function showTab(tabName) {
@@ -301,9 +340,13 @@
 
         // Load data for a module
         async function loadData(module) {
+            if (isLoading) return;
+            
             const resultDiv = document.getElementById(`${module}-result`);
-            resultDiv.innerHTML = '<div class="loading"></div> Đang tải...';
+            resultDiv.innerHTML = '<div class="loading"></div> Đang tải dữ liệu...';
             resultDiv.className = 'result show';
+            
+            showLoading('Đang tải dữ liệu...');
 
             try {
                 const response = await fetch(`${API_BASE}/${module}`);
@@ -317,11 +360,15 @@
             } catch (error) {
                 resultDiv.innerHTML = `<strong>Lỗi:</strong> ${error.message}`;
                 resultDiv.className = 'result show error';
+            } finally {
+                hideLoading();
             }
         }
 
         // Load data by ID (for khoa, monhoc, sinhvien)
         async function loadDataById(module) {
+            if (isLoading) return;
+            
             const idInput = document.getElementById(`${module}-id`);
             const id = idInput ? idInput.value.trim() : '';
             
@@ -331,8 +378,10 @@
             }
 
             const resultDiv = document.getElementById(`${module}-result`);
-            resultDiv.innerHTML = '<div class="loading"></div> Đang tải...';
+            resultDiv.innerHTML = '<div class="loading"></div> Đang tìm kiếm...';
             resultDiv.className = 'result show';
+            
+            showLoading('Đang tìm kiếm dữ liệu...');
 
             try {
                 const response = await fetch(`${API_BASE}/${module}?id=${encodeURIComponent(id)}`);
@@ -353,11 +402,15 @@
             } catch (error) {
                 resultDiv.innerHTML = `<strong>Lỗi:</strong> ${error.message}`;
                 resultDiv.className = 'result show error';
+            } finally {
+                hideLoading();
             }
         }
 
         // Load CTDaoTao by filter (khoa and/or khoahoc)
         async function loadCTDaoTaoByFilter() {
+            if (isLoading) return;
+            
             const khoaInput = document.getElementById('ctdaotao-khoa');
             const khoahocInput = document.getElementById('ctdaotao-khoahoc');
             const khoa = khoaInput ? khoaInput.value.trim() : '';
@@ -369,8 +422,10 @@
             }
 
             const resultDiv = document.getElementById('ctdaotao-result');
-            resultDiv.innerHTML = '<div class="loading"></div> Đang tải...';
+            resultDiv.innerHTML = '<div class="loading"></div> Đang tìm kiếm...';
             resultDiv.className = 'result show';
+            
+            showLoading('Đang tìm kiếm chương trình đào tạo...');
 
             try {
                 const params = new URLSearchParams();
@@ -388,11 +443,15 @@
             } catch (error) {
                 resultDiv.innerHTML = `<strong>Lỗi:</strong> ${error.message}`;
                 resultDiv.className = 'result show error';
+            } finally {
+                hideLoading();
             }
         }
 
         // Load DangKy by MaSV
         async function loadDangKyByMaSV() {
+            if (isLoading) return;
+            
             const masvInput = document.getElementById('dangky-masv');
             const masv = masvInput ? masvInput.value.trim() : '';
             
@@ -404,6 +463,8 @@
             const resultDiv = document.getElementById('dangky-result');
             resultDiv.innerHTML = '<div class="loading"></div> Đang tải...';
             resultDiv.className = 'result show';
+            
+            showLoading('Đang tải thông tin đăng ký...');
 
             try {
                 const response = await fetch(`${API_BASE}/dangky?masv=${encodeURIComponent(masv)}`);
@@ -417,6 +478,8 @@
             } catch (error) {
                 resultDiv.innerHTML = `<strong>Lỗi:</strong> ${error.message}`;
                 resultDiv.className = 'result show error';
+            } finally {
+                hideLoading();
             }
         }
 
@@ -590,6 +653,8 @@
 
         // Submit form
         async function submitForm() {
+            if (isLoading) return;
+            
             const formData = {};
             
             // Collect form data
@@ -631,6 +696,10 @@
 
             // Hide any previous alerts
             hideModalAlert();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            setButtonLoading(submitBtn, true);
+            showLoading(currentAction === 'create' ? 'Đang thêm dữ liệu...' : 'Đang cập nhật...');
 
             // Determine method and URL
             let method, url;
@@ -665,12 +734,18 @@
                 loadData(currentModule);
             } catch (error) {
                 showModalAlert(`❌ ${error.message}`, 'error');
+            } finally {
+                setButtonLoading(submitBtn, false);
+                hideLoading();
             }
         }
 
         // Delete record
         async function deleteRecord(module, id) {
+            if (isLoading) return;
             if (!confirm(`Bạn có chắc muốn xóa bản ghi này?`)) return;
+            
+            showLoading('Đang xóa dữ liệu...');
 
             try {
                 const response = await fetch(`${API_BASE}/${module}?id=${id}`, {
@@ -687,12 +762,16 @@
                 loadData(module);
             } catch (error) {
                 showAlert(module, `Lỗi: ${error.message}`, 'error');
+                hideLoading();
             }
         }
 
         // Delete CTDaoTao
         async function deleteCTDaoTao(maKhoa, khoaHoc, maMH) {
+            if (isLoading) return;
             if (!confirm(`Xóa môn ${maMH} khỏi CTĐT khoa ${maKhoa} khóa ${khoaHoc}?`)) return;
+            
+            showLoading('Đang xóa môn học khỏi CTĐT...');
 
             try {
                 const response = await fetch(`${API_BASE}/ctdaotao?khoa=${maKhoa}&khoahoc=${khoaHoc}&monhoc=${maMH}`, {
@@ -709,12 +788,16 @@
                 loadData('ctdaotao');
             } catch (error) {
                 showAlert('ctdaotao', `Lỗi: ${error.message}`, 'error');
+                hideLoading();
             }
         }
 
         // Delete DangKy
         async function deleteDangKy(maSV, maMon) {
+            if (isLoading) return;
             if (!confirm(`Hủy đăng ký môn ${maMon} của sinh viên ${maSV}?`)) return;
+            
+            showLoading('Đang hủy đăng ký...');
 
             try {
                 const response = await fetch(`${API_BASE}/dangky?masv=${maSV}&mamon=${maMon}`, {
@@ -731,13 +814,16 @@
                 loadData('dangky');
             } catch (error) {
                 showAlert('dangky', `Lỗi: ${error.message}`, 'error');
+                hideLoading();
             }
         }
 
         // Global queries
         async function callGlobalQuery(type) {
+            if (isLoading) return;
+            
             const resultDiv = document.getElementById(`global-result-${type}`);
-            resultDiv.innerHTML = '<div class="loading"></div> Đang tải...';
+            resultDiv.innerHTML = '<div class="loading"></div> Đang truy vấn...';
             resultDiv.className = 'result show';
 
             let params = new URLSearchParams();
@@ -760,6 +846,8 @@
                 }
                 params.append('query', query);
             }
+            
+            showLoading('Đang thực hiện truy vấn toàn cục...');
 
             try {
                 const response = await fetch(`${API_BASE}/global?${params}`);
@@ -773,6 +861,8 @@
             } catch (error) {
                 resultDiv.innerHTML = `<strong>Lỗi:</strong> ${error.message}`;
                 resultDiv.className = 'result show error';
+            } finally {
+                hideLoading();
             }
         }
 
