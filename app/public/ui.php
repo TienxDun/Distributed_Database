@@ -19,11 +19,14 @@
         <div class="header">
             <h1>🎓 HUFLIT Distributed Database</h1>
             <p>Full CRUD Interface - Hệ thống Cơ sở dữ liệu Phân tán</p>
-            <div style="margin-top: 1rem;">
+            <div style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                 <label style="display: inline-flex; align-items: center; cursor: pointer; font-size: 0.95rem; color: var(--secondary);">
                     <input type="checkbox" id="toggleSiteColumn" checked onchange="toggleSiteColumnVisibility()" style="margin-right: 0.5rem; cursor: pointer; width: 18px; height: 18px;">
                     <span style="font-weight: 500;">🗺️ Hiển thị cột Site (phân mảnh dữ liệu)</span>
                 </label>
+                <button class="btn btn-settings" onclick="openSettingsModal()" style="font-size: 0.9rem; padding: 0.4rem 1rem;">
+                    ⚙️ Cài đặt giao diện
+                </button>
             </div>
         </div>
 
@@ -200,6 +203,55 @@
             <div class="modal-footer">
                 <button class="btn btn-cancel" type="button" onclick="closeModal()">Hủy</button>
                 <button class="btn btn-success" type="submit" id="submitBtn" form="crudForm">Lưu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>⚙️ Cài đặt giao diện</h2>
+                <button class="modal-close" onclick="closeSettingsModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h3 style="margin-bottom: 1.5rem; color: var(--text); font-size: 1.1rem;">🎨 Màu nền</h3>
+                    
+                    <div class="form-group">
+                        <label for="bgColor" style="font-weight: 600; font-size: 0.95rem;">Chọn màu nền:</label>
+                        <div style="display: flex; gap: 1rem; align-items: center;">
+                            <input type="color" id="bgColor" value="#f8fafc" onchange="updateBackgroundColor()" 
+                                style="width: 80px; height: 80px; border: 3px solid var(--border); border-radius: 12px; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                            <div style="flex: 1;">
+                                <input type="text" id="bgColorText" value="#f8fafc" onchange="updateBackgroundColorFromText()" 
+                                    placeholder="#RRGGBB"
+                                    style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 8px; font-family: monospace; font-size: 1rem; font-weight: 600;">
+                                <small style="display: block; margin-top: 0.5rem; color: var(--secondary);">
+                                    Ví dụ: #ffffff (trắng), #000000 (đen), #f0f0f0 (xám nhạt)
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 2rem; padding: 1rem; background: rgba(37, 99, 235, 0.05); border-radius: 8px; border-left: 4px solid var(--primary);">
+                        <h4 style="margin-bottom: 0.75rem; color: var(--primary); font-size: 0.9rem;">💡 Gợi ý màu sắc</h4>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem;">
+                            <button onclick="applyPresetColor('#ffffff')" style="padding: 0.5rem; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; background: #ffffff; aspect-ratio: 1;" title="Trắng"></button>
+                            <button onclick="applyPresetColor('#f8fafc')" style="padding: 0.5rem; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; background: #f8fafc; aspect-ratio: 1;" title="Xám nhạt"></button>
+                            <button onclick="applyPresetColor('#e0e7ff')" style="padding: 0.5rem; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; background: #e0e7ff; aspect-ratio: 1;" title="Xanh nhạt"></button>
+                            <button onclick="applyPresetColor('#fef3c7')" style="padding: 0.5rem; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; background: #fef3c7; aspect-ratio: 1;" title="Vàng nhạt"></button>
+                            <button onclick="applyPresetColor('#dcfce7')" style="padding: 0.5rem; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; background: #dcfce7; aspect-ratio: 1;" title="Xanh lá nhạt"></button>
+                            <button onclick="applyPresetColor('#fee2e2')" style="padding: 0.5rem; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; background: #fee2e2; aspect-ratio: 1;" title="Đỏ nhạt"></button>
+                            <button onclick="applyPresetColor('#f3e8ff')" style="padding: 0.5rem; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; background: #f3e8ff; aspect-ratio: 1;" title="Tím nhạt"></button>
+                            <button onclick="applyPresetColor('#cffafe')" style="padding: 0.5rem; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; background: #cffafe; aspect-ratio: 1;" title="Cyan nhạt"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" onclick="resetToDefault()">🔄 Khôi phục mặc định</button>
+                <button class="btn btn-cancel" type="button" onclick="closeSettingsModal()">Đóng</button>
             </div>
         </div>
     </div>
@@ -921,15 +973,93 @@
         // Load initial data on page load
         window.addEventListener('DOMContentLoaded', () => {
             loadData('khoa');
+            loadSettings();
         });
 
         // Close modal when clicking outside
         window.addEventListener('click', (event) => {
-            const modal = document.getElementById('crudModal');
-            if (event.target === modal) {
+            const crudModal = document.getElementById('crudModal');
+            const settingsModal = document.getElementById('settingsModal');
+            if (event.target === crudModal) {
                 closeModal();
             }
+            if (event.target === settingsModal) {
+                closeSettingsModal();
+            }
         });
+
+        // ===== SETTINGS FUNCTIONS =====
+
+        function openSettingsModal() {
+            document.getElementById('settingsModal').classList.add('show');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').classList.remove('show');
+        }
+
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('uiSettings')) || {};
+            
+            if (settings.bgColor) {
+                document.getElementById('bgColor').value = settings.bgColor;
+                document.getElementById('bgColorText').value = settings.bgColor;
+                updateBackgroundColor(false);
+            }
+        }
+
+        function saveSettings() {
+            const settings = {
+                bgColor: document.getElementById('bgColor').value
+            };
+            localStorage.setItem('uiSettings', JSON.stringify(settings));
+        }
+
+        function updateBackgroundColor(save = true) {
+            const color = document.getElementById('bgColor').value;
+            
+            // Remove animation and gradient
+            document.body.style.background = color;
+            document.body.style.backgroundSize = 'auto';
+            document.body.style.animation = 'none';
+            
+            // Update text input
+            document.getElementById('bgColorText').value = color;
+            
+            if (save) saveSettings();
+        }
+
+        function updateBackgroundColorFromText() {
+            const textInput = document.getElementById('bgColorText');
+            const colorInput = document.getElementById('bgColor');
+            const value = textInput.value.trim();
+            
+            // Validate hex color
+            if (/^#[0-9A-F]{6}$/i.test(value)) {
+                colorInput.value = value;
+                updateBackgroundColor();
+            } else {
+                alert('⚠️ Vui lòng nhập mã màu hợp lệ (ví dụ: #ffffff)');
+            }
+        }
+
+        function applyPresetColor(color) {
+            document.getElementById('bgColor').value = color;
+            document.getElementById('bgColorText').value = color;
+            updateBackgroundColor();
+        }
+
+        function resetToDefault() {
+            localStorage.removeItem('uiSettings');
+            
+            // Reset to default light gray
+            const defaultColor = '#f8fafc';
+            document.getElementById('bgColor').value = defaultColor;
+            document.getElementById('bgColorText').value = defaultColor;
+            updateBackgroundColor(false);
+            
+            alert('✅ Đã khôi phục màu nền mặc định!');
+        }
     </script>
 </body>
 </html>
