@@ -19,13 +19,25 @@
         <div class="header">
             <h1>🎓 HUFLIT Distributed Database</h1>
             <p>Full CRUD Interface - Hệ thống Cơ sở dữ liệu Phân tán</p>
-            <div style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                <label style="display: inline-flex; align-items: center; cursor: pointer; font-size: 0.95rem; color: var(--secondary);">
-                    <input type="checkbox" id="toggleSiteColumn" checked onchange="toggleSiteColumnVisibility()" style="margin-right: 0.5rem; cursor: pointer; width: 18px; height: 18px;">
-                    <span style="font-weight: 500;">🗺️ Hiển thị cột Site (phân mảnh dữ liệu)</span>
-                </label>
-                <button class="btn btn-settings" onclick="openSettingsModal()" style="font-size: 0.9rem; padding: 0.4rem 1rem;">
-                    ⚙️ Cài đặt giao diện
+            <div style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div class="site-toggle-container">
+                    <label class="site-toggle-label" for="toggleSiteColumn">
+                        <input type="checkbox" id="toggleSiteColumn" checked onchange="toggleSiteColumnVisibility()" class="site-toggle-checkbox">
+                        <div class="site-toggle-slider">
+                            <span class="site-toggle-icon">🗺️</span>
+                        </div>
+                        <span class="site-toggle-text">
+                            <strong>Hiển thị cột Site</strong>
+                            <small>Phân mảnh dữ liệu phân tán</small>
+                        </span>
+                    </label>
+                </div>
+                <button class="btn-settings-modern" onclick="openSettingsModal()">
+                    <span class="settings-icon">⚙️</span>
+                    <span class="settings-text">
+                        <strong>Cài đặt giao diện</strong>
+                        <small>Tùy chỉnh màu sắc</small>
+                    </span>
                 </button>
             </div>
         </div>
@@ -153,7 +165,7 @@
                         <label for="global-masv-1">Mã Sinh Viên:</label>
                         <input type="text" id="global-masv-1" placeholder="Ví dụ: 25DH000001" onkeydown="if(event.key==='Enter') callGlobalQuery(1)">
                     </div>
-                    <button class="btn btn-primary" onclick="callGlobalQuery(1)">Truy Vấn</button>
+                    <button class="btn btn-success" onclick="callGlobalQuery(1)">Truy Vấn</button>
                     <div id="global-result-1" class="result"></div>
                 </div>
 
@@ -163,7 +175,7 @@
                         <label for="global-query-2">Tên Khoa hoặc Mã Khoa:</label>
                         <input type="text" id="global-query-2" placeholder="Ví dụ: CNTT" onkeydown="if(event.key==='Enter') callGlobalQuery(2)">
                     </div>
-                    <button class="btn btn-primary" onclick="callGlobalQuery(2)">Truy Vấn</button>
+                    <button class="btn btn-success" onclick="callGlobalQuery(2)">Truy Vấn</button>
                     <div id="global-result-2" class="result"></div>
                 </div>
 
@@ -173,14 +185,14 @@
                         <label for="global-masv-3">Mã Sinh Viên:</label>
                         <input type="text" id="global-masv-3" placeholder="Ví dụ: 25DH000001" onkeydown="if(event.key==='Enter') callGlobalQuery(3)">
                     </div>
-                    <button class="btn btn-primary" onclick="callGlobalQuery(3)">Truy Vấn</button>
+                    <button class="btn btn-success" onclick="callGlobalQuery(3)">Truy Vấn</button>
                     <div id="global-result-3" class="result"></div>
                 </div>
 
                 <div class="query-card">
                     <h3>Danh sách sinh viên đủ điều kiện tốt nghiệp</h3>
                     <p class="info-text">Sinh viên đã hoàn thành tất cả môn trong CTDT và đạt điểm ≥5.</p>
-                    <button class="btn btn-primary" onclick="callGlobalQuery(4)">Truy Vấn</button>
+                    <button class="btn btn-success" onclick="callGlobalQuery(4)">Truy Vấn</button>
                     <div id="global-result-4" class="result"></div>
                 </div>
             </div>
