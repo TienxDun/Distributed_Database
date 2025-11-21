@@ -9,20 +9,27 @@ import { PRIMARY_KEYS } from '../config.js';
 /**
  * Load all data for a module
  * @param {string} module - Module name
+ * @param {boolean} skipLoading - Skip loading overlay management
  */
-export async function loadData(module) {
-    if (getLoadingState()) return;
+export async function loadData(module, skipLoading = false) {
+    if (!skipLoading && getLoadingState()) return;
     
     showResultLoading(module, 'Đang tải dữ liệu...');
-    showLoading('Đang tải dữ liệu...');
+    if (!skipLoading) {
+        showLoading('Đang tải dữ liệu...');
+    }
 
     try {
         const data = await apiGet(`/${module}`);
         renderResult(module, data, 'Tổng số');
+        console.log(`[loadData] ${module}: Loaded ${data.length} records`);
     } catch (error) {
         showResultError(module, error.message);
+        console.error(`[loadData] ${module}: Error -`, error);
     } finally {
-        hideLoading();
+        if (!skipLoading) {
+            hideLoading();
+        }
     }
 }
 
@@ -39,10 +46,20 @@ export async function deleteRecord(module, id) {
 
     try {
         const result = await apiDelete(`/${module}?id=${id}`);
+        console.log(`[deleteRecord] ${module}: Deleted ID ${id}`);
         showAlert(module, result.message || 'Xóa thành công!', 'success');
-        await loadData(module);
+        
+        // Small delay to ensure backend has processed the deletion
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Clear current result and reload
+        showResultLoading(module, 'Đang tải lại...');
+        showLoading('Đang tải lại dữ liệu...');
+        await loadData(module, true);
+        console.log(`[deleteRecord] ${module}: Data reloaded`);
     } catch (error) {
         showAlert(module, `Lỗi: ${error.message}`, 'error');
+        console.error(`[deleteRecord] ${module}: Error -`, error);
     } finally {
         hideLoading();
     }
@@ -67,10 +84,20 @@ export async function deleteCTDaoTao(maKhoa, khoaHoc, maMH) {
             monhoc: maMH
         });
         const result = await apiDelete(`/ctdaotao${queryString}`);
+        console.log(`[deleteCTDaoTao] Deleted: ${maKhoa}-${khoaHoc}-${maMH}`);
         showAlert('ctdaotao', result.message || 'Xóa thành công!', 'success');
-        await loadData('ctdaotao');
+        
+        // Small delay to ensure backend has processed the deletion
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Clear current result and reload
+        showResultLoading('ctdaotao', 'Đang tải lại...');
+        showLoading('Đang tải lại dữ liệu...');
+        await loadData('ctdaotao', true);
+        console.log(`[deleteCTDaoTao] Data reloaded`);
     } catch (error) {
         showAlert('ctdaotao', `Lỗi: ${error.message}`, 'error');
+        console.error(`[deleteCTDaoTao] Error -`, error);
     } finally {
         hideLoading();
     }
@@ -93,10 +120,20 @@ export async function deleteDangKy(maSV, maMon) {
             mamon: maMon
         });
         const result = await apiDelete(`/dangky${queryString}`);
+        console.log(`[deleteDangKy] Deleted: ${maSV}-${maMon}`);
         showAlert('dangky', result.message || 'Xóa thành công!', 'success');
-        await loadData('dangky');
+        
+        // Small delay to ensure backend has processed the deletion
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Clear current result and reload
+        showResultLoading('dangky', 'Đang tải lại...');
+        showLoading('Đang tải lại dữ liệu...');
+        await loadData('dangky', true);
+        console.log(`[deleteDangKy] Data reloaded`);
     } catch (error) {
         showAlert('dangky', `Lỗi: ${error.message}`, 'error');
+        console.error(`[deleteDangKy] Error -`, error);
     } finally {
         hideLoading();
     }

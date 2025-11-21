@@ -10,7 +10,13 @@ import { API_BASE } from '../config.js';
  * @returns {Promise<any>} Response data
  */
 export async function apiGet(endpoint) {
-    const response = await fetch(`${API_BASE}${endpoint}`);
+    // Add cache-busting timestamp to prevent browser caching
+    const separator = endpoint.includes('?') ? '&' : '?';
+    const cacheBuster = `${separator}_t=${Date.now()}`;
+    
+    const response = await fetch(`${API_BASE}${endpoint}${cacheBuster}`, {
+        cache: 'no-store'  // Use fetch API's cache option instead of headers
+    });
     
     if (!response.ok) {
         if (response.status === 404) {
