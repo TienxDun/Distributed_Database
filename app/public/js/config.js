@@ -66,11 +66,13 @@ export const FIELDS_CONFIG = {
         },
         {
             name: 'MaKhoa',
-            label: 'Mã Khoa',
-            type: 'text',
+            label: 'Khoa',
+            type: 'select',
             required: true,
-            maxlength: 10,
-            placeholder: 'Ví dụ: CNTT, NN, LUAT'
+            optionsFrom: '/khoa',
+            optionValue: 'MaKhoa',
+            optionLabel: ['MaKhoa', 'TenKhoa'],  // Hiển thị: "CNTT - Công nghệ thông tin"
+            placeholder: 'Chọn khoa'
         },
         {
             name: 'KhoaHoc',
@@ -85,10 +87,13 @@ export const FIELDS_CONFIG = {
     ctdaotao: [
         {
             name: 'MaKhoa',
-            label: 'Mã Khoa',
-            type: 'text',
+            label: 'Khoa',
+            type: 'select',
             required: true,
-            maxlength: 10
+            optionsFrom: '/khoa',
+            optionValue: 'MaKhoa',
+            optionLabel: ['MaKhoa', 'TenKhoa'],
+            placeholder: 'Chọn khoa'
         },
         {
             name: 'KhoaHoc',
@@ -100,29 +105,36 @@ export const FIELDS_CONFIG = {
         },
         {
             name: 'MaMH',
-            label: 'Mã Môn Học',
-            type: 'text',
+            label: 'Môn Học',
+            type: 'select',
             required: true,
-            maxlength: 10
+            optionsFrom: '/monhoc',
+            optionValue: 'MaMH',
+            optionLabel: ['MaMH', 'TenMH'],
+            placeholder: 'Chọn môn học'
         }
     ],
     dangky: {
         create: [
             {
                 name: 'MaSV',
-                label: 'Mã Sinh Viên',
-                type: 'text',
+                label: 'Sinh Viên',
+                type: 'select',
                 required: true,
-                maxlength: 20,
-                placeholder: 'Ví dụ: 25DH000001, 24DH000002'
+                optionsFrom: '/sinhvien',
+                optionValue: 'MaSV',
+                optionLabel: ['MaSV', 'HoTen'],
+                placeholder: 'Chọn sinh viên'
             },
             {
                 name: 'MaMon',
-                label: 'Mã Môn Học',
-                type: 'text',
+                label: 'Môn Học',
+                type: 'select',
                 required: true,
-                maxlength: 10,
-                placeholder: 'Ví dụ: MH001, MH002'
+                optionsFrom: '/monhoc',
+                optionValue: 'MaMH',
+                optionLabel: ['MaMH', 'TenMH'],
+                placeholder: 'Chọn môn học'
             },
             {
                 name: 'DiemThi',

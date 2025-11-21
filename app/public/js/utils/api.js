@@ -109,3 +109,68 @@ export function buildQueryString(params) {
     const queryString = searchParams.toString();
     return queryString ? `?${queryString}` : '';
 }
+
+// Cache for dropdown options
+const optionsCache = {};
+
+/**
+ * Fetch options for select dropdown
+ * @param {string} endpoint - API endpoint (e.g., '/khoa', '/monhoc')
+ * @param {string} valueField - Field name for option value
+ * @param {Array<string>} labelFields - Field names for option label
+ * @returns {Promise<Array>} Array of {value, label} objects
+ */
+export async function fetchOptionsForField(endpoint, valueField, labelFields) {
+    // Check cache first
+    const cacheKey = `${endpoint}_${valueField}_${labelFields.join('_')}`;
+    if (optionsCache[cacheKey]) {
+        console.log(`[fetchOptions] Using cached options for ${endpoint}`);
+        return optionsCache[cacheKey];
+    }
+    
+    try {
+        console.log(`[fetchOptions] Fetching options from ${endpoint}`);
+        const data = await apiGet(endpoint);
+        
+        if (!Array.isArray(data) || data.length === 0) {
+            return [];
+        }
+        
+        // Format data into {value, label} format
+        const options = data.map(item => {
+            const value = item[valueField];
+            // Build label from multiple fields (e.g., "CNTT - Công nghệ thông tin")
+            const label = labelFields.map(field => item[field]).filter(Boolean).join(' - ');
+            return { value, label };
+        });
+        
+        // Cache the result
+        optionsCache[cacheKey] = options;
+        console.log(`[fetchOptions] Cached ${options.length} options for ${endpoint}`);
+        
+        return options;
+    } catch (error) {
+        console.error(`[fetchOptions] Error fetching options from ${endpoint}:`, error);
+        throw error;
+    }
+}
+
+/**
+ * Clear options cache (useful when data changes)
+ * @param {string} endpoint - Optional: clear specific endpoint, or all if not provided
+ */
+export function clearOptionsCache(endpoint = null) {
+    if (endpoint) {
+        // Clear specific endpoint cache
+        Object.keys(optionsCache).forEach(key => {
+            if (key.startsWith(endpoint)) {
+                delete optionsCache[key];
+            }
+        });
+        console.log(`[fetchOptions] Cleared cache for ${endpoint}`);
+    } else {
+        // Clear all cache
+        Object.keys(optionsCache).forEach(key => delete optionsCache[key]);
+        console.log(`[fetchOptions] Cleared all cache`);
+    }
+}
