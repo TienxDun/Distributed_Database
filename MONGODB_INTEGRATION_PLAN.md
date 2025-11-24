@@ -1,1168 +1,780 @@
-# 🚀 MONGODB INTEGRATION PLAN - Hybrid Storage Architecture
+# 📋 MongoDB Integration Plan
 
-<div align="center">
-
-**Kế hoạch triển khai tích hợp MongoDB vào HUFLIT Distributed Database**
-
-[![MongoDB](https://img.shields.io/badge/MongoDB-7.0-green?logo=mongodb)](https://www.mongodb.com/)
-[![Status](https://img.shields.io/badge/Status-Planning-yellow)]()
-[![Priority](https://img.shields.io/badge/Priority-High-red)]()
-
-</div>
+## 🎯 Mục tiêu
+Tích hợp MongoDB vào hệ thống CSDL phân tán HUFLIT để thêm 2 chức năng:
+1. **Audit Logs / Change History** - Ghi lại mọi thao tác CRUD
+2. **Query History & Statistics** - Theo dõi usage và performance
 
 ---
 
-## 📋 Tổng Quan
+## 🏗️ PHASE 1: Infrastructure Setup
 
-### 🎯 Mục tiêu
+### 1.1. Thêm MongoDB vào Docker Compose
+**File**: `docker-compose.yml`
 
-Tích hợp MongoDB vào hệ thống hiện tại để:
-- 📊 **Analytics & Reporting**: Phân tích dữ liệu sinh viên, môn học
-- 📝 **Audit Logging**: Ghi lại mọi thao tác CRUD
-- 🔔 **Notifications**: Hệ thống thông báo real-time
-- 📈 **Data Mining**: Dự đoán kết quả học tập, đề xuất môn học
-
-### 🏗️ Kiến trúc mục tiêu
-
-```text
-                    ┌─────────────────┐
-                    │    Web UI       │
-                    └────────┬────────┘
-                             │
-                    ┌────────▼────────┐
-                    │   PHP REST API  │
-                    └────┬───────┬────┘
-                         │       │
-            ┌────────────▼─┐   ┌─▼────────────┐
-            │  SQL Server  │   │   MongoDB    │
-            │  (OLTP)      │   │  (Analytics) │
-            └──────────────┘   └──────────────┘
-            • Khoa                • audit_logs
-            • SinhVien            • analytics
-            • MonHoc              • notifications
-            • CTDaoTao            • reports
-            • DangKy              • feedbacks
-```
-
----
-
-## 📅 PHASE 1: INFRASTRUCTURE SETUP (Tuần 1-2)
-
-### ✅ Step 1.1: Cài đặt MongoDB Container
-
-**Thời gian**: 2-3 giờ  
-**Mục tiêu**: Thêm MongoDB vào Docker Compose
-
-#### 📝 Task List
-
-- [ ] Cập nhật `docker-compose.yml`
-- [ ] Tạo thư mục `db/mongodb`
-- [ ] Tạo init script cho MongoDB
-- [ ] Test kết nối MongoDB
-
-#### 🔧 Implementation
-
-**1. Cập nhật `docker-compose.yml`**
-
+**Thêm service MongoDB**:
 ```yaml
-services:
-  # ... existing services (api_php, app_php, mssql_*) ...
+mongodb:
+  image: mongo:latest
+  container_name: mongodb
+  networks:
+    - huflit-network
+  environment:
+    - MONGO_INITDB_ROOT_USERNAME=admin
+    - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+    - MONGO_INITDB_DATABASE=huflit_logs
+  ports:
+    - "27017:27017"
+  volumes:
+    - ./db/mongodb/init:/docker-entrypoint-initdb.d
+    - mongodb_data:/data/db
+```
 
-  # ========== MONGODB SERVICE ==========
-  mongodb:
-    image: mongo:7.0
-    container_name: mongodb_analytics
-    networks:
-      - huflit-network
-    ports:
-      - "27017:27017"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD:-MongoDB@2025}
-      - MONGO_INITDB_DATABASE=huflit_analytics
-    volumes:
-      - ./db/mongodb:/docker-entrypoint-initdb.d
-      - mongodb_data:/data/db
-      - mongodb_config:/data/configdb
-    command: --auth
-    restart: unless-stopped
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # ========== MONGO EXPRESS (Optional - for development) ==========
-  mongo_express:
-    image: mongo-express:latest
-    container_name: mongo_express
-    networks:
-      - huflit-network
-    ports:
-      - "8082:8081"
-    environment:
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_PASSWORD:-MongoDB@2025}
-      - ME_CONFIG_MONGODB_URL=mongodb://admin:${MONGO_PASSWORD:-MongoDB@2025}@mongodb:27017/
-      - ME_CONFIG_BASICAUTH_USERNAME=admin
-      - ME_CONFIG_BASICAUTH_PASSWORD=admin
-    depends_on:
-      - mongodb
-    restart: unless-stopped
-
+**Thêm volume**:
+```yaml
 volumes:
-  # ... existing volumes ...
   mongodb_data:
-    name: mongodb_data
-  mongodb_config:
-    name: mongodb_config
 ```
 
-**2. Tạo `.env` file** (nếu chưa có)
-
-```bash
-# SQL Server
-MSSQL_SA_PASSWORD=Your@STROng!Pass#Word
-
-# MongoDB
-MONGO_PASSWORD=MongoDB@2025
+**Environment variables** (`.env` file):
+```
+MONGO_PASSWORD=Your@STROng!Mongo#Pass
 ```
 
-**3. Tạo init script `db/mongodb/init.js`**
+### 1.2. Tạo MongoDB Initialization Script
+**File**: `db/mongodb/init/init.js`
 
 ```javascript
-// Switch to huflit_analytics database
-db = db.getSiblingDB('huflit_analytics');
+// Switch to database
+db = db.getSiblingDB('huflit_logs');
 
 // Create collections with validation
 db.createCollection('audit_logs', {
   validator: {
     $jsonSchema: {
-      bsonType: 'object',
-      required: ['timestamp', 'action', 'entity'],
+      bsonType: "object",
+      required: ["table", "operation", "timestamp", "site"],
       properties: {
-        timestamp: {
-          bsonType: 'date',
-          description: 'Timestamp of the action'
-        },
-        action: {
-          enum: ['INSERT', 'UPDATE', 'DELETE'],
-          description: 'Type of action performed'
-        },
-        entity: {
-          enum: ['Khoa', 'MonHoc', 'SinhVien', 'CTDaoTao', 'DangKy'],
-          description: 'Entity affected'
-        },
-        entityId: {
-          bsonType: 'string',
-          description: 'ID of the affected entity'
-        },
-        site: {
-          enum: ['Site A', 'Site B', 'Site C'],
-          description: 'Site where action occurred'
-        },
-        user: {
-          bsonType: 'string',
-          description: 'User who performed the action'
-        }
+        table: { bsonType: "string", description: "Table name (Khoa, SinhVien, etc.)" },
+        operation: { enum: ["INSERT", "UPDATE", "DELETE"], description: "CRUD operation" },
+        data: { bsonType: "object", description: "Data involved in operation" },
+        old_data: { bsonType: "object", description: "Old data for UPDATE/DELETE" },
+        timestamp: { bsonType: "date", description: "Operation timestamp" },
+        site: { enum: ["Site_A", "Site_B", "Site_C", "Global"], description: "Database site" },
+        ip_address: { bsonType: "string", description: "Client IP" },
+        user_agent: { bsonType: "string", description: "Client user agent" }
       }
     }
   }
 });
 
-db.createCollection('student_analytics', {
+db.createCollection('query_history', {
   validator: {
     $jsonSchema: {
-      bsonType: 'object',
-      required: ['MaSV', 'semester'],
+      bsonType: "object",
+      required: ["endpoint", "method", "timestamp"],
       properties: {
-        MaSV: {
-          bsonType: 'string',
-          description: 'Student ID'
-        },
-        semester: {
-          bsonType: 'string',
-          description: 'Semester identifier'
-        }
+        endpoint: { bsonType: "string", description: "API endpoint" },
+        method: { enum: ["GET", "POST", "PUT", "DELETE"], description: "HTTP method" },
+        params: { bsonType: "object", description: "Query parameters" },
+        body: { bsonType: "object", description: "Request body" },
+        execution_time_ms: { bsonType: "number", description: "Execution time in milliseconds" },
+        result_count: { bsonType: "int", description: "Number of results returned" },
+        status_code: { bsonType: "int", description: "HTTP status code" },
+        timestamp: { bsonType: "date", description: "Query timestamp" },
+        ip_address: { bsonType: "string" }
       }
     }
   }
 });
-
-db.createCollection('notifications');
-db.createCollection('course_feedbacks');
-db.createCollection('reports');
 
 // Create indexes for performance
 db.audit_logs.createIndex({ timestamp: -1 });
-db.audit_logs.createIndex({ entity: 1, entityId: 1 });
-db.audit_logs.createIndex({ site: 1 });
-db.audit_logs.createIndex({ action: 1 });
+db.audit_logs.createIndex({ table: 1, timestamp: -1 });
+db.audit_logs.createIndex({ operation: 1, timestamp: -1 });
+db.audit_logs.createIndex({ site: 1, timestamp: -1 });
 
-db.student_analytics.createIndex({ MaSV: 1, semester: 1 }, { unique: true });
-db.student_analytics.createIndex({ 'statistics.averageGrade': -1 });
+db.query_history.createIndex({ timestamp: -1 });
+db.query_history.createIndex({ endpoint: 1, timestamp: -1 });
+db.query_history.createIndex({ method: 1, timestamp: -1 });
 
-db.notifications.createIndex({ recipient: 1, read: 1 });
-db.notifications.createIndex({ createdAt: -1 });
-
-db.course_feedbacks.createIndex({ MaMH: 1, semester: 1 });
-
-// Create TTL index for old logs (delete after 90 days)
-db.audit_logs.createIndex(
-  { timestamp: 1 },
-  { expireAfterSeconds: 7776000 } // 90 days
-);
-
-// Insert sample documents
-db.audit_logs.insertOne({
-  timestamp: new Date(),
-  action: 'INSERT',
-  entity: 'System',
-  entityId: 'INIT',
-  site: 'Global',
-  user: 'system',
-  oldData: null,
-  newData: { message: 'MongoDB initialized successfully' },
-  ipAddress: '127.0.0.1'
-});
-
-print('✅ MongoDB collections created successfully!');
-print('📊 Collections:', db.getCollectionNames());
-```
-
-**4. Test commands**
-
-```powershell
-# Start all services
-docker-compose up -d
-
-# Check MongoDB logs
-docker logs mongodb_analytics
-
-# Connect to MongoDB shell
-docker exec -it mongodb_analytics mongosh -u admin -p MongoDB@2025
-
-# Test query
-docker exec -it mongodb_analytics mongosh -u admin -p MongoDB@2025 --eval "db.getSiblingDB('huflit_analytics').audit_logs.countDocuments()"
+print('✅ MongoDB initialization completed!');
 ```
 
 ---
 
-### ✅ Step 1.2: Cài đặt MongoDB PHP Driver
+## 🔧 PHASE 2: PHP MongoDB Integration
 
-**Thời gian**: 1-2 giờ  
-**Mục tiêu**: Kết nối PHP với MongoDB
+### 2.1. Cập nhật Dockerfile
+**File**: `app/Dockerfile`
 
-#### 📝 Task List
-
-- [ ] Cập nhật Dockerfile để cài MongoDB extension
-- [ ] Tạo connection helper
-- [ ] Test connection
-- [ ] Tạo wrapper classes
-
-#### 🔧 Implementation
-
-**1. Cập nhật `app/Dockerfile`**
-
+**Thêm MongoDB extension**:
 ```dockerfile
-FROM php:8.2-cli
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    unixodbc-dev \
-    gnupg2 \
-    curl \
-    apt-transport-https \
-    libssl-dev \
-    libcurl4-openssl-dev \
-    pkg-config
-
-# Install Microsoft ODBC Driver for SQL Server
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
-    curl https://packages.microsoft.com/config/debian/11/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
-    apt-get update && \
-    ACCEPT_EULA=Y apt-get install -y msodbcsql18
-
-# Install PHP extensions for SQL Server
-RUN pecl install sqlsrv pdo_sqlsrv && \
-    docker-php-ext-enable sqlsrv pdo_sqlsrv
-
-# Install MongoDB extension
+# Install MongoDB PHP driver
 RUN pecl install mongodb && \
-    docker-php-ext-enable mongodb
-
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-WORKDIR /var/www/html
-
-# Copy composer files
-COPY composer.json composer.lock ./
-
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader
-
-COPY . .
-
-CMD ["php", "-S", "0.0.0.0:8080", "-t", "public"]
+    docker-php-ext-enable mongodb && \
+    echo "extension=mongodb.so" > /usr/local/etc/php/conf.d/mongodb.ini
 ```
 
-**2. Tạo `app/composer.json`**
-
-```json
-{
-  "name": "huflit/distributed-database",
-  "description": "HUFLIT Distributed Database System",
-  "type": "project",
-  "require": {
-    "php": ">=8.0",
-    "mongodb/mongodb": "^1.17"
-  },
-  "autoload": {
-    "psr-4": {
-      "App\\": "src/"
-    }
-  }
-}
-```
-
-**3. Tạo `app/mongo_connection.php`**
+### 2.2. Tạo MongoDB Connection Helper
+**File**: `app/mongo_helper.php`
 
 ```php
 <?php
+require_once 'vendor/autoload.php'; // Nếu dùng Composer
 
-use MongoDB\Client;
-use MongoDB\Database;
-
-class MongoConnection {
-    private static $instance = null;
-    private $client;
-    private $database;
+class MongoHelper {
+    private static $client = null;
+    private static $db = null;
     
-    private function __construct() {
-        $host = getenv('MONGO_HOST') ?: 'mongodb';
-        $port = getenv('MONGO_PORT') ?: '27017';
-        $username = getenv('MONGO_USERNAME') ?: 'admin';
-        $password = getenv('MONGO_PASSWORD') ?: 'MongoDB@2025';
-        $dbName = getenv('MONGO_DATABASE') ?: 'huflit_analytics';
-        
-        $uri = sprintf(
-            'mongodb://%s:%s@%s:%s/?authSource=admin',
-            $username,
-            $password,
-            $host,
-            $port
-        );
-        
+    public static function getClient() {
+        if (self::$client === null) {
+            try {
+                $mongoHost = getenv('MONGO_HOST') ?: 'mongodb';
+                $mongoPort = getenv('MONGO_PORT') ?: '27017';
+                $mongoUser = getenv('MONGO_USER') ?: 'admin';
+                $mongoPass = getenv('MONGO_PASSWORD') ?: 'Your@STROng!Mongo#Pass';
+                
+                $uri = "mongodb://{$mongoUser}:{$mongoPass}@{$mongoHost}:{$mongoPort}";
+                self::$client = new MongoDB\Driver\Manager($uri);
+            } catch (Exception $e) {
+                error_log("MongoDB connection failed: " . $e->getMessage());
+                return null;
+            }
+        }
+        return self::$client;
+    }
+    
+    public static function getDatabase($dbName = 'huflit_logs') {
+        $client = self::getClient();
+        if (!$client) return null;
+        return $dbName;
+    }
+    
+    // Insert audit log
+    public static function logAudit($table, $operation, $data, $oldData = null, $site = 'Global') {
         try {
-            $this->client = new Client($uri);
-            $this->database = $this->client->selectDatabase($dbName);
+            $manager = self::getClient();
+            if (!$manager) return false;
             
-            // Test connection
-            $this->client->listDatabases();
-            error_log("✅ MongoDB connected successfully to database: $dbName");
-        } catch (Exception $e) {
-            error_log("❌ MongoDB connection failed: " . $e->getMessage());
-            throw $e;
-        }
-    }
-    
-    public static function getInstance(): MongoConnection {
-        if (self::$instance === null) {
-            self::$instance = new MongoConnection();
-        }
-        return self::$instance;
-    }
-    
-    public function getDatabase(): Database {
-        return $this->database;
-    }
-    
-    public function getCollection(string $collectionName) {
-        return $this->database->selectCollection($collectionName);
-    }
-}
-
-function getMongoConnection(): Database {
-    return MongoConnection::getInstance()->getDatabase();
-}
-
-function getMongoCollection(string $collectionName) {
-    return MongoConnection::getInstance()->getCollection($collectionName);
-}
-?>
-```
-
-**4. Cập nhật `docker-compose.yml` - thêm env cho api_php**
-
-```yaml
-services:
-  api_php:
-    build: ./app
-    # ... existing config ...
-    environment:
-      - DB_HOST=mssql_global
-      - DB_PORT=1433
-      - DB_NAME=HUFLIT
-      - DB_USER=sa
-      - DB_PASS=${MSSQL_SA_PASSWORD}
-      - MONGO_HOST=mongodb
-      - MONGO_PORT=27017
-      - MONGO_USERNAME=admin
-      - MONGO_PASSWORD=${MONGO_PASSWORD}
-      - MONGO_DATABASE=huflit_analytics
-    depends_on:
-      - mssql_global
-      - mongodb
-```
-
-**5. Test connection `app/test_mongo.php`**
-
-```php
-<?php
-require_once 'mongo_connection.php';
-
-try {
-    $mongo = getMongoConnection();
-    
-    // Test insert
-    $collection = $mongo->selectCollection('audit_logs');
-    $result = $collection->insertOne([
-        'timestamp' => new MongoDB\BSON\UTCDateTime(),
-        'action' => 'TEST',
-        'entity' => 'System',
-        'entityId' => 'TEST-001',
-        'site' => 'Global',
-        'user' => 'test_user',
-        'message' => 'PHP connection test'
-    ]);
-    
-    echo "✅ Insert successful! ID: " . $result->getInsertedId() . "\n";
-    
-    // Test query
-    $count = $collection->countDocuments(['action' => 'TEST']);
-    echo "📊 Test documents count: $count\n";
-    
-    // Test find
-    $documents = $collection->find(['action' => 'TEST'])->toArray();
-    echo "📄 Found documents:\n";
-    print_r($documents);
-    
-} catch (Exception $e) {
-    echo "❌ Error: " . $e->getMessage() . "\n";
-}
-?>
-```
-
-**6. Run test**
-
-```powershell
-# Rebuild containers
-docker-compose down
-docker-compose build
-docker-compose up -d
-
-# Install composer dependencies
-docker exec -it api_php composer install
-
-# Run test
-docker exec -it api_php php test_mongo.php
-```
-
----
-
-### ✅ Step 1.3: Tạo Helper Classes & Utilities
-
-**Thời gian**: 2-3 giờ  
-**Mục tiêu**: Tạo các class tiện ích để làm việc với MongoDB
-
-#### 📝 Task List
-
-- [ ] Tạo AuditLogger class
-- [ ] Tạo AnalyticsService class
-- [ ] Tạo NotificationService class
-- [ ] Unit tests
-
-#### 🔧 Implementation
-
-**1. Tạo `app/src/Services/AuditLogger.php`**
-
-```php
-<?php
-namespace App\Services;
-
-use MongoDB\Collection;
-use MongoDB\BSON\UTCDateTime;
-
-class AuditLogger {
-    private Collection $collection;
-    
-    public function __construct() {
-        $this->collection = getMongoCollection('audit_logs');
-    }
-    
-    public function log(
-        string $action,
-        string $entity,
-        string $entityId,
-        string $site,
-        $oldData = null,
-        $newData = null,
-        string $user = 'system',
-        string $ipAddress = null
-    ): void {
-        try {
             $document = [
-                'timestamp' => new UTCDateTime(),
-                'action' => $action,
-                'entity' => $entity,
-                'entityId' => $entityId,
+                'table' => $table,
+                'operation' => $operation,
+                'data' => $data,
+                'timestamp' => new MongoDB\BSON\UTCDateTime(),
                 'site' => $site,
-                'user' => $user,
-                'oldData' => $oldData,
-                'newData' => $newData,
-                'ipAddress' => $ipAddress ?? $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+                'ip_address' => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
+                'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'unknown'
             ];
             
-            $this->collection->insertOne($document);
-        } catch (\Exception $e) {
+            if ($oldData !== null) {
+                $document['old_data'] = $oldData;
+            }
+            
+            $bulk = new MongoDB\Driver\BulkWrite;
+            $bulk->insert($document);
+            $manager->executeBulkWrite('huflit_logs.audit_logs', $bulk);
+            
+            return true;
+        } catch (Exception $e) {
             error_log("Audit log failed: " . $e->getMessage());
+            return false;
         }
     }
     
-    public function getEntityHistory(string $entity, string $entityId): array {
-        return $this->collection->find(
-            ['entity' => $entity, 'entityId' => $entityId],
-            ['sort' => ['timestamp' => -1]]
-        )->toArray();
+    // Log query history
+    public static function logQuery($endpoint, $method, $params = [], $body = [], $executionTime = 0, $resultCount = 0, $statusCode = 200) {
+        try {
+            $manager = self::getClient();
+            if (!$manager) return false;
+            
+            $document = [
+                'endpoint' => $endpoint,
+                'method' => $method,
+                'params' => $params,
+                'body' => $body,
+                'execution_time_ms' => (int)$executionTime,
+                'result_count' => (int)$resultCount,
+                'status_code' => (int)$statusCode,
+                'timestamp' => new MongoDB\BSON\UTCDateTime(),
+                'ip_address' => $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+            ];
+            
+            $bulk = new MongoDB\Driver\BulkWrite;
+            $bulk->insert($document);
+            $manager->executeBulkWrite('huflit_logs.query_history', $bulk);
+            
+            return true;
+        } catch (Exception $e) {
+            error_log("Query log failed: " . $e->getMessage());
+            return false;
+        }
     }
     
-    public function getRecentLogs(int $limit = 100): array {
-        return $this->collection->find(
-            [],
-            [
+    // Query audit logs with filters
+    public static function getAuditLogs($filter = [], $limit = 50, $skip = 0) {
+        try {
+            $manager = self::getClient();
+            if (!$manager) return [];
+            
+            $options = [
                 'sort' => ['timestamp' => -1],
-                'limit' => $limit
-            ]
-        )->toArray();
+                'limit' => $limit,
+                'skip' => $skip
+            ];
+            
+            $query = new MongoDB\Driver\Query($filter, $options);
+            $cursor = $manager->executeQuery('huflit_logs.audit_logs', $query);
+            
+            return $cursor->toArray();
+        } catch (Exception $e) {
+            error_log("Get audit logs failed: " . $e->getMessage());
+            return [];
+        }
     }
     
-    public function getLogsBySite(string $site, int $limit = 100): array {
-        return $this->collection->find(
-            ['site' => $site],
-            [
+    // Query history with filters
+    public static function getQueryHistory($filter = [], $limit = 50, $skip = 0) {
+        try {
+            $manager = self::getClient();
+            if (!$manager) return [];
+            
+            $options = [
                 'sort' => ['timestamp' => -1],
-                'limit' => $limit
-            ]
-        )->toArray();
-    }
-    
-    public function getStatsByAction(): array {
-        $pipeline = [
-            [
-                '$group' => [
-                    '_id' => '$action',
-                    'count' => ['$sum' => 1]
-                ]
-            ],
-            [
-                '$sort' => ['count' => -1]
-            ]
-        ];
-        
-        return $this->collection->aggregate($pipeline)->toArray();
-    }
-}
-?>
-```
-
-**2. Tạo `app/src/Services/AnalyticsService.php`**
-
-```php
-<?php
-namespace App\Services;
-
-use MongoDB\Collection;
-use MongoDB\BSON\UTCDateTime;
-
-class AnalyticsService {
-    private Collection $collection;
-    
-    public function __construct() {
-        $this->collection = getMongoCollection('student_analytics');
-    }
-    
-    public function updateStudentStats(
-        string $maSV,
-        string $semester,
-        array $statistics
-    ): void {
-        $document = [
-            'MaSV' => $maSV,
-            'semester' => $semester,
-            'statistics' => $statistics,
-            'updatedAt' => new UTCDateTime(),
-            'calculatedAt' => new UTCDateTime()
-        ];
-        
-        $this->collection->updateOne(
-            ['MaSV' => $maSV, 'semester' => $semester],
-            ['$set' => $document],
-            ['upsert' => true]
-        );
-    }
-    
-    public function getStudentStats(string $maSV, string $semester = null): ?array {
-        $filter = ['MaSV' => $maSV];
-        if ($semester) {
-            $filter['semester'] = $semester;
+                'limit' => $limit,
+                'skip' => $skip
+            ];
+            
+            $query = new MongoDB\Driver\Query($filter, $options);
+            $cursor = $manager->executeQuery('huflit_logs.query_history', $query);
+            
+            return $cursor->toArray();
+        } catch (Exception $e) {
+            error_log("Get query history failed: " . $e->getMessage());
+            return [];
         }
-        
-        $result = $this->collection->findOne(
-            $filter,
-            ['sort' => ['semester' => -1]]
-        );
-        
-        return $result ? (array)$result : null;
     }
     
-    public function getTopStudents(int $limit = 10): array {
-        return $this->collection->find(
-            [],
-            [
-                'sort' => ['statistics.averageGrade' => -1],
-                'limit' => $limit
-            ]
-        )->toArray();
-    }
-    
-    public function getAtRiskStudents(float $threshold = 5.0): array {
-        return $this->collection->find([
-            'statistics.averageGrade' => ['$lt' => $threshold]
-        ])->toArray();
-    }
-    
-    public function generateSemesterReport(string $semester): array {
-        $pipeline = [
-            ['$match' => ['semester' => $semester]],
-            [
-                '$group' => [
-                    '_id' => null,
-                    'totalStudents' => ['$sum' => 1],
-                    'avgGrade' => ['$avg' => '$statistics.averageGrade'],
-                    'passRate' => [
-                        '$avg' => [
-                            '$cond' => [
-                                ['$gte' => ['$statistics.averageGrade', 5.0]],
-                                1,
-                                0
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ];
-        
-        $result = $this->collection->aggregate($pipeline)->toArray();
-        return $result[0] ?? [];
-    }
-}
-?>
-```
-
-**3. Tạo `app/src/Services/NotificationService.php`**
-
-```php
-<?php
-namespace App\Services;
-
-use MongoDB\Collection;
-use MongoDB\BSON\UTCDateTime;
-
-class NotificationService {
-    private Collection $collection;
-    
-    public function __construct() {
-        $this->collection = getMongoCollection('notifications');
-    }
-    
-    public function create(
-        string $recipient,
-        string $title,
-        string $message,
-        string $type = 'info',
-        array $metadata = []
-    ): string {
-        $document = [
-            'recipient' => $recipient, // MaSV
-            'title' => $title,
-            'message' => $message,
-            'type' => $type, // info, warning, error, success
-            'read' => false,
-            'metadata' => $metadata,
-            'createdAt' => new UTCDateTime()
-        ];
-        
-        $result = $this->collection->insertOne($document);
-        return (string)$result->getInsertedId();
-    }
-    
-    public function getUnread(string $recipient): array {
-        return $this->collection->find(
-            ['recipient' => $recipient, 'read' => false],
-            ['sort' => ['createdAt' => -1]]
-        )->toArray();
-    }
-    
-    public function markAsRead(string $notificationId): void {
-        $this->collection->updateOne(
-            ['_id' => new \MongoDB\BSON\ObjectId($notificationId)],
-            ['$set' => ['read' => true, 'readAt' => new UTCDateTime()]]
-        );
-    }
-    
-    public function markAllAsRead(string $recipient): void {
-        $this->collection->updateMany(
-            ['recipient' => $recipient, 'read' => false],
-            ['$set' => ['read' => true, 'readAt' => new UTCDateTime()]]
-        );
-    }
-    
-    public function getCount(string $recipient, bool $unreadOnly = true): int {
-        $filter = ['recipient' => $recipient];
-        if ($unreadOnly) {
-            $filter['read'] = false;
+    // Get statistics
+    public static function getStatistics($collection, $pipeline) {
+        try {
+            $manager = self::getClient();
+            if (!$manager) return [];
+            
+            $command = new MongoDB\Driver\Command([
+                'aggregate' => $collection,
+                'pipeline' => $pipeline,
+                'cursor' => new stdClass,
+            ]);
+            
+            $cursor = $manager->executeCommand('huflit_logs', $command);
+            return $cursor->toArray();
+        } catch (Exception $e) {
+            error_log("Get statistics failed: " . $e->getMessage());
+            return [];
         }
-        return $this->collection->countDocuments($filter);
     }
 }
 ?>
 ```
 
-**4. Update `app/common.php` để load autoloader**
+### 2.3. Tạo Middleware Logger
+**File**: `app/request_logger.php`
 
 ```php
 <?php
-// Existing code...
+require_once 'mongo_helper.php';
 
-// Load Composer autoloader
-require_once __DIR__ . '/vendor/autoload.php';
-
-// Load MongoDB connection
-require_once __DIR__ . '/mongo_connection.php';
-
-// Existing functions...
+class RequestLogger {
+    private static $startTime;
+    private static $endpoint;
+    private static $method;
+    private static $params;
+    private static $body;
+    
+    public static function start() {
+        self::$startTime = microtime(true);
+        self::$endpoint = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        self::$method = $_SERVER['REQUEST_METHOD'];
+        self::$params = $_GET;
+        self::$body = json_decode(file_get_contents('php://input'), true) ?? [];
+    }
+    
+    public static function end($resultCount = 0, $statusCode = 200) {
+        if (self::$startTime === null) return;
+        
+        $executionTime = (microtime(true) - self::$startTime) * 1000; // Convert to ms
+        
+        MongoHelper::logQuery(
+            self::$endpoint,
+            self::$method,
+            self::$params,
+            self::$body,
+            $executionTime,
+            $resultCount,
+            $statusCode
+        );
+    }
+}
 ?>
 ```
 
 ---
 
-## 📅 PHASE 2: AUDIT LOGGING INTEGRATION (Tuần 2-3)
+## 🔌 PHASE 3: API Routes Integration
 
-### ✅ Step 2.1: Tích hợp Audit Logging vào CRUD Operations
-
-**Thời gian**: 4-6 giờ  
-**Mục tiêu**: Log mọi thao tác INSERT/UPDATE/DELETE
-
-#### 📝 Task List
-
-- [ ] Update route handlers để log
-- [ ] Tạo middleware logging
-- [ ] Test logging cho mỗi entity
-- [ ] Verify logs trong MongoDB
-
-#### 🔧 Implementation
-
-**1. Tạo `app/src/Middleware/AuditMiddleware.php`**
+### 3.1. Cập nhật index.php
+**File**: `app/public/index.php`
 
 ```php
 <?php
-namespace App\Middleware;
+header('Content-Type: application/json; charset=utf-8');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Cache-Control, Pragma, Expires');
+header('Access-Control-Max-Age: 3600');
 
-use App\Services\AuditLogger;
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    http_response_code(204);
+    exit(0);
+}
 
-class AuditMiddleware {
-    private AuditLogger $logger;
-    
-    public function __construct() {
-        $this->logger = new AuditLogger();
-    }
-    
-    public function logOperation(
-        string $action,
-        string $entity,
-        string $entityId,
-        $oldData = null,
-        $newData = null
-    ): void {
-        // Determine site based on entity data
-        $site = $this->determineSite($entity, $newData ?? $oldData);
-        
-        $this->logger->log(
-            $action,
-            $entity,
-            $entityId,
-            $site,
-            $oldData,
-            $newData,
-            $this->getCurrentUser(),
-            $this->getClientIp()
-        );
-    }
-    
-    private function determineSite(string $entity, $data): string {
-        if ($entity === 'MonHoc') {
-            return 'All Sites';
-        }
-        
-        $maKhoa = null;
-        if (is_array($data)) {
-            $maKhoa = $data['MaKhoa'] ?? null;
-        } elseif (is_object($data)) {
-            $maKhoa = $data->MaKhoa ?? null;
-        }
-        
-        if (!$maKhoa) {
-            return 'Unknown';
-        }
-        
-        if ($maKhoa < 'M') {
-            return 'Site A';
-        } elseif ($maKhoa >= 'M' && $maKhoa < 'S') {
-            return 'Site B';
+require_once '../common.php';
+require_once '../request_logger.php';
+
+// Start logging
+RequestLogger::start();
+
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$query = $_GET;
+
+$routes = [
+    '/khoa' => 'khoa',
+    '/monhoc' => 'monhoc',
+    '/sinhvien' => 'sinhvien',
+    '/dangky' => 'dangky',
+    '/ctdaotao' => 'ctdaotao',
+    '/global' => 'global',
+    '/logs' => 'logs',          // NEW: Audit logs endpoint
+    '/stats' => 'stats',        // NEW: Statistics endpoint
+];
+
+$method = $_SERVER['REQUEST_METHOD'];
+
+if (array_key_exists($path, $routes)) {
+    $routeFile = '../routes/' . $routes[$path] . '.php';
+    if (file_exists($routeFile)) {
+        require_once $routeFile;
+        $functionName = 'handle' . ucfirst($routes[$path]);
+        if (function_exists($functionName)) {
+            $functionName($method, $query);
         } else {
-            return 'Site C';
+            sendResponse(['error' => 'Handler not found'], 500);
         }
+    } else {
+        sendResponse(['error' => 'Route file not found'], 500);
     }
-    
-    private function getCurrentUser(): string {
-        // TODO: Implement authentication
-        return $_SERVER['PHP_AUTH_USER'] ?? 'anonymous';
-    }
-    
-    private function getClientIp(): string {
-        return $_SERVER['HTTP_X_FORWARDED_FOR'] 
-            ?? $_SERVER['REMOTE_ADDR'] 
-            ?? 'unknown';
-    }
+} else {
+    require_once '../routes/default.php';
+    handleDefault($method, $query);
 }
 ?>
 ```
 
-**2. Update `app/routes/khoa.php` - Add logging**
+### 3.2. Tạo Logs Route
+**File**: `app/routes/logs.php`
 
 ```php
 <?php
-require_once '../common.php';
+require_once '../mongo_helper.php';
 
-use App\Middleware\AuditMiddleware;
-
-function handleKhoa($method, $query) {
-    $audit = new AuditMiddleware();
-    
-    try {
-        $pdo = getDBConnection();
-        switch ($method) {
-            case 'POST':
-                $data = json_decode(file_get_contents('php://input'), true);
-                
-                // Validate
-                if (!isset($data['MaKhoa']) || !isset($data['TenKhoa'])) {
-                    sendResponse(['error' => 'Missing required fields'], 400);
-                    break;
-                }
-                
-                // Execute SQL
-                $stmt = $pdo->prepare("INSERT INTO Khoa_Global (MaKhoa, TenKhoa) VALUES (?, ?)");
-                $stmt->execute([$data['MaKhoa'], $data['TenKhoa']]);
-                
-                // ✅ LOG AUDIT
-                $audit->logOperation(
-                    'INSERT',
-                    'Khoa',
-                    $data['MaKhoa'],
-                    null,
-                    $data
-                );
-                
-                sendResponse(['message' => 'Khoa created successfully'], 201);
-                break;
-                
-            case 'PUT':
-                if (!isset($query['makhoa'])) {
-                    sendResponse(['error' => 'Missing parameter: makhoa'], 400);
-                    break;
-                }
-                
-                // Get old data first
-                $stmt = $pdo->prepare("SELECT * FROM Khoa_Global WHERE MaKhoa = ?");
-                $stmt->execute([$query['makhoa']]);
-                $oldData = $stmt->fetch(PDO::FETCH_ASSOC);
-                
-                $data = json_decode(file_get_contents('php://input'), true);
-                
-                // Execute update
-                $stmt = $pdo->prepare("UPDATE Khoa_Global SET TenKhoa = ? WHERE MaKhoa = ?");
-                $stmt->execute([$data['TenKhoa'], $query['makhoa']]);
-                
-                // ✅ LOG AUDIT
-                $audit->logOperation(
-                    'UPDATE',
-                    'Khoa',
-                    $query['makhoa'],
-                    $oldData,
-                    array_merge($oldData, $data)
-                );
-                
-                sendResponse(['message' => 'Khoa updated successfully']);
-                break;
-                
-            case 'DELETE':
-                if (!isset($query['makhoa'])) {
-                    sendResponse(['error' => 'Missing parameter: makhoa'], 400);
-                    break;
-                }
-                
-                // Get data before delete
-                $stmt = $pdo->prepare("SELECT * FROM Khoa_Global WHERE MaKhoa = ?");
-                $stmt->execute([$query['makhoa']]);
-                $oldData = $stmt->fetch(PDO::FETCH_ASSOC);
-                
-                // Execute delete
-                $stmt = $pdo->prepare("DELETE FROM Khoa_Global WHERE MaKhoa = ?");
-                $stmt->execute([$query['makhoa']]);
-                
-                // ✅ LOG AUDIT
-                $audit->logOperation(
-                    'DELETE',
-                    'Khoa',
-                    $query['makhoa'],
-                    $oldData,
-                    null
-                );
-                
-                sendResponse(['message' => 'Khoa deleted successfully']);
-                break;
-                
-            // GET case remains unchanged
-            case 'GET':
-                // ... existing code ...
-                break;
-        }
-    } catch (Exception $e) {
-        sendResponse(['error' => $e->getMessage()], 500);
-    }
-}
-?>
-```
-
-**3. Apply tương tự cho các routes khác**
-
-- `app/routes/monhoc.php`
-- `app/routes/sinhvien.php`
-- `app/routes/ctdaotao.php`
-- `app/routes/dangky.php`
-
----
-
-### ✅ Step 2.2: Tạo API Endpoint xem Audit Logs
-
-**Thời gian**: 2-3 giờ
-
-#### 🔧 Implementation
-
-**1. Tạo `app/routes/audit.php`**
-
-```php
-<?php
-require_once '../common.php';
-
-use App\Services\AuditLogger;
-
-function handleAudit($method, $query) {
+function handleLogs($method, $query) {
     if ($method !== 'GET') {
-        sendResponse(['error' => 'Only GET method is allowed'], 405);
+        sendResponse(['error' => 'Method not allowed'], 405);
         return;
     }
     
     try {
-        $logger = new AuditLogger();
+        // Build filter from query params
+        $filter = [];
         
-        if (isset($query['entity']) && isset($query['id'])) {
-            // Get history for specific entity
-            $logs = $logger->getEntityHistory($query['entity'], $query['id']);
-            sendResponse($logs);
-        } elseif (isset($query['site'])) {
-            // Get logs by site
-            $limit = isset($query['limit']) ? (int)$query['limit'] : 100;
-            $logs = $logger->getLogsBySite($query['site'], $limit);
-            sendResponse($logs);
-        } elseif (isset($query['stats'])) {
-            // Get statistics
-            $stats = $logger->getStatsByAction();
-            sendResponse($stats);
-        } else {
-            // Get recent logs
-            $limit = isset($query['limit']) ? (int)$query['limit'] : 100;
-            $logs = $logger->getRecentLogs($limit);
-            sendResponse($logs);
+        if (isset($query['table'])) {
+            $filter['table'] = $query['table'];
         }
+        
+        if (isset($query['operation'])) {
+            $filter['operation'] = strtoupper($query['operation']);
+        }
+        
+        if (isset($query['site'])) {
+            $filter['site'] = $query['site'];
+        }
+        
+        // Date range filter
+        if (isset($query['from']) || isset($query['to'])) {
+            $dateFilter = [];
+            if (isset($query['from'])) {
+                $dateFilter['$gte'] = new MongoDB\BSON\UTCDateTime(strtotime($query['from']) * 1000);
+            }
+            if (isset($query['to'])) {
+                $dateFilter['$lte'] = new MongoDB\BSON\UTCDateTime(strtotime($query['to']) * 1000);
+            }
+            $filter['timestamp'] = $dateFilter;
+        }
+        
+        $limit = isset($query['limit']) ? (int)$query['limit'] : 50;
+        $page = isset($query['page']) ? (int)$query['page'] : 1;
+        $skip = ($page - 1) * $limit;
+        
+        $logs = MongoHelper::getAuditLogs($filter, $limit, $skip);
+        
+        // Convert to array and format
+        $result = [];
+        foreach ($logs as $log) {
+            $logArray = (array)$log;
+            // Convert MongoDB BSON types to readable format
+            if (isset($logArray['timestamp'])) {
+                $logArray['timestamp'] = $logArray['timestamp']->toDateTime()->format('Y-m-d H:i:s');
+            }
+            $result[] = $logArray;
+        }
+        
+        RequestLogger::end(count($result), 200);
+        sendResponse([
+            'success' => true,
+            'data' => $result,
+            'page' => $page,
+            'limit' => $limit
+        ]);
+        
     } catch (Exception $e) {
+        RequestLogger::end(0, 500);
         sendResponse(['error' => $e->getMessage()], 500);
     }
 }
 ?>
 ```
 
-**2. Update `app/public/index.php`**
+### 3.3. Tạo Stats Route
+**File**: `app/routes/stats.php`
 
 ```php
 <?php
-// ... existing code ...
+require_once '../mongo_helper.php';
 
-} elseif (preg_match('#^/audit#', $path)) {
-    require_once '../routes/audit.php';
-    handleAudit($method, $query);
+function handleStats($method, $query) {
+    if ($method !== 'GET') {
+        sendResponse(['error' => 'Method not allowed'], 405);
+        return;
+    }
     
-// ... existing code ...
+    try {
+        $type = $query['type'] ?? 'overview';
+        
+        switch ($type) {
+            case 'overview':
+                // Get overview statistics
+                $result = [
+                    'total_operations' => getOperationCount(),
+                    'operations_by_type' => getOperationsByType(),
+                    'operations_by_table' => getOperationsByTable(),
+                    'operations_by_site' => getOperationsBySite(),
+                    'recent_activity' => getRecentActivity(10)
+                ];
+                break;
+                
+            case 'query_stats':
+                // Get query statistics
+                $result = [
+                    'total_queries' => getQueryCount(),
+                    'queries_by_endpoint' => getQueriesByEndpoint(),
+                    'queries_by_method' => getQueriesByMethod(),
+                    'avg_execution_time' => getAvgExecutionTime(),
+                    'slowest_queries' => getSlowestQueries(10)
+                ];
+                break;
+                
+            case 'performance':
+                // Get performance metrics
+                $result = [
+                    'avg_response_time_by_endpoint' => getAvgResponseTimeByEndpoint(),
+                    'error_rate' => getErrorRate(),
+                    'peak_hours' => getPeakHours()
+                ];
+                break;
+                
+            default:
+                sendResponse(['error' => 'Invalid stats type'], 400);
+                return;
+        }
+        
+        RequestLogger::end(1, 200);
+        sendResponse(['success' => true, 'data' => $result]);
+        
+    } catch (Exception $e) {
+        RequestLogger::end(0, 500);
+        sendResponse(['error' => $e->getMessage()], 500);
+    }
+}
+
+// Helper functions for statistics
+function getOperationCount() {
+    $pipeline = [
+        ['$count' => 'total']
+    ];
+    $result = MongoHelper::getStatistics('audit_logs', $pipeline);
+    return $result[0]->total ?? 0;
+}
+
+function getOperationsByType() {
+    $pipeline = [
+        ['$group' => ['_id' => '$operation', 'count' => ['$sum' => 1]]],
+        ['$sort' => ['count' => -1]]
+    ];
+    return MongoHelper::getStatistics('audit_logs', $pipeline);
+}
+
+function getOperationsByTable() {
+    $pipeline = [
+        ['$group' => ['_id' => '$table', 'count' => ['$sum' => 1]]],
+        ['$sort' => ['count' => -1]]
+    ];
+    return MongoHelper::getStatistics('audit_logs', $pipeline);
+}
+
+function getOperationsBySite() {
+    $pipeline = [
+        ['$group' => ['_id' => '$site', 'count' => ['$sum' => 1]]],
+        ['$sort' => ['count' => -1]]
+    ];
+    return MongoHelper::getStatistics('audit_logs', $pipeline);
+}
+
+function getRecentActivity($limit) {
+    return MongoHelper::getAuditLogs([], $limit, 0);
+}
+
+function getQueryCount() {
+    $pipeline = [
+        ['$count' => 'total']
+    ];
+    $result = MongoHelper::getStatistics('query_history', $pipeline);
+    return $result[0]->total ?? 0;
+}
+
+function getQueriesByEndpoint() {
+    $pipeline = [
+        ['$group' => ['_id' => '$endpoint', 'count' => ['$sum' => 1]]],
+        ['$sort' => ['count' => -1]]
+    ];
+    return MongoHelper::getStatistics('query_history', $pipeline);
+}
+
+function getQueriesByMethod() {
+    $pipeline = [
+        ['$group' => ['_id' => '$method', 'count' => ['$sum' => 1]]],
+        ['$sort' => ['count' => -1]]
+    ];
+    return MongoHelper::getStatistics('query_history', $pipeline);
+}
+
+function getAvgExecutionTime() {
+    $pipeline = [
+        ['$group' => ['_id' => null, 'avg_time' => ['$avg' => '$execution_time_ms']]]
+    ];
+    $result = MongoHelper::getStatistics('query_history', $pipeline);
+    return $result[0]->avg_time ?? 0;
+}
+
+function getSlowestQueries($limit) {
+    return MongoHelper::getQueryHistory([], $limit, 0);
+}
+
+function getAvgResponseTimeByEndpoint() {
+    $pipeline = [
+        ['$group' => [
+            '_id' => '$endpoint',
+            'avg_time' => ['$avg' => '$execution_time_ms'],
+            'count' => ['$sum' => 1]
+        ]],
+        ['$sort' => ['avg_time' => -1]]
+    ];
+    return MongoHelper::getStatistics('query_history', $pipeline);
+}
+
+function getErrorRate() {
+    $pipeline = [
+        ['$group' => [
+            '_id' => ['$cond' => [['$gte' => ['$status_code', 400]], 'error', 'success']],
+            'count' => ['$sum' => 1]
+        ]]
+    ];
+    return MongoHelper::getStatistics('query_history', $pipeline);
+}
+
+function getPeakHours() {
+    $pipeline = [
+        ['$group' => [
+            '_id' => ['$hour' => '$timestamp'],
+            'count' => ['$sum' => 1]
+        ]],
+        ['$sort' => ['count' => -1]],
+        ['$limit' => 5]
+    ];
+    return MongoHelper::getStatistics('query_history', $pipeline);
+}
 ?>
 ```
 
-**3. Test audit logging**
+### 3.4. Cập nhật các Route hiện có
+**Ví dụ**: `app/routes/sinhvien.php`
 
-```powershell
-# Create a Khoa
-curl -X POST http://localhost:8080/khoa -H "Content-Type: application/json" -d "{\"MaKhoa\":\"TEST\",\"TenKhoa\":\"Test Khoa\"}"
+Thêm audit logging vào mỗi operation:
 
-# View audit logs
-curl http://localhost:8080/audit?limit=10
+```php
+<?php
+require_once '../common.php';
+require_once '../mongo_helper.php';
 
-# View logs for specific entity
-curl "http://localhost:8080/audit?entity=Khoa&id=TEST"
+function handleSinhVien($method, $query) {
+    try {
+        $pdo = getDBConnection();
+        switch ($method) {
+            case 'POST':
+                $data = getJsonInput();
+                // ... existing validation ...
+                
+                // Execute SQL
+                $stmt = $pdo->prepare("INSERT INTO SinhVien_Global (MaSV, HoTen, MaKhoa, KhoaHoc) VALUES (?, ?, ?, ?)");
+                $stmt->execute([$data['MaSV'], $data['HoTen'], $data['MaKhoa'], $data['KhoaHoc']]);
+                
+                // Log to MongoDB
+                $site = determineSite($data['MaKhoa']); // Helper function
+                MongoHelper::logAudit('SinhVien', 'INSERT', $data, null, $site);
+                
+                sendResponse(['message' => 'SinhVien created successfully', 'MaSV' => $data['MaSV']], 201);
+                break;
+                
+            case 'PUT':
+                // Get old data first
+                $stmt = $pdo->prepare("SELECT * FROM SinhVien_Global WHERE MaSV = ?");
+                $stmt->execute([$query['id']]);
+                $oldData = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                $data = getJsonInput();
+                // ... existing validation and update ...
+                
+                // Log to MongoDB
+                $site = determineSite($data['MaKhoa']);
+                MongoHelper::logAudit('SinhVien', 'UPDATE', $data, $oldData, $site);
+                
+                sendResponse(['message' => 'SinhVien updated successfully']);
+                break;
+                
+            case 'DELETE':
+                // Get data before delete
+                $stmt = $pdo->prepare("SELECT * FROM SinhVien_Global WHERE MaSV = ?");
+                $stmt->execute([$query['id']]);
+                $oldData = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                // ... existing delete logic ...
+                
+                // Log to MongoDB
+                $site = determineSite($oldData['MaKhoa']);
+                MongoHelper::logAudit('SinhVien', 'DELETE', null, $oldData, $site);
+                
+                sendResponse(['message' => 'SinhVien deleted successfully']);
+                break;
+        }
+    } catch (Exception $e) {
+        sendResponse(['error' => $e->getMessage()], 500);
+    }
+}
 
-# View statistics
-curl http://localhost:8080/audit?stats=1
+function determineSite($maKhoa) {
+    if ($maKhoa < 'M') return 'Site_A';
+    if ($maKhoa >= 'M' && $maKhoa < 'S') return 'Site_B';
+    return 'Site_C';
+}
+?>
 ```
+
+**Áp dụng tương tự cho**: `khoa.php`, `monhoc.php`, `dangky.php`, `ctdaotao.php`
 
 ---
 
-### ✅ Step 2.3: Tạo UI Dashboard cho Audit Logs
+## 🎨 PHASE 4: UI Dashboard
 
-**Thời gian**: 3-4 giờ
+### 4.1. Tạo Logs Viewer Page
+**File**: `app/public/logs.html`
 
-#### 🔧 Implementation
-
-**1. Tạo `app/public/audit_dashboard.php`**
-
-```php
+```html
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📝 Audit Logs Dashboard</title>
+    <title>Audit Logs - HUFLIT</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        .audit-dashboard {
-            padding: 20px;
-        }
-        
-        .stats-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        
-        .stat-card h3 {
-            margin: 0 0 10px 0;
-            font-size: 14px;
-            opacity: 0.9;
-        }
-        
-        .stat-card .value {
-            font-size: 32px;
-            font-weight: bold;
-        }
-        
-        .log-filters {
+        .filter-bar {
+            background: #f5f5f5;
+            padding: 15px;
             margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
+            border-radius: 5px;
         }
-        
-        .log-table {
+        .filter-bar select, .filter-bar input {
+            margin-right: 10px;
+            padding: 8px;
+        }
+        .log-entry {
             background: white;
-            border-radius: 10px;
-            overflow: hidden;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 3px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        
-        .log-entry {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            display: grid;
-            grid-template-columns: 150px 80px 100px 150px 1fr;
-            gap: 15px;
-            align-items: center;
+        .log-entry.insert { border-left-color: #28a745; }
+        .log-entry.update { border-left-color: #ffc107; }
+        .log-entry.delete { border-left-color: #dc3545; }
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
         }
-        
-        .log-entry:hover {
-            background: #f9f9f9;
-        }
-        
-        .log-action {
-            font-weight: bold;
-            padding: 4px 8px;
-            border-radius: 4px;
-            text-align: center;
-        }
-        
-        .action-INSERT { background: #d4edda; color: #155724; }
-        .action-UPDATE { background: #fff3cd; color: #856404; }
-        .action-DELETE { background: #f8d7da; color: #721c24; }
-        
-        .site-badge {
-            padding: 4px 8px;
-            border-radius: 4px;
+        .log-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
             font-size: 12px;
-            text-align: center;
+            font-weight: bold;
         }
-        
-        .site-a { background: #cfe2ff; color: #084298; }
-        .site-b { background: #d1e7dd; color: #0f5132; }
-        .site-c { background: #f8d7da; color: #842029; }
+        .log-data {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 13px;
+        }
     </style>
 </head>
 <body>
-    <div class="audit-dashboard">
-        <h1>📝 Audit Logs Dashboard</h1>
+    <div class="container">
+        <h1>📋 Audit Logs & Change History</h1>
         
-        <div class="stats-cards" id="statsCards">
-            <!-- Will be populated by JS -->
-        </div>
-        
-        <div class="log-filters">
-            <select id="entityFilter">
-                <option value="">All Entities</option>
+        <div class="filter-bar">
+            <select id="tableFilter">
+                <option value="">All Tables</option>
                 <option value="Khoa">Khoa</option>
-                <option value="MonHoc">MonHoc</option>
                 <option value="SinhVien">SinhVien</option>
+                <option value="MonHoc">MonHoc</option>
                 <option value="CTDaoTao">CTDaoTao</option>
                 <option value="DangKy">DangKy</option>
             </select>
             
-            <select id="actionFilter">
-                <option value="">All Actions</option>
+            <select id="operationFilter">
+                <option value="">All Operations</option>
                 <option value="INSERT">INSERT</option>
                 <option value="UPDATE">UPDATE</option>
                 <option value="DELETE">DELETE</option>
@@ -1170,497 +782,420 @@ curl http://localhost:8080/audit?stats=1
             
             <select id="siteFilter">
                 <option value="">All Sites</option>
-                <option value="Site A">Site A</option>
-                <option value="Site B">Site B</option>
-                <option value="Site C">Site C</option>
+                <option value="Site_A">Site A</option>
+                <option value="Site_B">Site B</option>
+                <option value="Site_C">Site C</option>
+                <option value="Global">Global</option>
             </select>
             
-            <button onclick="loadLogs()">🔄 Refresh</button>
-            <button onclick="exportLogs()">📥 Export CSV</button>
+            <input type="date" id="fromDate" placeholder="From Date">
+            <input type="date" id="toDate" placeholder="To Date">
+            
+            <button onclick="loadLogs()">Filter</button>
+            <button onclick="clearFilters()">Clear</button>
         </div>
         
-        <div class="log-table" id="logTable">
-            <!-- Will be populated by JS -->
+        <div id="logsContainer"></div>
+        
+        <div style="text-align: center; margin-top: 20px;">
+            <button onclick="loadMore()">Load More</button>
         </div>
     </div>
     
     <script>
-        let allLogs = [];
+        let currentPage = 1;
         
-        async function loadStats() {
-            const response = await fetch('http://localhost:8080/audit?stats=1');
-            const stats = await response.json();
+        async function loadLogs(append = false) {
+            if (!append) currentPage = 1;
             
-            const statsHtml = stats.map(stat => `
-                <div class="stat-card">
-                    <h3>${stat._id}</h3>
-                    <div class="value">${stat.count}</div>
-                </div>
-            `).join('');
-            
-            document.getElementById('statsCards').innerHTML = statsHtml;
-        }
-        
-        async function loadLogs() {
-            const response = await fetch('http://localhost:8080/audit?limit=1000');
-            allLogs = await response.json();
-            renderLogs(allLogs);
-        }
-        
-        function renderLogs(logs) {
-            const logsHtml = logs.map(log => {
-                const timestamp = new Date(log.timestamp.$date).toLocaleString('vi-VN');
-                return `
-                    <div class="log-entry">
-                        <div>${timestamp}</div>
-                        <div class="log-action action-${log.action}">${log.action}</div>
-                        <div>${log.entity}</div>
-                        <div class="site-badge site-${log.site.toLowerCase().replace(' ', '-')}">${log.site}</div>
-                        <div>
-                            <strong>${log.entityId}</strong>
-                            <br>
-                            <small>User: ${log.user} | IP: ${log.ipAddress}</small>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            
-            document.getElementById('logTable').innerHTML = logsHtml || '<p style="padding: 20px;">No logs found</p>';
-        }
-        
-        function filterLogs() {
-            const entity = document.getElementById('entityFilter').value;
-            const action = document.getElementById('actionFilter').value;
-            const site = document.getElementById('siteFilter').value;
-            
-            let filtered = allLogs.filter(log => {
-                return (!entity || log.entity === entity) &&
-                       (!action || log.action === action) &&
-                       (!site || log.site === site);
+            const params = new URLSearchParams({
+                page: currentPage,
+                limit: 20
             });
             
-            renderLogs(filtered);
+            const table = document.getElementById('tableFilter').value;
+            const operation = document.getElementById('operationFilter').value;
+            const site = document.getElementById('siteFilter').value;
+            const from = document.getElementById('fromDate').value;
+            const to = document.getElementById('toDate').value;
+            
+            if (table) params.append('table', table);
+            if (operation) params.append('operation', operation);
+            if (site) params.append('site', site);
+            if (from) params.append('from', from);
+            if (to) params.append('to', to);
+            
+            try {
+                const response = await fetch(`http://localhost:8080/logs?${params}`);
+                const result = await response.json();
+                
+                const container = document.getElementById('logsContainer');
+                if (!append) container.innerHTML = '';
+                
+                result.data.forEach(log => {
+                    container.innerHTML += formatLogEntry(log);
+                });
+            } catch (error) {
+                alert('Error loading logs: ' + error.message);
+            }
         }
         
-        document.getElementById('entityFilter').addEventListener('change', filterLogs);
-        document.getElementById('actionFilter').addEventListener('change', filterLogs);
-        document.getElementById('siteFilter').addEventListener('change', filterLogs);
-        
-        function exportLogs() {
-            // TODO: Implement CSV export
-            alert('Export feature coming soon!');
+        function formatLogEntry(log) {
+            const opClass = log.operation.toLowerCase();
+            return `
+                <div class="log-entry ${opClass}">
+                    <div class="log-header">
+                        <div>
+                            <span class="log-badge" style="background: #007bff; color: white;">${log.table}</span>
+                            <span class="log-badge" style="background: #6c757d; color: white;">${log.operation}</span>
+                            <span class="log-badge" style="background: #17a2b8; color: white;">${log.site}</span>
+                        </div>
+                        <div style="color: #666; font-size: 14px;">
+                            ${log.timestamp} | ${log.ip_address}
+                        </div>
+                    </div>
+                    ${log.old_data ? `<div><strong>Old Data:</strong><div class="log-data">${JSON.stringify(log.old_data, null, 2)}</div></div>` : ''}
+                    ${log.data ? `<div><strong>${log.operation === 'DELETE' ? 'Deleted Data' : 'New Data'}:</strong><div class="log-data">${JSON.stringify(log.data, null, 2)}</div></div>` : ''}
+                </div>
+            `;
         }
         
-        // Load data on page load
-        loadStats();
-        loadLogs();
-        
-        // Auto refresh every 30 seconds
-        setInterval(() => {
-            loadStats();
+        function clearFilters() {
+            document.getElementById('tableFilter').value = '';
+            document.getElementById('operationFilter').value = '';
+            document.getElementById('siteFilter').value = '';
+            document.getElementById('fromDate').value = '';
+            document.getElementById('toDate').value = '';
             loadLogs();
-        }, 30000);
+        }
+        
+        function loadMore() {
+            currentPage++;
+            loadLogs(true);
+        }
+        
+        // Load logs on page load
+        loadLogs();
     </script>
 </body>
 </html>
 ```
 
-**2. Access dashboard**
+### 4.2. Tạo Statistics Dashboard
+**File**: `app/public/stats.html`
 
-```
-http://localhost:8081/audit_dashboard.php
-```
-
----
-
-## 📅 PHASE 3: ANALYTICS & REPORTING (Tuần 3-4)
-
-### ✅ Step 3.1: ETL Job - Extract from SQL to MongoDB
-
-**Thời gian**: 4-6 giờ  
-**Mục tiêu**: Tự động đồng bộ dữ liệu analytics
-
-#### 🔧 Implementation
-
-**1. Tạo `app/jobs/sync_analytics.php`**
-
-```php
-<?php
-require_once __DIR__ . '/../common.php';
-
-use App\Services\AnalyticsService;
-
-class AnalyticsSync {
-    private $sqlPdo;
-    private $analyticsService;
+```html
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics Dashboard - HUFLIT</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #007bff;
+            margin: 10px 0;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Statistics Dashboard</h1>
+        
+        <div class="stats-grid" id="statsOverview"></div>
+        
+        <div class="chart-container">
+            <h3>Operations by Type</h3>
+            <canvas id="operationsChart"></canvas>
+        </div>
+        
+        <div class="chart-container">
+            <h3>Operations by Table</h3>
+            <canvas id="tablesChart"></canvas>
+        </div>
+        
+        <div class="chart-container">
+            <h3>Queries by Endpoint</h3>
+            <canvas id="endpointsChart"></canvas>
+        </div>
+        
+        <div class="chart-container">
+            <h3>Average Response Time by Endpoint</h3>
+            <canvas id="responseTimeChart"></canvas>
+        </div>
+    </div>
     
-    public function __construct() {
-        $this->sqlPdo = getDBConnection();
-        $this->analyticsService = new AnalyticsService();
-    }
-    
-    public function syncAllStudents(string $semester): void {
-        echo "🔄 Starting analytics sync for semester: $semester\n";
-        
-        // Get all students
-        $stmt = $this->sqlPdo->query("
-            SELECT DISTINCT sv.MaSV, sv.HoTen, sv.MaKhoa, sv.KhoaHoc
-            FROM SinhVien_Global sv
-        ");
-        
-        $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $total = count($students);
-        $count = 0;
-        
-        foreach ($students as $student) {
-            $count++;
-            echo "Processing {$count}/{$total}: {$student['MaSV']}...\n";
-            
-            $stats = $this->calculateStudentStats($student['MaSV'], $semester);
-            
-            if ($stats) {
-                $this->analyticsService->updateStudentStats(
-                    $student['MaSV'],
-                    $semester,
-                    $stats
-                );
+    <script>
+        async function loadStatistics() {
+            try {
+                // Load overview stats
+                const overviewResponse = await fetch('http://localhost:8080/stats?type=overview');
+                const overview = await overviewResponse.json();
+                displayOverview(overview.data);
+                
+                // Load query stats
+                const queryResponse = await fetch('http://localhost:8080/stats?type=query_stats');
+                const queryStats = await queryResponse.json();
+                displayQueryStats(queryStats.data);
+                
+                // Load performance stats
+                const perfResponse = await fetch('http://localhost:8080/stats?type=performance');
+                const perfStats = await perfResponse.json();
+                displayPerformanceStats(perfStats.data);
+                
+            } catch (error) {
+                alert('Error loading statistics: ' + error.message);
             }
         }
         
-        echo "✅ Sync completed! Processed $count students.\n";
-    }
-    
-    private function calculateStudentStats(string $maSV, string $semester): ?array {
-        // Get all courses and grades for student
-        $stmt = $this->sqlPdo->prepare("
-            SELECT 
-                dk.MaMon,
-                mh.TenMH,
-                dk.DiemThi,
-                ctdt.MaKhoa,
-                sv.KhoaHoc
-            FROM DangKy_Global dk
-            JOIN MonHoc_Global mh ON dk.MaMon = mh.MaMH
-            JOIN SinhVien_Global sv ON dk.MaSV = sv.MaSV
-            LEFT JOIN CTDaoTao_Global ctdt ON dk.MaMon = ctdt.MaMH AND sv.MaKhoa = ctdt.MaKhoa
-            WHERE dk.MaSV = ?
-        ");
-        
-        $stmt->execute([$maSV]);
-        $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        if (empty($courses)) {
-            return null;
+        function displayOverview(data) {
+            const container = document.getElementById('statsOverview');
+            container.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-label">Total Operations</div>
+                    <div class="stat-value">${data.total_operations}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Queries</div>
+                    <div class="stat-value">${data.total_queries || 0}</div>
+                </div>
+            `;
+            
+            // Operations by type chart
+            const opLabels = data.operations_by_type.map(item => item._id);
+            const opData = data.operations_by_type.map(item => item.count);
+            createPieChart('operationsChart', opLabels, opData);
+            
+            // Operations by table chart
+            const tableLabels = data.operations_by_table.map(item => item._id);
+            const tableData = data.operations_by_table.map(item => item.count);
+            createBarChart('tablesChart', tableLabels, tableData, 'Operations');
         }
         
-        $totalCredits = count($courses) * 3; // Assume 3 credits per course
-        $grades = array_filter(array_column($courses, 'DiemThi'), fn($g) => $g !== null);
-        
-        $averageGrade = !empty($grades) ? array_sum($grades) / count($grades) : 0;
-        $passedCourses = count(array_filter($grades, fn($g) => $g >= 5.0));
-        $failedCourses = count(array_filter($grades, fn($g) => $g < 5.0));
-        
-        return [
-            'totalCourses' => count($courses),
-            'completedCourses' => count($grades),
-            'pendingCourses' => count($courses) - count($grades),
-            'totalCredits' => $totalCredits,
-            'averageGrade' => round($averageGrade, 2),
-            'maxGrade' => !empty($grades) ? max($grades) : 0,
-            'minGrade' => !empty($grades) ? min($grades) : 0,
-            'passedCourses' => $passedCourses,
-            'failedCourses' => $failedCourses,
-            'passRate' => count($grades) > 0 ? round($passedCourses / count($grades) * 100, 2) : 0,
-            'gpa' => round($averageGrade, 2),
-            'atRisk' => $averageGrade < 5.0,
-            'excellent' => $averageGrade >= 8.5,
-            'courses' => array_map(function($course) {
-                return [
-                    'MaMon' => $course['MaMon'],
-                    'TenMH' => $course['TenMH'],
-                    'DiemThi' => $course['DiemThi'],
-                    'passed' => $course['DiemThi'] >= 5.0
-                ];
-            }, $courses)
-        ];
-    }
-}
-
-// Run sync
-if (php_sapi_name() === 'cli') {
-    $semester = $argv[1] ?? '2025-1';
-    $sync = new AnalyticsSync();
-    $sync->syncAllStudents($semester);
-}
-?>
-```
-
-**2. Tạo cron job script `app/jobs/cron.sh`**
-
-```bash
-#!/bin/bash
-
-# Run analytics sync daily at 2 AM
-0 2 * * * cd /var/www/html/jobs && php sync_analytics.php "2025-1" >> /var/log/sync.log 2>&1
-```
-
-**3. Run manual sync**
-
-```powershell
-docker exec -it api_php php jobs/sync_analytics.php "2025-1"
-```
-
----
-
-### ✅ Step 3.2: Analytics API Endpoints
-
-**Thời gian**: 2-3 giờ
-
-#### 🔧 Implementation
-
-**1. Tạo `app/routes/analytics.php`**
-
-```php
-<?php
-require_once '../common.php';
-
-use App\Services\AnalyticsService;
-
-function handleAnalytics($method, $query) {
-    if ($method !== 'GET') {
-        sendResponse(['error' => 'Only GET method is allowed'], 405);
-        return;
-    }
-    
-    try {
-        $service = new AnalyticsService();
-        
-        if (isset($query['masv'])) {
-            // Get student stats
-            $semester = $query['semester'] ?? null;
-            $stats = $service->getStudentStats($query['masv'], $semester);
-            sendResponse($stats ?? ['error' => 'No data found']);
-            
-        } elseif (isset($query['top'])) {
-            // Get top students
-            $limit = isset($query['limit']) ? (int)$query['limit'] : 10;
-            $students = $service->getTopStudents($limit);
-            sendResponse($students);
-            
-        } elseif (isset($query['atrisk'])) {
-            // Get at-risk students
-            $threshold = isset($query['threshold']) ? (float)$query['threshold'] : 5.0;
-            $students = $service->getAtRiskStudents($threshold);
-            sendResponse($students);
-            
-        } elseif (isset($query['report'])) {
-            // Generate semester report
-            $semester = $query['semester'] ?? '2025-1';
-            $report = $service->generateSemesterReport($semester);
-            sendResponse($report);
-            
-        } else {
-            sendResponse(['error' => 'Invalid query parameters'], 400);
+        function displayQueryStats(data) {
+            const endpointLabels = data.queries_by_endpoint.map(item => item._id);
+            const endpointData = data.queries_by_endpoint.map(item => item.count);
+            createBarChart('endpointsChart', endpointLabels, endpointData, 'Queries');
         }
         
-    } catch (Exception $e) {
-        sendResponse(['error' => $e->getMessage()], 500);
-    }
-}
-?>
+        function displayPerformanceStats(data) {
+            const labels = data.avg_response_time_by_endpoint.map(item => item._id);
+            const times = data.avg_response_time_by_endpoint.map(item => item.avg_time);
+            createBarChart('responseTimeChart', labels, times, 'Avg Time (ms)', '#ff6384');
+        }
+        
+        function createPieChart(canvasId, labels, data) {
+            new Chart(document.getElementById(canvasId), {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: ['#36a2eb', '#ff6384', '#ffce56']
+                    }]
+                }
+            });
+        }
+        
+        function createBarChart(canvasId, labels, data, label, color = '#36a2eb') {
+            new Chart(document.getElementById(canvasId), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        data: data,
+                        backgroundColor: color
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+        
+        // Load stats on page load
+        loadStatistics();
+        
+        // Refresh every 30 seconds
+        setInterval(loadStatistics, 30000);
+    </script>
+</body>
+</html>
 ```
 
-**2. Update `app/public/index.php`**
+---
 
-```php
-} elseif (preg_match('#^/analytics#', $path)) {
-    require_once '../routes/analytics.php';
-    handleAnalytics($method, $query);
-```
+## ✅ PHASE 5: Testing & Deployment
 
-**3. Test analytics API**
+### 5.1. Testing Checklist
+
+**Infrastructure**:
+- [ ] MongoDB container starts successfully
+- [ ] Collections and indexes created
+- [ ] PHP MongoDB extension installed
+
+**Audit Logs**:
+- [ ] INSERT operations logged correctly
+- [ ] UPDATE operations include old_data
+- [ ] DELETE operations logged
+- [ ] Site routing correct (A/B/C)
+- [ ] Timestamp accuracy
+
+**Query History**:
+- [ ] All API calls logged
+- [ ] Execution time measured
+- [ ] Result count accurate
+- [ ] Status codes logged
+
+**API Endpoints**:
+- [ ] `/logs` returns filtered results
+- [ ] `/logs` pagination works
+- [ ] `/stats?type=overview` returns correct data
+- [ ] `/stats?type=query_stats` works
+- [ ] `/stats?type=performance` works
+
+**UI**:
+- [ ] Logs page displays entries
+- [ ] Filters work correctly
+- [ ] Stats dashboard shows charts
+- [ ] Real-time updates work
+
+### 5.2. Deployment Steps
 
 ```powershell
-# Sync data first
-docker exec -it api_php php jobs/sync_analytics.php "2025-1"
-
-# Get student stats
-curl "http://localhost:8080/analytics?masv=25DH123456"
-
-# Get top 10 students
-curl "http://localhost:8080/analytics?top=1&limit=10"
-
-# Get at-risk students
-curl "http://localhost:8080/analytics?atrisk=1&threshold=5.0"
-
-# Get semester report
-curl "http://localhost:8080/analytics?report=1&semester=2025-1"
-```
-
----
-
-## 📅 PHASE 4: ADVANCED FEATURES (Tuần 4-5)
-
-### ✅ Step 4.1: Notifications System
-
-**Chi tiết trong document riêng để giữ plan ngắn gọn**
-
-### ✅ Step 4.2: Course Feedback System
-
-**Chi tiết trong document riêng**
-
-### ✅ Step 4.3: Predictive Analytics với ML
-
-**Chi tiết trong document riêng**
-
----
-
-## ✅ TESTING & VALIDATION
-
-### Test Checklist
-
-- [ ] MongoDB connection test
-- [ ] Audit logging for all CRUD operations
-- [ ] Analytics sync job
-- [ ] API endpoints response time < 500ms
-- [ ] Load test with 1000 concurrent requests
-- [ ] Data consistency between SQL and MongoDB
-- [ ] Backup & restore procedures
-
-### Performance Benchmarks
-
-| Metric | Target | Actual |
-|--------|--------|--------|
-| API Response Time | < 500ms | ___ ms |
-| MongoDB Write | < 50ms | ___ ms |
-| MongoDB Read | < 100ms | ___ ms |
-| Analytics Sync | < 5 min | ___ min |
-| Audit Log Volume | 10K/day | ___ K/day |
-
----
-
-## 📚 DOCUMENTATION
-
-### Files to create/update
-
-- [x] `MONGODB_INTEGRATION_PLAN.md` (this file)
-- [ ] `MONGODB_SETUP.md` - Detailed setup guide
-- [ ] `ANALYTICS_GUIDE.md` - How to use analytics
-- [ ] `API_DOCUMENTATION.md` - Update with new endpoints
-- [ ] `DEPLOYMENT.md` - Production deployment guide
-
----
-
-## 🚀 DEPLOYMENT CHECKLIST
-
-### Pre-deployment
-
-- [ ] Code review completed
-- [ ] All tests passing
-- [ ] Documentation updated
-- [ ] Backup current database
-- [ ] Performance benchmarks met
-
-### Deployment Steps
-
-```powershell
-# 1. Pull latest code
-git pull origin main
-
-# 2. Stop containers
+# 1. Stop existing containers
 docker-compose down
 
-# 3. Update .env with MongoDB credentials
-# (edit .env file)
+# 2. Update environment variables
+# Create .env file with MongoDB password
 
-# 4. Build and start
-docker-compose build
-docker-compose up -d
+# 3. Build and start containers
+docker-compose up -d --build
 
-# 5. Verify services
-docker ps
-docker logs mongodb_analytics
-docker logs api_php
+# 4. Wait for MongoDB to be ready
+Start-Sleep -Seconds 10
 
-# 6. Run initial sync
-docker exec -it api_php php jobs/sync_analytics.php "2025-1"
+# 5. Verify MongoDB connection
+docker exec -it mongodb mongosh -u admin -p 'Your@STROng!Mongo#Pass' --eval "db.adminCommand('ping')"
 
-# 7. Test endpoints
-curl http://localhost:8080/audit?limit=10
-curl http://localhost:8080/analytics?report=1
+# 6. Check collections created
+docker exec -it mongodb mongosh -u admin -p 'Your@STROng!Mongo#Pass' huflit_logs --eval "show collections"
 
-# 8. Access dashboards
-# - Web UI: http://localhost:8081/ui.php
-# - Audit Dashboard: http://localhost:8081/audit_dashboard.php
-# - Mongo Express: http://localhost:8082
-```
+# 7. Test API endpoints
+curl http://localhost:8080/logs
+curl http://localhost:8080/stats?type=overview
 
-### Post-deployment
+# 8. Test audit logging by creating a record
+curl -X POST http://localhost:8080/khoa -H "Content-Type: application/json" -d '{"MaKhoa":"TEST","TenKhoa":"Test Khoa"}'
 
-- [ ] Verify all endpoints working
-- [ ] Check audit logs being created
-- [ ] Monitor MongoDB performance
-- [ ] Setup monitoring alerts
-- [ ] Schedule backup jobs
+# 9. Verify log was created
+curl http://localhost:8080/logs?table=Khoa
 
----
-
-## 🆘 TROUBLESHOOTING
-
-### Common Issues
-
-**Issue 1: MongoDB connection refused**
-```powershell
-# Check MongoDB is running
-docker ps | grep mongodb
-
-# Check logs
-docker logs mongodb_analytics
-
-# Verify network
-docker network inspect huflit-network
-```
-
-**Issue 2: PHP MongoDB extension not found**
-```powershell
-# Rebuild with MongoDB extension
-docker-compose build --no-cache api_php
-docker-compose up -d api_php
-
-# Verify extension loaded
-docker exec -it api_php php -m | grep mongodb
-```
-
-**Issue 3: Audit logs not being created**
-```powershell
-# Check MongoDB credentials in .env
-cat .env
-
-# Test connection manually
-docker exec -it api_php php test_mongo.php
-
-# Check API logs
-docker logs api_php
+# 10. Access UI dashboards
+start http://localhost:8081/logs.html
+start http://localhost:8081/stats.html
 ```
 
 ---
 
-## 📞 SUPPORT & CONTACTS
+## 📊 Expected Results
 
-- **Project Lead**: [Your Name]
-- **MongoDB Expert**: [Expert Name]
-- **DevOps**: [DevOps Name]
+### Audit Logs Collection
+```javascript
+{
+  "_id": ObjectId("..."),
+  "table": "SinhVien",
+  "operation": "INSERT",
+  "data": {
+    "MaSV": "SV001",
+    "HoTen": "Nguyen Van A",
+    "MaKhoa": "CNTT",
+    "KhoaHoc": 2024
+  },
+  "timestamp": ISODate("2025-11-24T10:30:00Z"),
+  "site": "Site_A",
+  "ip_address": "172.18.0.1",
+  "user_agent": "Mozilla/5.0..."
+}
+```
+
+### Query History Collection
+```javascript
+{
+  "_id": ObjectId("..."),
+  "endpoint": "/sinhvien",
+  "method": "GET",
+  "params": {},
+  "body": {},
+  "execution_time_ms": 45,
+  "result_count": 120,
+  "status_code": 200,
+  "timestamp": ISODate("2025-11-24T10:31:00Z"),
+  "ip_address": "172.18.0.1"
+}
+```
 
 ---
 
-<div align="center">
+## 🚀 Future Enhancements
 
-**[⬅️ Back to README](README.md)** | **[🏗️ Architecture](ARCHITECTURE.md)**
+1. **Real-time Notifications**: WebSocket cho live updates
+2. **Export Functionality**: Export logs to CSV/Excel
+3. **Advanced Filtering**: Complex query builder
+4. **Alerting System**: Email/SMS alerts cho critical operations
+5. **Data Retention**: Auto-cleanup old logs
+6. **Performance Optimization**: Caching frequently accessed stats
+7. **Security**: API authentication/authorization
+8. **Backup Strategy**: Automated MongoDB backups
 
 ---
 
-**Made with ❤️ for HUFLIT**
+## 📝 Notes
 
-*Last updated: 2025-11-21*
+- MongoDB sử dụng cổng **27017**
+- Logs API endpoint: **http://localhost:8080/logs**
+- Stats API endpoint: **http://localhost:8080/stats**
+- Logs UI: **http://localhost:8081/logs.html**
+- Stats Dashboard: **http://localhost:8081/stats.html**
+- Default MongoDB credentials: `admin / Your@STROng!Mongo#Pass`
+- Audit logs retention: Unlimited (có thể thêm TTL index)
+- Query history retention: Unlimited (có thể thêm TTL index)
 
-</div>
+---
+
+**Estimated Timeline**: 2-3 days
+- Day 1: Infrastructure + MongoDB Integration (Phase 1-2)
+- Day 2: API Routes + Logging Integration (Phase 3)
+- Day 3: UI Dashboard + Testing (Phase 4-5)
