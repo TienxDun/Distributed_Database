@@ -32,13 +32,33 @@
                         </span>
                     </label>
                 </div>
-                <button class="btn-settings-modern" onclick="openSettingsModal()">
-                    <span class="settings-icon">⚙️</span>
-                    <span class="settings-text">
-                        <strong>Cài đặt giao diện</strong>
-                        <small>Tùy chỉnh màu sắc</small>
-                    </span>
-                </button>
+                <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                    <a href="logs.php" style="text-decoration: none;">
+                        <button class="btn-settings-modern" style="border: none; cursor: pointer;">
+                            <span class="settings-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">📋</span>
+                            <span class="settings-text">
+                                <strong>Audit Logs</strong>
+                                <small>Lịch sử thay đổi</small>
+                            </span>
+                        </button>
+                    </a>
+                    <a href="stats.php" style="text-decoration: none;">
+                        <button class="btn-settings-modern" style="border: none; cursor: pointer;">
+                            <span class="settings-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">📊</span>
+                            <span class="settings-text">
+                                <strong>Statistics</strong>
+                                <small>Thống kê & phân tích</small>
+                            </span>
+                        </button>
+                    </a>
+                    <button class="btn-settings-modern" onclick="openSettingsModal()">
+                        <span class="settings-icon">⚙️</span>
+                        <span class="settings-text">
+                            <strong>Cài đặt giao diện</strong>
+                            <small>Tùy chỉnh màu sắc</small>
+                        </span>
+                    </button>
+                </div>
             </div>
         </div>
 

@@ -11,11 +11,29 @@
         <div class="header">
             <h1>📋 Audit Logs</h1>
             <p>Lịch sử thay đổi dữ liệu - HUFLIT Distributed Database</p>
-        </div>
-
-        <div class="stats-nav" style="margin-bottom: 2rem;">
-            <a href="ui.php">← Về trang chính</a>
-            <a href="stats.php">📈 Statistics</a>
+            <div style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div></div>
+                <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                    <a href="ui.php" style="text-decoration: none;">
+                        <button class="btn-settings-modern" style="border: none; cursor: pointer;">
+                            <span class="settings-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">🏠</span>
+                            <span class="settings-text">
+                                <strong>Trang chính</strong>
+                                <small>CRUD Interface</small>
+                            </span>
+                        </button>
+                    </a>
+                    <a href="stats.php" style="text-decoration: none;">
+                        <button class="btn-settings-modern" style="border: none; cursor: pointer;">
+                            <span class="settings-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">📊</span>
+                            <span class="settings-text">
+                                <strong>Statistics</strong>
+                                <small>Thống kê & phân tích</small>
+                            </span>
+                        </button>
+                    </a>
+                </div>
+            </div>
         </div>
 
         <div class="logs-filters">
@@ -65,7 +83,7 @@
             </div>
 
             <div class="filter-actions">
-                <button class="btn btn-primary" onclick="applyFilters()">🔍 Lọc dữ liệu</button>
+                <button class="btn btn-primary" onclick="applyFilters()">Lọc dữ liệu</button>
                 <button class="btn btn-secondary" onclick="resetFilters()">🔄 Đặt lại</button>
             </div>
         </div>
@@ -197,20 +215,40 @@
 
             document.getElementById('statsBar').innerHTML = `
                 <div class="stat-card">
-                    <h3>${total}</h3>
-                    <p>📊 Tổng số logs</p>
+                    <div class="stat-card-header">
+                        <div class="stat-icon blue">📊</div>
+                        <div class="stat-content">
+                            <div class="stat-label">Tổng số logs</div>
+                            <div class="stat-value blue">${total}</div>
+                        </div>
+                    </div>
                 </div>
                 <div class="stat-card">
-                    <h3>${inserts}</h3>
-                    <p>✅ INSERT</p>
+                    <div class="stat-card-header">
+                        <div class="stat-icon green">✅</div>
+                        <div class="stat-content">
+                            <div class="stat-label">Insert</div>
+                            <div class="stat-value green">${inserts}</div>
+                        </div>
+                    </div>
                 </div>
                 <div class="stat-card">
-                    <h3>${updates}</h3>
-                    <p>🔄 UPDATE</p>
+                    <div class="stat-card-header">
+                        <div class="stat-icon orange">🔄</div>
+                        <div class="stat-content">
+                            <div class="stat-label">Update</div>
+                            <div class="stat-value orange">${updates}</div>
+                        </div>
+                    </div>
                 </div>
                 <div class="stat-card">
-                    <h3>${deletes}</h3>
-                    <p>❌ DELETE</p>
+                    <div class="stat-card-header">
+                        <div class="stat-icon red">❌</div>
+                        <div class="stat-content">
+                            <div class="stat-label">Delete</div>
+                            <div class="stat-value red">${deletes}</div>
+                        </div>
+                    </div>
                 </div>
             `;
         }

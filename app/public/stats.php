@@ -12,11 +12,29 @@
         <div class="header">
             <h1>📊 Statistics Dashboard</h1>
             <p>Thống kê và phân tích - HUFLIT Distributed Database</p>
-        </div>
-
-        <div class="stats-nav">
-            <a href="ui.php">← Về trang chính</a>
-            <a href="logs.php">📋 Audit Logs</a>
+            <div style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div></div>
+                <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                    <a href="ui.php" style="text-decoration: none;">
+                        <button class="btn-settings-modern" style="border: none; cursor: pointer;">
+                            <span class="settings-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">🏠</span>
+                            <span class="settings-text">
+                                <strong>Trang chính</strong>
+                                <small>CRUD Interface</small>
+                            </span>
+                        </button>
+                    </a>
+                    <a href="logs.php" style="text-decoration: none;">
+                        <button class="btn-settings-modern" style="border: none; cursor: pointer;">
+                            <span class="settings-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">📋</span>
+                            <span class="settings-text">
+                                <strong>Audit Logs</strong>
+                                <small>Lịch sử thay đổi</small>
+                            </span>
+                        </button>
+                    </a>
+                </div>
+            </div>
         </div>
 
         <div class="stats-overview" id="statsOverview">

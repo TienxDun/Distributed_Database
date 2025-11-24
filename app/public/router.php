@@ -4,6 +4,11 @@
  * Only allows API endpoints, blocks UI files
  */
 
+require_once __DIR__ . '/../request_logger.php';
+
+// Start request logging
+RequestLogger::start();
+
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 // List of blocked UI files

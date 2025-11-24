@@ -11,10 +11,13 @@ function handleMonHoc($method, $query) {
                     $stmt = $pdo->prepare("SELECT * FROM MonHoc_Global WHERE MaMH = ?");
                     $stmt->execute([$query['id']]);
                     $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                    RequestLogger::end($result ? 1 : 0, $result ? 200 : 404);
                     sendResponse($result ?: ['error' => 'Not found'], $result ? 200 : 404);
                 } else {
                     $stmt = $pdo->query("SELECT * FROM MonHoc_Global");
-                    sendResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
+                    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    RequestLogger::end(count($result), 200);
+                    sendResponse($result);
                 }
                 break;
             case 'POST':
@@ -30,6 +33,7 @@ function handleMonHoc($method, $query) {
                 // Log to MongoDB - Global since it's synced to all sites
                 MongoHelper::logAudit('MonHoc', 'INSERT', $data, null, 'Global');
                 
+                RequestLogger::end(1, 201);
                 sendResponse(['message' => 'MonHoc created successfully on all sites', 'MaMH' => $data['MaMH']], 201);
                 break;
             case 'PUT':
@@ -56,6 +60,7 @@ function handleMonHoc($method, $query) {
                 $newData = ['MaMH' => $query['id'], 'TenMH' => $data['TenMH']];
                 MongoHelper::logAudit('MonHoc', 'UPDATE', $newData, $oldData, 'Global');
                 
+                RequestLogger::end(1, 200);
                 sendResponse(['message' => 'MonHoc updated successfully on all sites']);
                 break;
             case 'DELETE':
@@ -78,12 +83,14 @@ function handleMonHoc($method, $query) {
                     MongoHelper::logAudit('MonHoc', 'DELETE', null, $oldData, 'Global');
                 }
                 
+                RequestLogger::end(1, 200);
                 sendResponse(['message' => 'MonHoc deleted successfully from all sites']);
                 break;
             default:
                 sendResponse(['error' => 'Method not allowed'], 405);
         }
     } catch (Exception $e) {
+        RequestLogger::end(0, 500);
         sendResponse(['error' => $e->getMessage()], 500);
     }
 }

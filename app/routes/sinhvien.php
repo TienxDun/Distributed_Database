@@ -24,6 +24,7 @@ function handleSinhVien($method, $query) {
                         FROM SinhVien_Global WHERE MaSV = ?");
                     $stmt->execute([$query['id']]);
                     $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                    RequestLogger::end($result ? 1 : 0, $result ? 200 : 404);
                     sendResponse($result ?: ['error' => 'Not found'], $result ? 200 : 404);
                 } else {
                     $stmt = $pdo->query("
@@ -34,7 +35,9 @@ function handleSinhVien($method, $query) {
                                 ELSE 'Site C'
                             END AS Site
                         FROM SinhVien_Global");
-                    sendResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
+                    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    RequestLogger::end(count($result), 200);
+                    sendResponse($result);
                 }
                 break;
             case 'POST':
@@ -51,6 +54,7 @@ function handleSinhVien($method, $query) {
                 $site = determineSite($data['MaKhoa']);
                 MongoHelper::logAudit('SinhVien', 'INSERT', $data, null, $site);
                 
+                RequestLogger::end(1, 201);
                 sendResponse(['message' => 'SinhVien created successfully', 'MaSV' => $data['MaSV']], 201);
                 break;
             case 'PUT':

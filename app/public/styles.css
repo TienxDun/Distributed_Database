@@ -1103,9 +1103,21 @@ table td.site-c {
 
 .filters-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.5rem;
     margin-bottom: 1.5rem;
+}
+
+/* Responsive filters */
+@media (max-width: 768px) {
+    .filters-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .logs-filters {
+        padding: 1.5rem;
+    }
 }
 
 .filter-group {
@@ -1122,12 +1134,24 @@ table td.site-c {
 
 .filter-group select,
 .filter-group input[type="date"] {
-    padding: 0.75rem;
+    padding: 0.75rem 1rem;
     border: 2px solid var(--border);
-    border-radius: 10px;
-    font-size: 1rem;
-    transition: all 0.3s;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
     background: white;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1rem;
+    padding-right: 2.5rem;
+}
+
+.filter-group select:hover,
+.filter-group input[type="date"]:hover {
+    border-color: rgba(37, 99, 235, 0.5);
 }
 
 .filter-group select:focus,
@@ -1141,6 +1165,19 @@ table td.site-c {
     display: flex;
     gap: 1rem;
     justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Responsive filter actions */
+@media (max-width: 480px) {
+    .filter-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-actions button {
+        width: 100%;
+    }
 }
 
 .stats-grid {
@@ -1157,24 +1194,37 @@ table td.site-c {
     padding: 2rem;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.6);
+    overflow-x: auto;
 }
 
 .logs-table {
     width: 100%;
+    min-width: 800px;
     border-collapse: separate;
     border-spacing: 0;
     overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .logs-table thead th {
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    padding: 1rem;
+    padding: 0.75rem 1rem;
     text-align: left;
     font-weight: 600;
     color: var(--text);
     position: sticky;
     top: 0;
     z-index: 10;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.3s;
+    white-space: nowrap;
+    font-size: 0.9rem;
+}
+
+.logs-table thead th:hover {
+    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
 }
 
 .logs-table thead th:first-child {
@@ -1183,6 +1233,10 @@ table td.site-c {
 
 .logs-table thead th:last-child {
     border-top-right-radius: 10px;
+}
+
+.logs-table tbody tr:nth-child(even) {
+    background: rgba(248, 250, 252, 0.5);
 }
 
 .logs-table tbody tr {
@@ -1230,19 +1284,22 @@ table td.site-c {
 }
 
 .badge-site {
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-    color: white;
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    color: #1e40af;
 }
 
 .data-preview {
     max-height: 120px;
+    max-width: 350px;
     overflow: auto;
     background: #f8fafc;
     padding: 0.75rem;
     border-radius: 8px;
     font-family: 'Courier New', monospace;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     border: 1px solid var(--border);
+    word-wrap: break-word;
+    white-space: pre-wrap;
 }
 
 .data-preview::-webkit-scrollbar {
@@ -1395,12 +1452,12 @@ table td.site-c {
 
 /* Stats card for logs page - gradient style */
 .stats-grid .stat-card {
-    background: linear-gradient(135deg, var(--primary) 0%, #1e40af 100%);
-    color: white;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
+    color: var(--text);
     padding: 1.5rem;
     border-radius: 15px;
     text-align: center;
-    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+    border: 2px solid rgba(37, 99, 235, 0.15);
     transition: transform 0.3s;
 }
 

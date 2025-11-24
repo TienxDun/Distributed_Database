@@ -33,12 +33,15 @@ class MongoHelper {
             $document = [
                 'table' => $table,
                 'operation' => $operation,
-                'data' => $data,
                 'timestamp' => new MongoDB\BSON\UTCDateTime(),
                 'site' => $site,
                 'ip_address' => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
                 'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'unknown'
             ];
+            
+            if ($data !== null) {
+                $document['data'] = $data;
+            }
             
             if ($oldData !== null) {
                 $document['old_data'] = $oldData;

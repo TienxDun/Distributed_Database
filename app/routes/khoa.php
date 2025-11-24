@@ -24,6 +24,7 @@ function handleKhoa($method, $query) {
                         FROM Khoa_Global WHERE MaKhoa = ?");
                     $stmt->execute([$query['id']]);
                     $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                    RequestLogger::end($result ? 1 : 0, $result ? 200 : 404);
                     sendResponse($result ?: ['error' => 'Not found'], $result ? 200 : 404);
                 } else {
                     $stmt = $pdo->query("
@@ -34,7 +35,9 @@ function handleKhoa($method, $query) {
                                 ELSE 'Site C'
                             END AS Site
                         FROM Khoa_Global");
-                    sendResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
+                    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    RequestLogger::end(count($result), 200);
+                    sendResponse($result);
                 }
                 break;
             case 'POST':
@@ -51,7 +54,8 @@ function handleKhoa($method, $query) {
                 $site = determineSite($data['MaKhoa']);
                 MongoHelper::logAudit('Khoa', 'INSERT', $data, null, $site);
                 
-                sendResponse(['message' => 'Khoa created successfully', 'MaKhoa' => $data['MaKhoa']], 201);
+                RequestLogger::end(1, 201);
+                sendResponse(['message' => 'Khoa created successfully'], 201);
                 break;
             case 'PUT':
                 // Update Khoa via trigger
@@ -78,6 +82,7 @@ function handleKhoa($method, $query) {
                 $site = determineSite($query['id']);
                 MongoHelper::logAudit('Khoa', 'UPDATE', $newData, $oldData, $site);
                 
+                RequestLogger::end(1, 200);
                 sendResponse(['message' => 'Khoa updated successfully']);
                 break;
             case 'DELETE':
@@ -101,12 +106,14 @@ function handleKhoa($method, $query) {
                     MongoHelper::logAudit('Khoa', 'DELETE', null, $oldData, $site);
                 }
                 
+                RequestLogger::end(1, 200);
                 sendResponse(['message' => 'Khoa deleted successfully']);
                 break;
             default:
                 sendResponse(['error' => 'Method not allowed'], 405);
         }
     } catch (Exception $e) {
+        RequestLogger::end(0, 500);
         sendResponse(['error' => $e->getMessage()], 500);
     }
 }
