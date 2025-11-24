@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Statistics Dashboard - HUFLIT MongoDB</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4"></script>
 </head>
 <body>
     <div class="container">
@@ -79,7 +79,10 @@
         <div class="chart-container">
             <h3>⚡ Thời gian phản hồi trung bình (ms)</h3>
             <div class="chart-wrapper">
-                <canvas id="responseTimeChart"></canvas>
+                <canvas id="responseTimeChart" style="width: 100%; height: 100%;"></canvas>
+                <div id="responseTimeMessage" style="text-align: center; padding: 20px; color: #666; display: none;">
+                    Đang tải dữ liệu...
+                </div>
             </div>
         </div>
 
@@ -243,9 +246,26 @@
 
             // Response time chart
             if (perfData.avg_response_time_by_endpoint && perfData.avg_response_time_by_endpoint.length > 0) {
-                const labels = perfData.avg_response_time_by_endpoint.map(item => item._id);
-                const times = perfData.avg_response_time_by_endpoint.map(item => parseFloat(item.avg_time.toFixed(2)));
-                createBarChart('responseTimeChart', labels, times, 'Thời gian TB (ms)', 'rgba(239, 68, 68, 0.8)');
+                console.log('Performance data:', perfData.avg_response_time_by_endpoint);
+                // Filter out null avg_time values
+                const validData = perfData.avg_response_time_by_endpoint.filter(item => item.avg_time !== null);
+                console.log('Valid performance data:', validData);
+                
+                if (validData.length > 0) {
+                    const labels = validData.map(item => item._id);
+                    const times = validData.map(item => parseFloat(item.avg_time.toFixed(2)));
+                    console.log('Labels:', labels, 'Times:', times);
+                    createBarChart('responseTimeChart', labels, times, 'Thời gian TB (ms)', 'rgba(239, 68, 68, 0.8)');
+                    document.getElementById('responseTimeMessage').style.display = 'none';
+                } else {
+                    console.log('No valid performance data after filtering');
+                    document.getElementById('responseTimeMessage').textContent = 'Không có dữ liệu hiệu suất hợp lệ';
+                    document.getElementById('responseTimeMessage').style.display = 'block';
+                }
+            } else {
+                console.log('No performance data available:', perfData);
+                document.getElementById('responseTimeMessage').textContent = 'Chưa có dữ liệu hiệu suất';
+                document.getElementById('responseTimeMessage').style.display = 'block';
             }
         }
 
@@ -303,74 +323,106 @@
         }
 
         function createBarChart(canvasId, labels, data, label, color) {
-            const ctx = document.getElementById(canvasId);
-            if (!ctx) return;
+            try {
+                const ctx = document.getElementById(canvasId);
+                if (!ctx) {
+                    console.error('Canvas not found:', canvasId);
+                    return;
+                }
 
-            // Destroy existing chart if exists
-            if (charts[canvasId]) {
-                charts[canvasId].destroy();
-            }
+                // Destroy existing chart if exists
+                if (charts[canvasId]) {
+                    charts[canvasId].destroy();
+                }
 
-            charts[canvasId] = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: label,
-                        data: data,
-                        backgroundColor: color,
-                        borderRadius: 10,
-                        borderSkipped: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            padding: 12,
-                            titleFont: {
-                                size: 14,
-                                weight: 'bold'
-                            },
-                            bodyFont: {
-                                size: 13
-                            },
-                            cornerRadius: 8
-                        }
+                console.log('Creating chart for', canvasId, 'with labels:', labels, 'data:', data);
+                charts[canvasId] = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: label,
+                            data: data,
+                            backgroundColor: color,
+                            borderColor: color.replace('0.8', '1'),
+                            borderWidth: 2,
+                            borderRadius: 6,
+                            borderSkipped: false,
+                            barThickness: 40,
+                            maxBarThickness: 50
+                        }]
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                precision: 0,
-                                font: {
-                                    size: 12
-                                }
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        layout: {
+                            padding: {
+                                left: 20,
+                                right: 20,
+                                top: 20,
+                                bottom: 20
                             }
                         },
-                        x: {
-                            ticks: {
-                                maxRotation: 45,
-                                minRotation: 45,
-                                font: {
-                                    size: 12
-                                }
-                            },
-                            grid: {
+                        plugins: {
+                            legend: {
                                 display: false
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 12,
+                                titleFont: {
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                bodyFont: {
+                                    size: 13
+                                },
+                                cornerRadius: 8
                             }
+                        },
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true,
+                                    precision: 0,
+                                    fontSize: 12,
+                                    fontColor: '#666'
+                                },
+                                gridLines: {
+                                    color: 'rgba(0, 0, 0, 0.05)',
+                                    drawBorder: false
+                                },
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Số thao tác',
+                                    fontSize: 14,
+                                    fontColor: '#333'
+                                }
+                            }],
+                            xAxes: [{
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 45,
+                                    fontSize: 12,
+                                    fontColor: '#666'
+                                },
+                                gridLines: {
+                                    display: false,
+                                    drawBorder: false
+                                },
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Bảng dữ liệu',
+                                    fontSize: 14,
+                                    fontColor: '#333'
+                                }
+                            }]
                         }
                     }
-                }
-            });
+                });
+            } catch (error) {
+                console.error('Error creating chart', canvasId, ':', error);
+            }
         }
 
         // Load stats on page load

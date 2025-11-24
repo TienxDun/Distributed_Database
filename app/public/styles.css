@@ -1597,6 +1597,12 @@ table td.site-c {
 .chart-wrapper {
     position: relative;
     height: 350px;
+    width: 100%;
+}
+
+.chart-wrapper canvas {
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .loading-container {
