@@ -1445,45 +1445,48 @@ table td.site-c {
 
 .stats-overview {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
     margin-bottom: 2rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-/* Stats card for logs page - gradient style */
+/* Stats card for logs page - modern minimalist style */
 .stats-grid .stat-card {
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
-    color: var(--text);
-    padding: 1.5rem;
-    border-radius: 15px;
-    text-align: center;
-    border: 2px solid rgba(37, 99, 235, 0.15);
-    transition: transform 0.3s;
-}
-
-.stats-grid .stat-card:hover {
-    transform: translateY(-5px);
-}
-
-.stats-grid .stat-card h3 {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.stats-grid .stat-card p {
-    opacity: 0.9;
-    font-size: 0.9rem;
-}
-
-/* Stats card for stats page - modern minimalist style */
-.stats-overview .stat-card {
     background: white;
-    padding: 1.75rem;
+    padding: 1.5rem;
     border-radius: 16px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 2px solid transparent;
     position: relative;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.stats-grid .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    border-color: var(--primary);
+}
+
+/* Stats card for stats page - modern minimalist style */
+.stats-overview .stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid transparent;
+    position: relative;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .stats-overview .stat-card:hover {
@@ -1495,18 +1498,18 @@ table td.site-c {
 .stat-card-header {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
 }
 
 .stat-icon {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     flex-shrink: 0;
 }
 
@@ -1536,19 +1539,23 @@ table td.site-c {
 
 .stat-content {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .stat-label {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--secondary);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
 }
 
 .stat-value {
-    font-size: 2rem;
+    font-size: 1.75rem;
     font-weight: 700;
     color: var(--text);
     line-height: 1.2;
@@ -1747,10 +1754,22 @@ table td.site-c {
 
     .stats-overview {
         grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .stats-overview .stat-card {
+        padding: 1.25rem;
+        min-height: 100px;
     }
 
     .stat-value {
         font-size: 1.5rem;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
     }
 
     .stat-icon {
