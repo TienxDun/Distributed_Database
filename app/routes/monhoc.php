@@ -1,5 +1,6 @@
 <?php
 require_once '../common.php';
+require_once '../mongo_helper.php';
 
 function handleMonHoc($method, $query) {
     try {
@@ -25,6 +26,10 @@ function handleMonHoc($method, $query) {
                 }
                 $stmt = $pdo->prepare("INSERT INTO MonHoc_Global (MaMH, TenMH) VALUES (?, ?)");
                 $stmt->execute([$data['MaMH'], $data['TenMH']]);
+                
+                // Log to MongoDB - Global since it's synced to all sites
+                MongoHelper::logAudit('MonHoc', 'INSERT', $data, null, 'Global');
+                
                 sendResponse(['message' => 'MonHoc created successfully on all sites', 'MaMH' => $data['MaMH']], 201);
                 break;
             case 'PUT':
@@ -33,6 +38,12 @@ function handleMonHoc($method, $query) {
                     sendResponse(['error' => 'Missing required parameter: id'], 400);
                     break;
                 }
+                
+                // Get old data first
+                $stmt = $pdo->prepare("SELECT * FROM MonHoc_Global WHERE MaMH = ?");
+                $stmt->execute([$query['id']]);
+                $oldData = $stmt->fetch(PDO::FETCH_ASSOC);
+                
                 $data = json_decode(file_get_contents('php://input'), true);
                 if (!isset($data['TenMH'])) {
                     sendResponse(['error' => 'Missing required field: TenMH'], 400);
@@ -40,6 +51,11 @@ function handleMonHoc($method, $query) {
                 }
                 $stmt = $pdo->prepare("UPDATE MonHoc_Global SET TenMH = ? WHERE MaMH = ?");
                 $stmt->execute([$data['TenMH'], $query['id']]);
+                
+                // Log to MongoDB - Global since it's synced to all sites
+                $newData = ['MaMH' => $query['id'], 'TenMH' => $data['TenMH']];
+                MongoHelper::logAudit('MonHoc', 'UPDATE', $newData, $oldData, 'Global');
+                
                 sendResponse(['message' => 'MonHoc updated successfully on all sites']);
                 break;
             case 'DELETE':
@@ -48,8 +64,20 @@ function handleMonHoc($method, $query) {
                     sendResponse(['error' => 'Missing required parameter: id'], 400);
                     break;
                 }
+                
+                // Get data before delete
+                $stmt = $pdo->prepare("SELECT * FROM MonHoc_Global WHERE MaMH = ?");
+                $stmt->execute([$query['id']]);
+                $oldData = $stmt->fetch(PDO::FETCH_ASSOC);
+                
                 $stmt = $pdo->prepare("DELETE FROM MonHoc_Global WHERE MaMH = ?");
                 $stmt->execute([$query['id']]);
+                
+                // Log to MongoDB - Global since it's synced to all sites
+                if ($oldData) {
+                    MongoHelper::logAudit('MonHoc', 'DELETE', null, $oldData, 'Global');
+                }
+                
                 sendResponse(['message' => 'MonHoc deleted successfully from all sites']);
                 break;
             default:

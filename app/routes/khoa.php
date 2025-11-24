@@ -1,5 +1,12 @@
 <?php
 require_once '../common.php';
+require_once '../mongo_helper.php';
+
+function determineSite($maKhoa) {
+    if ($maKhoa < 'M') return 'Site_A';
+    if ($maKhoa >= 'M' && $maKhoa < 'S') return 'Site_B';
+    return 'Site_C';
+}
 
 function handleKhoa($method, $query) {
     try {
@@ -39,6 +46,11 @@ function handleKhoa($method, $query) {
                 }
                 $stmt = $pdo->prepare("INSERT INTO Khoa_Global (MaKhoa, TenKhoa) VALUES (?, ?)");
                 $stmt->execute([$data['MaKhoa'], $data['TenKhoa']]);
+                
+                // Log to MongoDB
+                $site = determineSite($data['MaKhoa']);
+                MongoHelper::logAudit('Khoa', 'INSERT', $data, null, $site);
+                
                 sendResponse(['message' => 'Khoa created successfully', 'MaKhoa' => $data['MaKhoa']], 201);
                 break;
             case 'PUT':
@@ -47,6 +59,12 @@ function handleKhoa($method, $query) {
                     sendResponse(['error' => 'Missing required parameter: id'], 400);
                     break;
                 }
+                
+                // Get old data first
+                $stmt = $pdo->prepare("SELECT * FROM Khoa_Global WHERE MaKhoa = ?");
+                $stmt->execute([$query['id']]);
+                $oldData = $stmt->fetch(PDO::FETCH_ASSOC);
+                
                 $data = json_decode(file_get_contents('php://input'), true);
                 if (!isset($data['TenKhoa'])) {
                     sendResponse(['error' => 'Missing required field: TenKhoa'], 400);
@@ -54,6 +72,12 @@ function handleKhoa($method, $query) {
                 }
                 $stmt = $pdo->prepare("UPDATE Khoa_Global SET TenKhoa = ? WHERE MaKhoa = ?");
                 $stmt->execute([$data['TenKhoa'], $query['id']]);
+                
+                // Log to MongoDB
+                $newData = ['MaKhoa' => $query['id'], 'TenKhoa' => $data['TenKhoa']];
+                $site = determineSite($query['id']);
+                MongoHelper::logAudit('Khoa', 'UPDATE', $newData, $oldData, $site);
+                
                 sendResponse(['message' => 'Khoa updated successfully']);
                 break;
             case 'DELETE':
@@ -62,8 +86,21 @@ function handleKhoa($method, $query) {
                     sendResponse(['error' => 'Missing required parameter: id'], 400);
                     break;
                 }
+                
+                // Get data before delete
+                $stmt = $pdo->prepare("SELECT * FROM Khoa_Global WHERE MaKhoa = ?");
+                $stmt->execute([$query['id']]);
+                $oldData = $stmt->fetch(PDO::FETCH_ASSOC);
+                
                 $stmt = $pdo->prepare("DELETE FROM Khoa_Global WHERE MaKhoa = ?");
                 $stmt->execute([$query['id']]);
+                
+                // Log to MongoDB
+                if ($oldData) {
+                    $site = determineSite($query['id']);
+                    MongoHelper::logAudit('Khoa', 'DELETE', null, $oldData, $site);
+                }
+                
                 sendResponse(['message' => 'Khoa deleted successfully']);
                 break;
             default:

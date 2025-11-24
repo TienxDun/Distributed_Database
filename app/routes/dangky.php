@@ -1,5 +1,12 @@
 <?php
 require_once '../common.php';
+require_once '../mongo_helper.php';
+
+function determineSite($maKhoa) {
+    if ($maKhoa < 'M') return 'Site_A';
+    if ($maKhoa >= 'M' && $maKhoa < 'S') return 'Site_B';
+    return 'Site_C';
+}
 
 function handleDangKy($method, $query) {
     try {
@@ -57,6 +64,15 @@ function handleDangKy($method, $query) {
                 $diemThi = (isset($data['DiemThi']) && $data['DiemThi'] !== '') ? $data['DiemThi'] : null;
                 $stmt = $pdo->prepare("INSERT INTO DangKy_Global (MaSV, MaMon, DiemThi) VALUES (?, ?, ?)");
                 $stmt->execute([$data['MaSV'], $data['MaMon'], $diemThi]);
+                
+                // Log to MongoDB - Get MaKhoa from SinhVien
+                $stmt = $pdo->prepare("SELECT MaKhoa FROM SinhVien_Global WHERE MaSV = ?");
+                $stmt->execute([$data['MaSV']]);
+                $sv = $stmt->fetch(PDO::FETCH_ASSOC);
+                $site = $sv ? determineSite($sv['MaKhoa']) : 'Global';
+                $logData = ['MaSV' => $data['MaSV'], 'MaMon' => $data['MaMon'], 'DiemThi' => $diemThi];
+                MongoHelper::logAudit('DangKy', 'INSERT', $logData, null, $site);
+                
                 sendResponse(['message' => 'DangKy created successfully'], 201);
                 break;
             case 'PUT':
@@ -65,6 +81,12 @@ function handleDangKy($method, $query) {
                     sendResponse(['error' => 'Missing required parameters: masv, mamon'], 400);
                     break;
                 }
+                
+                // Get old data first
+                $stmt = $pdo->prepare("SELECT * FROM DangKy_Global WHERE MaSV = ? AND MaMon = ?");
+                $stmt->execute([$query['masv'], $query['mamon']]);
+                $oldData = $stmt->fetch(PDO::FETCH_ASSOC);
+                
                 $data = json_decode(file_get_contents('php://input'), true);
                 if (!isset($data['DiemThi'])) {
                     sendResponse(['error' => 'Missing required field: DiemThi'], 400);
@@ -72,6 +94,15 @@ function handleDangKy($method, $query) {
                 }
                 $stmt = $pdo->prepare("UPDATE DangKy_Global SET DiemThi = ? WHERE MaSV = ? AND MaMon = ?");
                 $stmt->execute([$data['DiemThi'], $query['masv'], $query['mamon']]);
+                
+                // Log to MongoDB - Get MaKhoa from SinhVien
+                $stmt = $pdo->prepare("SELECT MaKhoa FROM SinhVien_Global WHERE MaSV = ?");
+                $stmt->execute([$query['masv']]);
+                $sv = $stmt->fetch(PDO::FETCH_ASSOC);
+                $site = $sv ? determineSite($sv['MaKhoa']) : 'Global';
+                $newData = ['MaSV' => $query['masv'], 'MaMon' => $query['mamon'], 'DiemThi' => $data['DiemThi']];
+                MongoHelper::logAudit('DangKy', 'UPDATE', $newData, $oldData, $site);
+                
                 sendResponse(['message' => 'DiemThi updated successfully']);
                 break;
             case 'DELETE':
@@ -80,8 +111,24 @@ function handleDangKy($method, $query) {
                     sendResponse(['error' => 'Missing required parameters: masv, mamon'], 400);
                     break;
                 }
+                
+                // Get data before delete
+                $stmt = $pdo->prepare("SELECT * FROM DangKy_Global WHERE MaSV = ? AND MaMon = ?");
+                $stmt->execute([$query['masv'], $query['mamon']]);
+                $oldData = $stmt->fetch(PDO::FETCH_ASSOC);
+                
                 $stmt = $pdo->prepare("DELETE FROM DangKy_Global WHERE MaSV = ? AND MaMon = ?");
                 $stmt->execute([$query['masv'], $query['mamon']]);
+                
+                // Log to MongoDB - Get MaKhoa from SinhVien
+                if ($oldData) {
+                    $stmt = $pdo->prepare("SELECT MaKhoa FROM SinhVien_Global WHERE MaSV = ?");
+                    $stmt->execute([$query['masv']]);
+                    $sv = $stmt->fetch(PDO::FETCH_ASSOC);
+                    $site = $sv ? determineSite($sv['MaKhoa']) : 'Global';
+                    MongoHelper::logAudit('DangKy', 'DELETE', null, $oldData, $site);
+                }
+                
                 sendResponse(['message' => 'DangKy deleted successfully']);
                 break;
             default:

@@ -4,6 +4,7 @@ FROM php:8.4-cli
 RUN apt-get update && apt-get install -y \
     gnupg2 curl apt-transport-https apt-utils \
     unixodbc-dev libgssapi-krb5-2 \
+    libssl-dev pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
 # Microsoft repo key + repo list
@@ -20,6 +21,11 @@ RUN apt-get update \
 # Install sqlsrv + pdo_sqlsrv via PECL
 RUN pecl install sqlsrv pdo_sqlsrv \
     && docker-php-ext-enable sqlsrv pdo_sqlsrv
+
+# Install MongoDB PHP driver
+RUN pecl install mongodb \
+    && docker-php-ext-enable mongodb \
+    && echo "extension=mongodb.so" > /usr/local/etc/php/conf.d/mongodb.ini
 
 # Set working dir
 WORKDIR /var/www/html

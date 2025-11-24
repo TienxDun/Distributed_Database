@@ -1,7 +1,7 @@
 services: 
   api_php: 
     build: ./app
-    command: php -S 0.0.0.0:8080 -t public
+    command: php -S 0.0.0.0:8080 -t public public/router.php
     container_name: api_php
     networks:
       - huflit-network
@@ -11,12 +11,17 @@ services:
       - DB_NAME=HUFLIT 
       - DB_USER=sa 
       - DB_PASS=${MSSQL_SA_PASSWORD}
+      - MONGO_HOST=mongodb
+      - MONGO_PORT=27017
+      - MONGO_USER=admin
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
     ports: 
       - "8080:8080"
     volumes:
       - ./app:/var/www/html
     depends_on: 
       - mssql_global
+      - mongodb
 
   app_php:
     build: ./app
@@ -24,10 +29,23 @@ services:
     container_name: app_php
     networks:
       - huflit-network
+    environment: 
+      - DB_HOST=mssql_global 
+      - DB_PORT=1433 
+      - DB_NAME=HUFLIT 
+      - DB_USER=sa 
+      - DB_PASS=${MSSQL_SA_PASSWORD}
+      - MONGO_HOST=mongodb
+      - MONGO_PORT=27017
+      - MONGO_USER=admin
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
     ports:
       - "8081:8081"
     volumes:
       - ./app:/var/www/html
+    depends_on: 
+      - mssql_global
+      - mongodb
   
   mssql_global:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -88,6 +106,21 @@ services:
       - ./db/site_c:/docker-entrypoint-initdb.d
       - sqlserver_data_c:/var/opt/mssql
 
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    networks:
+      - huflit-network
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_INITDB_DATABASE=huflit_logs
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./db/mongodb/init:/docker-entrypoint-initdb.d
+      - mongodb_data:/data/db
+
   
 
 volumes:
@@ -95,6 +128,7 @@ volumes:
   sqlserver_data_b:
   sqlserver_data_c:
   sqlserver_data_global:
+  mongodb_data:
     
 networks:
     huflit-network:

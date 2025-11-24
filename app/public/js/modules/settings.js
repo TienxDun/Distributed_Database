@@ -58,6 +58,9 @@ export function updateBackgroundColor(save = true) {
     // Update text input
     document.getElementById('bgColorText').value = color;
     
+    // Save to localStorage for cross-page sync
+    localStorage.setItem('bgColor', color);
+    
     if (save) saveSettings();
 }
 
@@ -93,6 +96,7 @@ export function applyPresetColor(color) {
  */
 export function resetToDefault() {
     localStorage.removeItem('uiSettings');
+    localStorage.removeItem('bgColor');
     
     // Reset to default light gray
     document.getElementById('bgColor').value = DEFAULT_BG_COLOR;

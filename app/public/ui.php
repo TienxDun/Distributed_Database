@@ -233,7 +233,7 @@
                     <div class="form-group">
                         <label for="bgColor" style="font-weight: 600; font-size: 0.95rem;">Chọn màu nền:</label>
                         <div style="display: flex; gap: 1rem; align-items: center;">
-                            <input type="color" id="bgColor" value="#f8fafc" onchange="updateBackgroundColor()" 
+                            <input type="color" id="bgColor" value="#f8fafc" oninput="updateBackgroundColor()" 
                                 style="width: 80px; height: 80px; border: 3px solid var(--border); border-radius: 12px; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
                             <div style="flex: 1;">
                                 <input type="text" id="bgColorText" value="#f8fafc" onchange="updateBackgroundColorFromText()" 

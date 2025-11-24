@@ -1,5 +1,12 @@
 <?php
 require_once '../common.php';
+require_once '../mongo_helper.php';
+
+function determineSite($maKhoa) {
+    if ($maKhoa < 'M') return 'Site_A';
+    if ($maKhoa >= 'M' && $maKhoa < 'S') return 'Site_B';
+    return 'Site_C';
+}
 
 function handleCTDaoTao($method, $query) {
     try {
@@ -50,6 +57,11 @@ function handleCTDaoTao($method, $query) {
                 }
                 $stmt = $pdo->prepare("INSERT INTO CTDaoTao_Global (MaKhoa, KhoaHoc, MaMH) VALUES (?, ?, ?)");
                 $stmt->execute([$data['MaKhoa'], $data['KhoaHoc'], $data['MaMH']]);
+                
+                // Log to MongoDB
+                $site = determineSite($data['MaKhoa']);
+                MongoHelper::logAudit('CTDaoTao', 'INSERT', $data, null, $site);
+                
                 sendResponse(['message' => 'CTDaoTao created successfully'], 201);
                 break;
             case 'PUT':
@@ -62,8 +74,21 @@ function handleCTDaoTao($method, $query) {
                     sendResponse(['error' => 'Missing required parameters: khoa, khoahoc, monhoc'], 400);
                     break;
                 }
+                
+                // Get data before delete
+                $stmt = $pdo->prepare("SELECT * FROM CTDaoTao_Global WHERE MaKhoa = ? AND KhoaHoc = ? AND MaMH = ?");
+                $stmt->execute([$query['khoa'], $query['khoahoc'], $query['monhoc']]);
+                $oldData = $stmt->fetch(PDO::FETCH_ASSOC);
+                
                 $stmt = $pdo->prepare("DELETE FROM CTDaoTao_Global WHERE MaKhoa = ? AND KhoaHoc = ? AND MaMH = ?");
                 $stmt->execute([$query['khoa'], $query['khoahoc'], $query['monhoc']]);
+                
+                // Log to MongoDB
+                if ($oldData) {
+                    $site = determineSite($query['khoa']);
+                    MongoHelper::logAudit('CTDaoTao', 'DELETE', null, $oldData, $site);
+                }
+                
                 sendResponse(['message' => 'CTDaoTao deleted successfully']);
                 break;
             default:

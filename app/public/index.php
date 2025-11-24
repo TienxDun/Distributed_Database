@@ -11,6 +11,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 }
 
 require_once '../common.php';
+require_once '../request_logger.php';
+
+// Start logging
+RequestLogger::start();
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $query = $_GET;
@@ -22,6 +26,8 @@ $routes = [
     '/dangky' => 'dangky',
     '/ctdaotao' => 'ctdaotao',
     '/global' => 'global',
+    '/logs' => 'logs',
+    '/stats' => 'stats',
 ];
 
 $method = $_SERVER['REQUEST_METHOD'];
