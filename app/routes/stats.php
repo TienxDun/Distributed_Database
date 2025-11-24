@@ -115,6 +115,10 @@ function getQueryCount() {
 
 function getQueriesByEndpoint() {
     $pipeline = [
+        ['$match' => [
+            'endpoint' => ['$in' => ['/khoa', '/monhoc', '/sinhvien', '/dangky', '/ctdaotao', '/global', '/logs', '/stats']],
+            'status_code' => ['$in' => [200, 201]]
+        ]],
         ['$group' => ['_id' => '$endpoint', 'count' => ['$sum' => 1]]],
         ['$sort' => ['count' => -1]]
     ];
@@ -123,6 +127,7 @@ function getQueriesByEndpoint() {
 
 function getQueriesByMethod() {
     $pipeline = [
+        ['$match' => ['status_code' => ['$in' => [200, 201]]]],
         ['$group' => ['_id' => '$method', 'count' => ['$sum' => 1]]],
         ['$sort' => ['count' => -1]]
     ];
@@ -131,6 +136,7 @@ function getQueriesByMethod() {
 
 function getAvgExecutionTime() {
     $pipeline = [
+        ['$match' => ['status_code' => ['$in' => [200, 201]]]],
         ['$group' => ['_id' => null, 'avg_time' => ['$avg' => '$execution_time_ms']]]
     ];
     $result = MongoHelper::getStatistics('query_history', $pipeline);
@@ -155,6 +161,10 @@ function getSlowestQueries($limit) {
 
 function getAvgResponseTimeByEndpoint() {
     $pipeline = [
+        ['$match' => [
+            'endpoint' => ['$in' => ['/khoa', '/monhoc', '/sinhvien', '/dangky', '/ctdaotao', '/global', '/logs', '/stats']],
+            'status_code' => ['$in' => [200, 201]]
+        ]],
         ['$group' => [
             '_id' => '$endpoint',
             'avg_time' => ['$avg' => '$execution_time_ms'],
