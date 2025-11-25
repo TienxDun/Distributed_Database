@@ -6,6 +6,12 @@ class MongoHelper {
     public static function getClient() {
         if (self::$client === null) {
             try {
+                // Check if MongoDB extension is loaded
+                if (!extension_loaded('mongodb')) {
+                    error_log("MongoDB extension not loaded. Please rebuild Docker containers.");
+                    return null;
+                }
+                
                 $mongoHost = getenv('MONGO_HOST') ?: 'mongodb';
                 $mongoPort = getenv('MONGO_PORT') ?: '27017';
                 $mongoUser = getenv('MONGO_USER') ?: 'admin';
