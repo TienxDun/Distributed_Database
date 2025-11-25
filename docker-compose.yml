@@ -120,6 +120,7 @@ services:
     volumes:
       - ./db/mongodb/init:/docker-entrypoint-initdb.d
       - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
 
   
 
@@ -129,6 +130,7 @@ volumes:
   sqlserver_data_c:
   sqlserver_data_global:
   mongodb_data:
+  mongodb_config:
     
 networks:
     huflit-network:

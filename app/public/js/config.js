@@ -120,11 +120,19 @@ export const FIELDS_CONFIG = {
                 name: 'MaSV',
                 label: 'Sinh Viên',
                 type: 'select',
-                required: true,
+                required: false,  // Không bắt buộc vì có MaSV_input thay thế
                 optionsFrom: '/sinhvien',
                 optionValue: 'MaSV',
                 optionLabel: ['MaSV', 'HoTen'],
-                placeholder: 'Chọn sinh viên'
+                placeholder: 'Chọn sinh viên từ danh sách'
+            },
+            {
+                name: 'MaSV_input',
+                label: 'Hoặc nhập mã sinh viên',
+                type: 'text',
+                required: false,
+                maxlength: 20,
+                placeholder: 'Nhập trực tiếp mã sinh viên (ví dụ: 25DH000001)'
             },
             {
                 name: 'MaMon',

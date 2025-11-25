@@ -14,6 +14,30 @@ let currentAction = ''; // 'create' or 'edit'
 let editingId = null;
 
 /**
+ * Handle Escape key press to close modal
+ * @param {KeyboardEvent} event - Keyboard event
+ */
+function handleEscapeKey(event) {
+    if (event.key === 'Escape') {
+        closeModal();
+    }
+}
+
+/**
+ * Add Escape key listener when modal opens
+ */
+function addEscapeKeyListener() {
+    document.addEventListener('keydown', handleEscapeKey);
+}
+
+/**
+ * Remove Escape key listener when modal closes
+ */
+function removeEscapeKeyListener() {
+    document.removeEventListener('keydown', handleEscapeKey);
+}
+
+/**
  * Open create modal
  * @param {string} module - Module name
  */
@@ -29,6 +53,9 @@ export async function openCreateModal(module) {
     
     // Load options for select fields
     await populateSelectOptions();
+    
+    // Add Escape key listener
+    addEscapeKeyListener();
 }
 
 /**
@@ -58,6 +85,9 @@ export async function openEditModal(module, data) {
     
     // Load options for select fields
     await populateSelectOptions();
+    
+    // Add Escape key listener
+    addEscapeKeyListener();
 }
 
 /**
@@ -67,6 +97,9 @@ export function closeModal() {
     document.getElementById('crudModal').classList.remove('show');
     document.getElementById('crudForm').reset();
     hideModalAlert();
+    
+    // Remove Escape key listener
+    removeEscapeKeyListener();
 }
 
 /**
@@ -246,16 +279,47 @@ export async function submitForm() {
     // Collect form data
     const formData = collectFormData('#formFields', 'field-');
     
+    // Special handling for dangky: prioritize MaSV_input over MaSV dropdown
+    if (currentModule === 'dangky' && currentAction === 'create') {
+        if (formData['MaSV_input'] && formData['MaSV_input'].trim() !== '') {
+            formData['MaSV'] = formData['MaSV_input'].trim();
+            delete formData['MaSV_input']; // Remove the helper field
+        }
+        // If MaSV_input is empty but MaSV dropdown has value, use dropdown value
+        else if (formData['MaSV'] && formData['MaSV'].trim() !== '') {
+            // Keep the dropdown value
+        }
+        // If both are empty, validation will catch it
+    }
+    
     // Validate required fields
     const requiredFields = [];
     document.querySelectorAll('#formFields input[required]').forEach(input => {
         if (input.id.startsWith('field-')) {
             const fieldName = input.id.replace('field-', '');
+            
+            // Special validation for dangky MaSV fields
+            if (currentModule === 'dangky' && currentAction === 'create' && fieldName === 'MaSV') {
+                // Skip validation for MaSV dropdown since we have MaSV_input as alternative
+                return;
+            }
+            
             if (!formData[fieldName] || formData[fieldName].trim() === '') {
                 requiredFields.push(fieldName);
             }
         }
     });
+    
+    // Special validation for dangky: ensure at least one MaSV field is filled
+    if (currentModule === 'dangky' && currentAction === 'create') {
+        const hasMaSV = formData['MaSV'] && formData['MaSV'].trim() !== '';
+        const hasMaSVInput = formData['MaSV_input'] && formData['MaSV_input'].trim() !== '';
+        
+        if (!hasMaSV && !hasMaSVInput) {
+            showModalAlert('⚠️ Vui lòng chọn sinh viên từ danh sách hoặc nhập mã sinh viên', 'error');
+            return;
+        }
+    }
     
     if (requiredFields.length > 0) {
         showModalAlert(`⚠️ Vui lòng nhập ${requiredFields.join(', ')}`, 'error');
