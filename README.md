@@ -6,6 +6,7 @@
 [![PHP](https://img.shields.io/badge/PHP-777BB4?style=flat&logo=php&logoColor=white)](https://php.net)
 [![SQL Server](https://img.shields.io/badge/SQL%20Server-CC2927?style=flat&logo=microsoft-sql-server&logoColor=white)](https://microsoft.com/sql-server)
 [![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat&logo=mongodb&logoColor=white)](https://mongodb.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
@@ -17,6 +18,7 @@
 - [📡 API Endpoints](#-api-endpoints)
 - [📁 Cấu trúc dự án](#-cấu-trúc-dự-án)
 - [🎯 Demo](#-demo)
+- [📄 Bản quyền](#-bản-quyền)
 
 ---
 
@@ -228,3 +230,19 @@ Distributed_Database/
 ## 📄 Bản quyền
 
 © 2025 - Đồ án môn Cơ sở dữ liệu phân tán HUFLIT
+
+Dự án này được phát triển như một phần của chương trình học môn Cơ sở dữ liệu phân tán tại Trường Đại học HUFLIT.
+
+**Giấy phép:** [MIT License](LICENSE.md)
+
+**Công nghệ sử dụng:**
+
+- Microsoft SQL Server 2022 (Enterprise Edition)
+- MongoDB Community Edition
+- PHP 8.2 với sqlsrv & mongodb extensions
+- Docker & Docker Compose
+- Chart.js cho trực quan hóa dữ liệu
+
+---
+
+🎓 Phát triển với ❤️ cho môn Cơ sở dữ liệu phân tán HUFLIT
