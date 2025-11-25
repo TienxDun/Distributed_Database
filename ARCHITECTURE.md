@@ -4,66 +4,79 @@
 
 ---
 
+## 📋 Mục lục
+
+- [📊 Tổng quan kiến trúc](#-tổng-quan-kiến-trúc)
+  - [Mô hình phân tán](#mô-hình-phân-tán)
+- [🗄️ Database Layer - Lớp dữ liệu phân tán](#️-database-layer---lớp-dữ-liệu-phân-tán)
+  - [SQL Server Cluster (4 containers)](#sql-server-cluster-4-containers)
+  - [MongoDB (Port 27017)](#mongodb-port-27017)
+- [🔧 Application Layer - Lớp ứng dụng](#-application-layer---lớp-ứng-dụng)
+  - [PHP Backend (2 containers)](#php-backend-2-containers)
+  - [Core PHP Files](#core-php-files)
+  - [Route Handlers](#route-handlers)
+  - [Frontend (JavaScript ES6 Modules)](#frontend-javascript-es6-modules)
+- [🔄 Data Flow - Luồng dữ liệu](#-data-flow---luồng-dữ-liệu)
+  - [CREATE Flow (INSERT)](#create-flow-insert)
+  - [UPDATE Flow (cross-site move)](#update-flow-cross-site-move)
+  - [SYNC Flow (MonHoc)](#sync-flow-monhoc)
+  - [QUERY Flow (Global complex query)](#query-flow-global-complex-query)
+- [🔐 Key Design Decisions](#-key-design-decisions)
+- [📈 Performance Considerations](#-performance-considerations)
+- [🧪 Testing Strategy](#-testing-strategy)
+- [🚀 Deployment](#-deployment)
+- [📚 References](#-references)
+- [🎯 Future Enhancements](#-future-enhancements)
+
+---
+
 ## 📊 Tổng quan kiến trúc
 
 ### Mô hình phân tán
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                      CLIENT LAYER                            │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │   Browser    │  │   Postman    │  │  Mobile App  │      │
-│  │   (UI.php)   │  │  (REST API)  │  │   (Future)   │      │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘      │
-└─────────┼──────────────────┼──────────────────┼─────────────┘
-          │                  │                  │
-          └──────────────────┼──────────────────┘
-                             │ HTTP/JSON
-┌─────────────────────────────┼─────────────────────────────────┐
-│                   APPLICATION LAYER                            │
-│        ┌───────────────────┴────────────────────┐             │
-│        │      PHP Application (Docker)          │             │
-│        │  ┌──────────────┐  ┌────────────────┐ │             │
-│        │  │  API Server  │  │  Web UI Server │ │             │
-│        │  │  (Port 8080) │  │  (Port 8081)   │ │             │
-│        │  └──────┬───────┘  └────────┬───────┘ │             │
-│        │         │                    │         │             │
-│        │  ┌──────┴────────────────────┴───────┐ │             │
-│        │  │     Router (index.php)            │ │             │
-│        │  │  ┌──────────┐  ┌──────────────┐  │ │             │
-│        │  │  │  Routes  │  │ Request Log  │  │ │             │
-│        │  │  │ Handlers │  │   Manager    │  │ │             │
-│        │  │  └──────────┘  └──────────────┘  │ │             │
-│        │  └────────────────────────────────────┘ │             │
-│        └─────────────────────────────────────────┘             │
-└────────────────────────┬───────────────────┬───────────────────┘
-                         │ sqlsrv/PDO       │ mongodb
-┌────────────────────────┼───────────────────┼───────────────────┐
-│                   DATABASE LAYER            │                   │
-│   ┌────────────────────┴────────┐          │                   │
-│   │   SQL Server Cluster        │    ┌─────┴──────┐           │
-│   │                              │    │  MongoDB   │           │
-│   │  ┌──────────────────────┐   │    │  (Logs)    │           │
-│   │  │   GLOBAL (HUFLIT)    │   │    │            │           │
-│   │  │  - Linked Servers    │   │    │ - audit    │           │
-│   │  │  - Partitioned Views │   │    │   _logs    │           │
-│   │  │  - INSTEAD OF        │   │    │ - query    │           │
-│   │  │    Triggers          │   │    │   _history │           │
-│   │  └──────┬───────────────┘   │    └────────────┘           │
-│   │         │                    │                             │
-│   │  ┌──────┴──────────────┐    │                             │
-│   │  │   Routing Logic      │    │                             │
-│   │  │  (by MaKhoa)         │    │                             │
-│   │  └──┬────────┬─────┬───┘    │                             │
-│   │     │        │     │         │                             │
-│   │  ┌──┴──┐  ┌─┴──┐ ┌┴───┐    │                             │
-│   │  │SITE │  │SITE│ │SITE│    │                             │
-│   │  │  A  │  │ B  │ │ C  │    │                             │
-│   │  │     │  │    │ │    │    │                             │
-│   │  │A-L  │  │M-R │ │S-Z │    │                             │
-│   │  └─────┘  └────┘ └────┘    │                             │
-│   └─────────────────────────────┘                             │
-└───────────────────────────────────────────────────────────────┘
+```mermaid
+graph TD
+    subgraph "Client Layer"
+        Browser[Browser<br/>UI.php]
+        Postman[Postman<br/>REST API]
+        Mobile[Mobile App<br/>Future]
+    end
+
+    subgraph "Application Layer"
+        subgraph "PHP Application (Docker)"
+            API[API Server<br/>Port 8080]
+            UI[Web UI Server<br/>Port 8081]
+            Router[Router<br/>index.php]
+            Routes[Routes<br/>Handlers]
+            Logger[Request Logger<br/>Manager]
+        end
+    end
+
+    subgraph "Database Layer"
+        subgraph "SQL Server Cluster"
+            Global[GLOBAL<br/>HUFLIT<br/>Linked Servers<br/>Partitioned Views<br/>INSTEAD OF Triggers]
+            subgraph "Routing Logic (by MaKhoa)"
+                SiteA[SITE A<br/>A-L]
+                SiteB[SITE B<br/>M-R]
+                SiteC[SITE C<br/>S-Z]
+            end
+        end
+        Mongo[MongoDB<br/>Logs<br/>audit_logs<br/>query_history]
+    end
+
+    Browser --> API
+    Postman --> API
+    Mobile --> API
+    API --> Router
+    UI --> Router
+    Router --> Routes
+    Routes --> Logger
+    Routes --> Global
+    Global --> SiteA
+    Global --> SiteB
+    Global --> SiteC
+    Routes --> Mongo
+    Logger --> Mongo
 ```
 
 ---
@@ -73,21 +86,25 @@
 ### 1. SQL Server Cluster (4 containers)
 
 #### Global Database - HUFLIT (Port 14333)
+
 **Vai trò**: Điểm truy cập thống nhất, quản lý phân mảnh
 
 **Thành phần chính**:
 
 ##### a) Linked Servers
+
 ```sql
 SITE_A -> mssql_site_a:1433
 SITE_B -> mssql_site_b:1433
 SITE_C -> mssql_site_c:1433
 ```
+
 - Kết nối trực tiếp đến 3 sites
 - Cho phép truy vấn cross-database với cú pháp: `[SITE_A].SiteA.dbo.TableName`
 - Authentication: sa account với password từ .env
 
 ##### b) Partitioned Views
+
 ```sql
 VIEW Khoa_Global AS
   SELECT * FROM [SITE_A].SiteA.dbo.Khoa
@@ -110,9 +127,11 @@ VIEW Khoa_Global AS
 - Không thể INSERT/UPDATE/DELETE trực tiếp → Cần triggers
 
 ##### c) INSTEAD OF Triggers
+
 **Nhiệm vụ**: Chặn operations trên views, route đến site đúng
 
 **Logic phân mảnh theo MaKhoa**:
+
 ```sql
 IF MaKhoa < 'M'        -> SITE_A (A-L)
 IF MaKhoa >= 'M' AND < 'S' -> SITE_B (M-R)
@@ -120,6 +139,7 @@ IF MaKhoa >= 'S'       -> SITE_C (S-Z)
 ```
 
 **15 triggers** (5 tables × 3 operations):
+
 1. **Khoa_Global**: 3 triggers (INSERT, UPDATE, DELETE)
 2. **MonHoc_Global**: 3 triggers (sync 3 sites đồng thời)
 3. **SinhVien_Global**: 3 triggers (cho phép cross-site move)
@@ -127,13 +147,14 @@ IF MaKhoa >= 'S'       -> SITE_C (S-Z)
 5. **DangKy_Global**: 3 triggers (distributed join validation)
 
 **Ví dụ trigger INSERT Khoa**:
+
 ```sql
 CREATE TRIGGER TR_Khoa_Global_Insert ON Khoa_Global INSTEAD OF INSERT
 AS BEGIN
   -- 1. Validate: Check duplicates
   IF EXISTS (SELECT 1 FROM Khoa_Global WHERE MaKhoa IN (SELECT MaKhoa FROM inserted))
     RAISERROR('Mã khoa đã tồn tại!', 16, 1);
-  
+
   -- 2. Route to appropriate site
   IF @MaKhoa < 'M'
     INSERT INTO [SITE_A].SiteA.dbo.Khoa ...
@@ -143,8 +164,6 @@ AS BEGIN
     INSERT INTO [SITE_C].SiteC.dbo.Khoa ...
 END
 ```
-
----
 
 #### Site Databases (Ports 14334-14336)
 
@@ -207,6 +226,7 @@ DangKy (
 ```
 
 **Quan hệ FK**:
+
 ```
 Khoa (root)
   ↓ 1:N
@@ -216,8 +236,6 @@ Khoa (root)
   └─> CTDaoTao -> MonHoc
 ```
 
----
-
 ### 2. MongoDB (Port 27017)
 
 **Database**: `huflit_logs`
@@ -225,9 +243,11 @@ Khoa (root)
 **Vai trò**: Audit logging & analytics
 
 #### Collection 1: `audit_logs`
+
 **Mục đích**: Ghi lại mọi thay đổi dữ liệu
 
 **Schema**:
+
 ```javascript
 {
   table: "Khoa|MonHoc|SinhVien|CTDaoTao|DangKy",
@@ -254,9 +274,11 @@ Khoa (root)
 - Analytics về operations
 
 #### Collection 2: `query_history`
+
 **Mục đích**: Ghi lại mọi API request
 
 **Schema**:
+
 ```javascript
 {
   endpoint: "/khoa|/sinhvien|...",
@@ -289,6 +311,7 @@ Khoa (root)
 ### 1. PHP Backend (2 containers)
 
 #### Container 1: API Server (Port 8080)
+
 **Entry point**: `app/public/index.php` (via router.php)
 
 **Tech stack**:
@@ -297,6 +320,7 @@ Khoa (root)
 - Server: Built-in PHP server
 
 **Request flow**:
+
 ```
 HTTP Request
   ↓
@@ -321,6 +345,7 @@ sendResponse($data, $code) → JSON response
 ```
 
 #### Container 2: Web UI Server (Port 8081)
+
 **Entry point**: `app/public/ui.php`, `logs.php`, `stats.php`
 
 **Phục vụ**:
@@ -329,11 +354,10 @@ sendResponse($data, $code) → JSON response
 - JavaScript modules (ES6)
 - Static assets
 
----
-
 ### 2. Core PHP Files
 
 #### `common.php` - Database & utilities
+
 ```php
 getDBConnection()  // PDO connection to HUFLIT (Global)
   → sqlsrv:Server=mssql_global,1433;Database=HUFLIT
@@ -344,6 +368,7 @@ getJsonInput()                 // Parse request body
 ```
 
 #### `mongo_helper.php` - MongoDB operations
+
 ```php
 MongoHelper::getClient()
   → Check extension_loaded('mongodb')
@@ -362,6 +387,7 @@ MongoHelper::getStatistics($collection, $pipeline)
 ```
 
 #### `request_logger.php` - Request tracking
+
 ```php
 RequestLogger::start()
   → Capture: startTime, endpoint, method, params, body
@@ -371,11 +397,10 @@ RequestLogger::end($resultCount, $statusCode)
   → Call MongoHelper::logQuery()
 ```
 
----
-
 ### 3. Route Handlers (`app/routes/*.php`)
 
 #### Pattern chung:
+
 ```php
 function handle{Module}($method, $query) {
   try {
@@ -432,11 +457,10 @@ function handle{Module}($method, $query) {
 - Aggregation pipelines
 - Real-time analytics
 
----
-
 ### 4. Frontend (JavaScript ES6 Modules)
 
 #### Structure:
+
 ```
 js/
 ├── app.js              # Entry point, initialize
@@ -461,6 +485,7 @@ js/
 - `PRIMARY_KEYS`: Xác định PK cho edit/delete
 
 **`crud.js`**:
+
 ```javascript
 loadData(module)    // GET /{module}
 deleteRecord(id)    // DELETE /{module}?id={id}
@@ -497,7 +522,7 @@ updateRecord(id, data) // PUT /{module}?id={id}
   ↓
 [API] routes/sinhvien.php → handleSinhVien('POST', {})
   ↓
-[SQL] INSERT INTO SinhVien_Global (MaSV, HoTen, MaKhoa, KhoaHoc) 
+[SQL] INSERT INTO SinhVien_Global (MaSV, HoTen, MaKhoa, KhoaHoc)
       VALUES ('25DH001', 'Nguyen Van A', 'CNTT', 2025)
   ↓
 [Trigger] TR_SinhVien_Global_Insert
@@ -521,8 +546,6 @@ updateRecord(id, data) // PUT /{module}?id={id}
 [Browser] Receive JSON, show alert, reload table
 ```
 
----
-
 ### 2. UPDATE Flow (cross-site move)
 
 **Example**: Chuyển SV từ CNTT (Site A) sang MMT (Site B)
@@ -535,8 +558,8 @@ updateRecord(id, data) // PUT /{module}?id={id}
   SELECT * FROM SinhVien_Global WHERE MaSV = '25DH001'
   → old: {MaSV: "25DH001", HoTen: "...", MaKhoa: "CNTT", KhoaHoc: 2025}
   ↓
-[SQL] UPDATE SinhVien_Global 
-      SET HoTen = '...', MaKhoa = 'MMT', KhoaHoc = 2025 
+[SQL] UPDATE SinhVien_Global
+      SET HoTen = '...', MaKhoa = 'MMT', KhoaHoc = 2025
       WHERE MaSV = '25DH001'
   ↓
 [Trigger] TR_SinhVien_Global_Update
@@ -553,8 +576,6 @@ updateRecord(id, data) // PUT /{module}?id={id}
   ↓
 [Browser] Success, table refreshed
 ```
-
----
 
 ### 3. SYNC Flow (MonHoc)
 
@@ -577,8 +598,6 @@ updateRecord(id, data) // PUT /{module}?id={id}
   ↓
 [Browser] Success: "MonHoc created successfully on all sites"
 ```
-
----
 
 ### 4. QUERY Flow (Global complex query)
 
@@ -620,18 +639,19 @@ updateRecord(id, data) // PUT /{module}?id={id}
 ## 🔐 Key Design Decisions
 
 ### 1. Horizontal Partitioning (Phân mảnh ngang)
+
 **Strategy**: Range partitioning theo MaKhoa
-- **Pros**: 
+
+- **Pros**:
   - Load balancing tự nhiên (phân bố đều khoa)
   - Isolation: Lỗi 1 site không ảnh hưởng sites khác
   - Scalability: Dễ thêm sites mới
-- **Cons**: 
+
+- **Cons**:
   - Cross-site queries phức tạp (cần JOIN qua linked servers)
   - Data migration (chuyển khoa) tốn kém
 
 **Alternative considered**: Hash partitioning → Bị loại vì khó query range
-
----
 
 ### 2. Replication vs Partitioning
 
@@ -643,8 +663,6 @@ updateRecord(id, data) // PUT /{module}?id={id}
 **Khoa, SinhVien, CTDaoTao, DangKy: Partitioning**
 - **Lý do**: Dữ liệu lớn, không cần replicate
 - **Advantage**: Giảm redundancy, dễ maintain
-
----
 
 ### 3. INSTEAD OF Triggers vs Application Logic
 
@@ -659,8 +677,6 @@ updateRecord(id, data) // PUT /{module}?id={id}
 - ❌ Performance overhead (cursor iteration)
 - ❌ Migration phức tạp (trigger code phải sync)
 
----
-
 ### 4. MongoDB cho Audit Logs
 
 **Why not SQL Server?**
@@ -673,8 +689,6 @@ updateRecord(id, data) // PUT /{module}?id={id}
 - Compliance: Audit trail cho regulatory requirements
 - Debugging: Trace lại history của 1 record
 - Analytics: Usage patterns, slow queries, error rates
-
----
 
 ### 5. PHP Built-in Server (không dùng Apache/Nginx)
 
@@ -702,8 +716,6 @@ updateRecord(id, data) // PUT /{module}?id={id}
 - `{timestamp: -1}` → Sort queries nhanh
 - `{table: 1, timestamp: -1}` → Filter + sort composite
 
----
-
 ### 2. Query Optimization
 
 **Avoid**:
@@ -714,8 +726,6 @@ updateRecord(id, data) // PUT /{module}?id={id}
 - Filter sớm: `WHERE MaKhoa = 'CNTT'` → chỉ query Site A
 - Pagination: `LIMIT` + `OFFSET`
 - Caching: Browser cache cho reference data (Khoa list)
-
----
 
 ### 3. Transaction Management
 
@@ -751,6 +761,7 @@ updateRecord(id, data) // PUT /{module}?id={id}
 ## 🚀 Deployment
 
 ### Development (Current)
+
 ```bash
 docker-compose up -d       # 6 containers
 .\init_databases.ps1       # Init DB schemas + seed data
@@ -820,5 +831,5 @@ docker-compose up -d       # 6 containers
 
 ---
 
-**📝 Tài liệu cập nhật**: November 25, 2025
+**📝 Tài liệu cập nhật**: November 25, 2025  
 **✍️ Tác giả**: HUFLIT Distributed Database Team
