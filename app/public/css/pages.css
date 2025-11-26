@@ -286,30 +286,6 @@
     margin-bottom: 0.5rem;
 }
 
-.auto-refresh {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
-    border-radius: 12px;
-    margin-bottom: 2rem;
-    border: 2px solid rgba(37, 99, 235, 0.15);
-}
-
-.auto-refresh input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-    accent-color: var(--primary);
-}
-
-.auto-refresh label {
-    font-weight: 600;
-    color: var(--text);
-    cursor: pointer;
-}
-
 @keyframes dots {
     0%, 20% {
         content: '.';

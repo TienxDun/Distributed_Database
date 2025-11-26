@@ -78,16 +78,6 @@
                 <h1>📋 Audit Logs</h1>
                 <p>Lịch sử thay đổi dữ liệu - HUFLIT Distributed Database</p>
             </div>
-            <div class="topbar-actions">
-                <div class="quick-actions">
-                    <button class="quick-action-btn" onclick="loadLogs()" title="Refresh">
-                        <span>🔄</span>
-                    </button>
-                    <button class="quick-action-btn" onclick="resetFilters()" title="Reset Filters">
-                        <span>🗑️</span>
-                    </button>
-                </div>
-            </div>
         </div>
 
         <div class="content-wrapper">
@@ -141,11 +131,6 @@
                     <button class="btn btn-primary" onclick="applyFilters()">Lọc dữ liệu</button>
                     <button class="btn btn-secondary" onclick="resetFilters()">🔄 Đặt lại</button>
                 </div>
-            </div>
-
-            <div class="auto-refresh">
-                <input type="checkbox" id="autoRefresh" onchange="toggleAutoRefresh()">
-                <label for="autoRefresh">🔄 Tự động làm mới mỗi 30 giây</label>
             </div>
 
             <div class="stats-grid" id="statsBar"></div>

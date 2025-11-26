@@ -44,13 +44,16 @@ export function loadSettings() {
         autoRefreshEnabled = true; // Default to enabled
     }
 
-    // Update toggle button
-    const toggleBtn = document.getElementById('autoRefreshToggle');
-    if (toggleBtn) {
+    // Update sidebar button
+    const sidebarBtn = document.getElementById('autoRefreshBtn');
+    const statusSpan = document.getElementById('autoRefreshStatus');
+    if (sidebarBtn && statusSpan) {
         if (autoRefreshEnabled) {
-            toggleBtn.classList.add('active');
+            sidebarBtn.classList.add('active');
+            statusSpan.textContent = 'ON';
         } else {
-            toggleBtn.classList.remove('active');
+            sidebarBtn.classList.remove('active');
+            statusSpan.textContent = 'OFF';
         }
     }
 
@@ -137,9 +140,11 @@ export function resetToDefault() {
     // Reset auto-refresh
     autoRefreshEnabled = true; // Default to enabled
     autoRefreshTime = 30000;
-    const toggleBtn = document.getElementById('autoRefreshToggle');
-    if (toggleBtn) {
-        toggleBtn.classList.add('active');
+    const sidebarBtn = document.getElementById('autoRefreshBtn');
+    const statusSpan = document.getElementById('autoRefreshStatus');
+    if (sidebarBtn && statusSpan) {
+        sidebarBtn.classList.add('active');
+        statusSpan.textContent = 'ON';
     }
     updateAutoRefresh();
 
@@ -151,12 +156,15 @@ export function resetToDefault() {
  */
 export function toggleAutoRefresh() {
     autoRefreshEnabled = !autoRefreshEnabled;
-    const toggleBtn = document.getElementById('autoRefreshToggle');
-    if (toggleBtn) {
+    const sidebarBtn = document.getElementById('autoRefreshBtn');
+    const statusSpan = document.getElementById('autoRefreshStatus');
+    if (sidebarBtn && statusSpan) {
         if (autoRefreshEnabled) {
-            toggleBtn.classList.add('active');
+            sidebarBtn.classList.add('active');
+            statusSpan.textContent = 'ON';
         } else {
-            toggleBtn.classList.remove('active');
+            sidebarBtn.classList.remove('active');
+            statusSpan.textContent = 'OFF';
         }
     }
     updateAutoRefresh();

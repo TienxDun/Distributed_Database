@@ -77,16 +77,6 @@
                 <h1>🎓 HUFLIT Distributed Database</h1>
                 <p>Full CRUD Interface - Hệ thống Cơ sở dữ liệu Phân tán</p>
             </div>
-            <div class="topbar-actions">
-                <div class="quick-actions">
-                    <button class="quick-action-btn" onclick="refreshCurrentTab()" title="Refresh">
-                        <span>🔄</span>
-                    </button>
-                    <button class="quick-action-btn" onclick="clearAllResults()" title="Clear Results">
-                        <span>🗑️</span>
-                    </button>
-                </div>
-            </div>
         </div>
 
         <div class="content-wrapper">

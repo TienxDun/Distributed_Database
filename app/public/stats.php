@@ -55,6 +55,51 @@
             box-shadow: 0 0 8px rgba(37, 99, 235, 0.5);
         }
     </style>
+    <style>
+        /* Sidebar Button Styles */
+        .sidebar-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: none;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: var(--text, #1f2937);
+        }
+
+        .sidebar-btn:hover {
+            background: rgba(37, 99, 235, 0.1);
+            transform: translateX(4px);
+        }
+
+        .sidebar-btn.active {
+            background: rgba(37, 99, 235, 0.15);
+            border-left: 3px solid var(--primary, #2563eb);
+        }
+
+        .sidebar-btn.active .sidebar-status {
+            color: var(--primary, #2563eb);
+            font-weight: 600;
+        }
+
+        .sidebar-status {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--secondary, #6b7280);
+            background: rgba(255, 255, 255, 0.8);
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            min-width: 32px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
     <!-- Loading Overlay -->
@@ -89,6 +134,11 @@
         <div class="sidebar-section">
             <h3 class="sidebar-section-title">⚙️ Tools</h3>
             <ul class="sidebar-nav">
+                <li><button class="sidebar-btn" id="autoRefreshBtn" onclick="toggleAutoRefresh()">
+                    <span class="sidebar-icon">🔄</span>
+                    <span class="sidebar-text">Auto Refresh</span>
+                    <span class="sidebar-status" id="autoRefreshStatus">ON</span>
+                </button></li>
                 <li><button class="sidebar-btn" onclick="openSettingsModal()">
                     <span class="sidebar-icon">⚙️</span>
                     <span class="sidebar-text">Settings</span>
@@ -122,16 +172,6 @@
             <div class="topbar-title">
                 <h1>📊 Statistics Dashboard</h1>
                 <p>Thống kê và phân tích - HUFLIT Distributed Database</p>
-            </div>
-            <div class="topbar-actions">
-                <div class="quick-actions">
-                    <button class="quick-action-btn" onclick="loadStats()" title="Refresh">
-                        <span>🔄</span>
-                    </button>
-                    <button class="quick-action-btn" onclick="resetCharts()" title="Reset Charts">
-                        <span>🗑️</span>
-                    </button>
-                </div>
             </div>
         </div>
 
@@ -232,22 +272,6 @@
                             <button onclick="applyPresetColor('#f3e8ff')" style="padding: 0.5rem; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; background: #f3e8ff; aspect-ratio: 1;" title="Tím nhạt"></button>
                             <button onclick="applyPresetColor('#cffafe')" style="padding: 0.5rem; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; background: #cffafe; aspect-ratio: 1;" title="Cyan nhạt"></button>
                         </div>
-                    </div>
-                </div>
-
-                <div class="settings-section">
-                    <h3 style="margin-bottom: 1.5rem; color: var(--text); font-size: 1.1rem;">🔄 Tự động làm mới</h3>
-
-                    <div class="form-group">
-                        <label style="display: flex; align-items: center; gap: 0.75rem; font-weight: 600; font-size: 0.95rem;">
-                            <span>Tự động làm mới dữ liệu</span>
-                            <button id="autoRefreshToggle" class="toggle-btn active" onclick="toggleAutoRefresh()">
-                                <div class="toggle-slider"></div>
-                            </button>
-                        </label>
-                        <small style="display: block; margin-top: 0.5rem; color: var(--secondary);">
-                            Tự động làm mới dữ liệu của tab hiện tại mỗi 30 giây
-                        </small>
                     </div>
                 </div>
             </div>

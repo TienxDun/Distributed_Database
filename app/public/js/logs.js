@@ -3,7 +3,6 @@ import { loadSettings, openSettingsModal, closeSettingsModal, updateBackgroundCo
 
 // Module variables
 let currentPage = 1;
-let autoRefreshInterval = null;
 
 // Expose functions to global scope
 window.toggleSidebar = function() {
@@ -216,20 +215,6 @@ function resetFilters() {
     currentPage = 1;
     loadLogs();
 }
-
-function toggleAutoRefresh() {
-    const checkbox = document.getElementById('autoRefresh');
-    if (checkbox.checked) {
-        autoRefreshInterval = setInterval(loadLogs, 30000);
-    } else {
-        if (autoRefreshInterval) {
-            clearInterval(autoRefreshInterval);
-            autoRefreshInterval = null;
-        }
-    }
-}
-
-window.toggleAutoRefresh = toggleAutoRefresh;
 
 // Load logs on page load
 loadLogs();
