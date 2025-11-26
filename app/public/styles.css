@@ -215,7 +215,9 @@ body {
 /* Content Wrapper */
 .content-wrapper {
     padding: 2rem;
-    max-width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
 }
 
 .tabs-container {
@@ -1650,6 +1652,7 @@ table td.site-c {
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
+    width: 100%;
 }
 
 /* Stats card for logs page - modern minimalist style */
@@ -1772,6 +1775,10 @@ table td.site-c {
     grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
     gap: 2rem;
     margin-bottom: 2rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
 }
 
 .chart-container {
@@ -1782,6 +1789,9 @@ table td.site-c {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.6);
     transition: all 0.3s;
+    min-height: 450px;
+    display: flex;
+    flex-direction: column;
 }
 
 .chart-container:hover {
@@ -1804,6 +1814,8 @@ table td.site-c {
     position: relative;
     height: 350px;
     width: 100%;
+    flex: 1;
+    min-height: 350px;
 }
 
 .chart-wrapper canvas {
@@ -1833,7 +1845,7 @@ table td.site-c {
 }
 
 .last-updated {
-    text-align: right;
+    text-align: center;
     color: var(--secondary);
     font-size: 0.9rem;
     margin-top: 2rem;
@@ -1842,6 +1854,9 @@ table td.site-c {
     backdrop-filter: blur(10px);
     border-radius: 10px;
     border: 1px solid var(--border);
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /* ==================== RESPONSIVE DESIGN ==================== */
@@ -2110,6 +2125,13 @@ table td.site-c {
 }
 
 /* Responsive Design */
+@media (min-width: 1600px) {
+    .content-wrapper {
+        max-width: 1600px;
+        padding: 3rem;
+    }
+}
+
 @media (max-width: 1024px) {
     .sidebar {
         width: 250px;
@@ -2198,8 +2220,6 @@ table td.site-c {
         padding: 0.5rem;
         font-size: 0.8rem;
     }
-}
-    font-size: 0.9rem;
 }
 
 /* Site Status Button */
