@@ -7,7 +7,7 @@
 import { loadData, deleteRecord, deleteCTDaoTao, deleteDangKy, showTab, toggleSiteColumnVisibility } from './modules/crud.js';
 
 // Import modal functions
-import { openCreateModal, openEditModal, closeModal, submitForm, refreshSiteStatus, toggleSiteStatusPanel } from './modules/modal.js';
+import { openCreateModal, openEditModal, closeModal, submitForm } from './modules/modal.js';
 
 // Import settings functions
 import { openSettingsModal, closeSettingsModal, loadSettings, updateBackgroundColor, updateBackgroundColorFromText, applyPresetColor, resetToDefault, toggleAutoRefresh, updateAutoRefreshTime, getAutoRefreshStatus } from './modules/settings.js';
@@ -127,9 +127,6 @@ window.applyPresetColor = applyPresetColor;
 window.resetToDefault = resetToDefault;
 window.toggleAutoRefresh = toggleAutoRefresh;
 window.updateAutoRefreshTime = updateAutoRefreshTime;
-
-window.refreshSiteStatus = refreshSiteStatus;
-window.toggleSiteStatusPanel = toggleSiteStatusPanel;
 
 window.toggleSidebar = toggleSidebar;
 window.refreshCurrentTab = refreshCurrentTab;

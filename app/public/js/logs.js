@@ -1,5 +1,4 @@
 // Logs page JavaScript
-import { toggleSiteStatusPanel } from './modules/modal.js';
 import { loadSettings, openSettingsModal, closeSettingsModal, updateBackgroundColor, updateBackgroundColorFromText, applyPresetColor, resetToDefault, updateAutoRefreshTime } from './modules/settings.js';
 
 // Module variables
@@ -19,7 +18,6 @@ window.toggleSidebar = function() {
     localStorage.setItem('sidebarCollapsed', isCollapsed);
 };
 
-window.toggleSiteStatusPanel = toggleSiteStatusPanel;
 window.openSettingsModal = openSettingsModal;
 window.closeSettingsModal = closeSettingsModal;
 window.updateBackgroundColor = updateBackgroundColor;

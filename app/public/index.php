@@ -28,7 +28,6 @@ $routes = [
     '/global' => 'global',
     '/logs' => 'logs',
     '/stats' => 'stats',
-    '/health' => 'health',
 ];
 
 $method = $_SERVER['REQUEST_METHOD'];
