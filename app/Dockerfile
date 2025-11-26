@@ -24,8 +24,10 @@ RUN pecl install sqlsrv pdo_sqlsrv \
 
 # Install MongoDB PHP driver
 RUN pecl install mongodb \
-    && docker-php-ext-enable mongodb \
-    && echo "extension=mongodb.so" > /usr/local/etc/php/conf.d/mongodb.ini
+    && docker-php-ext-enable mongodb
 
 # Set working dir
 WORKDIR /var/www/html
+
+# Copy application code
+COPY . /var/www/html
