@@ -227,13 +227,13 @@ DangKy (
 
 **Quan hệ FK**:
 
-```
-Khoa (root)
-  ↓ 1:N
-  ├─> SinhVien
-  │     ↓ 1:N
-  │     └─> DangKy -> MonHoc
-  └─> CTDaoTao -> MonHoc
+```mermaid
+graph TD
+    Khoa[Khoa<br/>(root)] -->|1:N| SinhVien[SinhVien]
+    Khoa -->|1:N| CTDaoTao[CTDaoTao]
+    SinhVien -->|1:N| DangKy[DangKy]
+    CTDaoTao -->|N:1| MonHoc1[MonHoc]
+    DangKy -->|N:1| MonHoc2[MonHoc]
 ```
 
 ### 2. MongoDB (Port 27017)
@@ -565,122 +565,109 @@ css/
 
 **Example**: Tạo Sinh Viên mới với MaKhoa = 'CNTT'
 
-```
-[Browser] POST /sinhvien
-  body: {MaSV: "25DH001", HoTen: "Nguyen Van A", MaKhoa: "CNTT", KhoaHoc: 2025}
-  ↓
-[API] routes/sinhvien.php → handleSinhVien('POST', {})
-  ↓
-[SQL] INSERT INTO SinhVien_Global (MaSV, HoTen, MaKhoa, KhoaHoc)
-      VALUES ('25DH001', 'Nguyen Van A', 'CNTT', 2025)
-  ↓
-[Trigger] TR_SinhVien_Global_Insert
-  ├─ Validate: Check MaSV unique
-  ├─ Validate: Check MaKhoa exists in Khoa_Global
-  ├─ Determine site: 'CNTT' < 'M' → SITE_A
-  └─ Execute: INSERT INTO [SITE_A].SiteA.dbo.SinhVien ...
-  ↓
-[Site A] Insert thành công vào bảng local SinhVien
-  ↓
-[API] MongoHelper::logAudit('SinhVien', 'INSERT', {...}, null, 'Site_A')
-  ↓
-[MongoDB] Insert document vào audit_logs collection
-  ↓
-[API] RequestLogger::end(1, 201)
-  ↓
-[MongoDB] Insert document vào query_history collection
-  ↓
-[API] sendResponse({message: 'SinhVien created successfully'}, 201)
-  ↓
-[Browser] Receive JSON, show alert, reload table
+```mermaid
+sequenceDiagram
+    participant Browser
+    participant API
+    participant SQL
+    participant Trigger
+    participant SiteA
+    participant MongoDB
+
+    Browser->>API: POST /sinhvien<br/>body: {MaSV: "25DH001", HoTen: "Nguyen Van A", MaKhoa: "CNTT", KhoaHoc: 2025}
+    API->>SQL: INSERT INTO SinhVien_Global<br/>VALUES ('25DH001', 'Nguyen Van A', 'CNTT', 2025)
+    SQL->>Trigger: TR_SinhVien_Global_Insert
+    Trigger->>Trigger: Validate: Check MaSV unique & MaKhoa exists
+    Trigger->>SiteA: INSERT INTO [SITE_A].SiteA.dbo.SinhVien
+    SiteA-->>Trigger: Insert thành công
+    Trigger-->>SQL: Success
+    SQL-->>API: Success
+    API->>MongoDB: MongoHelper::logAudit('SinhVien', 'INSERT', {...}, null, 'Site_A')
+    API->>MongoDB: RequestLogger::end(1, 201)
+    API->>Browser: sendResponse({message: 'SinhVien created successfully'}, 201)
+    Browser->>Browser: Show alert, reload table
 ```
 
 ### 2. UPDATE Flow (cross-site move)
 
 **Example**: Chuyển SV từ CNTT (Site A) sang MMT (Site B)
 
-```
-[Browser] PUT /sinhvien?id=25DH001
-  body: {HoTen: "Nguyen Van A", MaKhoa: "MMT", KhoaHoc: 2025}
-  ↓
-[API] Get old data first:
-  SELECT * FROM SinhVien_Global WHERE MaSV = '25DH001'
-  → old: {MaSV: "25DH001", HoTen: "...", MaKhoa: "CNTT", KhoaHoc: 2025}
-  ↓
-[SQL] UPDATE SinhVien_Global
-      SET HoTen = '...', MaKhoa = 'MMT', KhoaHoc = 2025
-      WHERE MaSV = '25DH001'
-  ↓
-[Trigger] TR_SinhVien_Global_Update
-  ├─ Detect MaKhoa change: 'CNTT' → 'MMT'
-  ├─ Old site: 'CNTT' < 'M' → SITE_A
-  ├─ New site: 'MMT' >= 'M' AND < 'S' → SITE_B
-  ├─ Begin Transaction
-  │   ├─ DELETE FROM [SITE_A].SiteA.dbo.SinhVien WHERE MaSV = '25DH001'
-  │   ├─ INSERT INTO [SITE_B].SiteB.dbo.SinhVien VALUES (...)
-  │   └─ CASCADE: DangKy records follow (deleted from A, inserted to B)
-  └─ Commit Transaction
-  ↓
-[API] MongoHelper::logAudit('SinhVien', 'UPDATE', newData, oldData, 'Site_B')
-  ↓
-[Browser] Success, table refreshed
+```mermaid
+sequenceDiagram
+    participant Browser
+    participant API
+    participant SQL
+    participant Trigger
+    participant SiteA
+    participant SiteB
+    participant MongoDB
+
+    Browser->>API: PUT /sinhvien?id=25DH001<br/>body: {HoTen: "Nguyen Van A", MaKhoa: "MMT", KhoaHoc: 2025}
+    API->>SQL: SELECT * FROM SinhVien_Global WHERE MaSV = '25DH001'<br/>→ old: {MaSV: "25DH001", HoTen: "...", MaKhoa: "CNTT", KhoaHoc: 2025}
+    API->>SQL: UPDATE SinhVien_Global SET HoTen = '...', MaKhoa = 'MMT', KhoaHoc = 2025 WHERE MaSV = '25DH001'
+    SQL->>Trigger: TR_SinhVien_Global_Update
+    Trigger->>Trigger: Detect MaKhoa change: 'CNTT' → 'MMT'
+    Trigger->>Trigger: Old site: 'CNTT' < 'M' → SITE_A<br/>New site: 'MMT' >= 'M' AND < 'S' → SITE_B
+    Trigger->>Trigger: Begin Transaction
+    Trigger->>SiteA: DELETE FROM [SITE_A].SiteA.dbo.SinhVien WHERE MaSV = '25DH001'
+    Trigger->>SiteB: INSERT INTO [SITE_B].SiteB.dbo.SinhVien VALUES (...)
+    Trigger->>Trigger: CASCADE: DangKy records follow (deleted from A, inserted to B)
+    Trigger->>Trigger: Commit Transaction
+    Trigger-->>SQL: Success
+    SQL-->>API: Success
+    API->>MongoDB: MongoHelper::logAudit('SinhVien', 'UPDATE', newData, oldData, 'Site_B')
+    API->>Browser: Success, table refreshed
 ```
 
 ### 3. SYNC Flow (MonHoc)
 
 **Example**: Tạo môn học mới → phải có ở cả 3 sites
 
-```
-[Browser] POST /monhoc
-  body: {MaMH: "MH999", TenMH: "Trí tuệ nhân tạo"}
-  ↓
-[SQL] INSERT INTO MonHoc_Global (MaMH, TenMH) VALUES ('MH999', '...')
-  ↓
-[Trigger] TR_MonHoc_Global_Insert
-  ├─ Validate: Check MaMH unique across 3 sites
-  ├─ INSERT INTO [SITE_A].SiteA.dbo.MonHoc VALUES ('MH999', '...')
-  ├─ INSERT INTO [SITE_B].SiteB.dbo.MonHoc VALUES ('MH999', '...')
-  └─ INSERT INTO [SITE_C].SiteC.dbo.MonHoc VALUES ('MH999', '...')
-  (Nếu 1 site fail → rollback tất cả)
-  ↓
-[MongoDB] Log audit with site='Global'
-  ↓
-[Browser] Success: "MonHoc created successfully on all sites"
+```mermaid
+sequenceDiagram
+    participant Browser
+    participant SQL
+    participant Trigger
+    participant SiteA
+    participant SiteB
+    participant SiteC
+    participant MongoDB
+
+    Browser->>SQL: POST /monhoc<br/>body: {MaMH: "MH999", TenMH: "Trí tuệ nhân tạo"}
+    SQL->>Trigger: INSERT INTO MonHoc_Global VALUES ('MH999', '...')
+    Trigger->>Trigger: TR_MonHoc_Global_Insert<br/>Validate: Check MaMH unique across 3 sites
+    Trigger->>SiteA: INSERT INTO [SITE_A].SiteA.dbo.MonHoc VALUES ('MH999', '...')
+    Trigger->>SiteB: INSERT INTO [SITE_B].SiteB.dbo.MonHoc VALUES ('MH999', '...')
+    Trigger->>SiteC: INSERT INTO [SITE_C].SiteC.dbo.MonHoc VALUES ('MH999', '...')
+    SiteA-->>Trigger: Success
+    SiteB-->>Trigger: Success
+    SiteC-->>Trigger: Success
+    Trigger-->>SQL: Success (Nếu 1 site fail → rollback tất cả)
+    SQL-->>Browser: Success: "MonHoc created successfully on all sites"
+    Browser->>MongoDB: Log audit with site='Global'
 ```
 
 ### 4. QUERY Flow (Global complex query)
 
 **Example**: Tìm SV đủ điều kiện tốt nghiệp (query type 4)
 
-```
-[Browser] GET /global?type=4
-  ↓
-[API] routes/global.php → handleGlobal('GET', {type: 4})
-  ↓
-[SQL] Complex query:
-  SELECT s.MaSV, s.HoTen
-  FROM SinhVien_Global s
-  WHERE NOT EXISTS (
-    -- Môn học trong CTĐT mà SV chưa học hoặc chưa đạt
-    SELECT * FROM CTDaoTao_Global c
-    WHERE c.MaKhoa = s.MaKhoa AND c.KhoaHoc = s.KhoaHoc
-      AND NOT EXISTS (
-        SELECT * FROM DangKy_Global d
-        WHERE d.MaSV = s.MaSV AND d.MaMon = c.MaMH AND d.DiemThi >= 5
-      )
-  )
-  ↓
-[Global DB] Execute query using partitioned views:
-  ├─ SinhVien_Global → UNION Site A, B, C
-  ├─ CTDaoTao_Global → UNION Site A, B, C
-  └─ DangKy_Global → UNION Site A, B, C
-  (SQL Server optimizer handles distributed execution)
-  ↓
-[MongoDB] Log query to query_history (execution_time, result_count)
-  ↓
-[API] sendResponse([{MaSV: "...", HoTen: "..."}], 200)
-  ↓
-[Browser] Render results in table
+```mermaid
+sequenceDiagram
+    participant Browser
+    participant API
+    participant SQL
+    participant GlobalDB
+    participant MongoDB
+
+    Browser->>API: GET /global?type=4
+    API->>SQL: Complex query - Logic: Số môn bắt buộc = Số môn đã hoàn thành<br/>SELECT s.MaSV, s.HoTen FROM SinhVien_Global s WHERE (...subqueries...)
+    SQL->>GlobalDB: Execute query using partitioned views
+    GlobalDB->>GlobalDB: SinhVien_Global → UNION Site A, B, C<br/>CTDaoTao_Global → UNION Site A, B, C<br/>DangKy_Global → UNION Site A, B, C<br/>(SQL Server optimizer handles distributed execution)
+    GlobalDB-->>SQL: Results
+    SQL-->>API: Results
+    API->>MongoDB: Log query to query_history (execution_time, result_count)
+    API->>Browser: sendResponse([{MaSV: "...", HoTen: "..."}], 200)
+    Browser->>Browser: Render results in table
 ```
 
 ---
