@@ -1,0 +1,44 @@
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Docker volumes (local development)
+sqlserver_data_*/
+mongodb_data/
+mongodb_config/
+
+# Logs
+*.log
+logs/
+app/public/logs/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Database backups
+*.bak
+*.sql.bak
+
+# Node modules (if any)
+node_modules/
+
+# Composer (if any)
+vendor/
