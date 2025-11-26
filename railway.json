@@ -1,0 +1,19 @@
+# Railway Configuration
+# File: railway.json
+{
+  "build": {
+    "builder": "dockerfile",
+    "dockerfilePath": "Dockerfile"
+  },
+  "deploy": {
+    "startCommand": "docker-compose up -d"
+  },
+  "environments": {
+    "production": {
+      "variables": {
+        "MSSQL_SA_PASSWORD": "${{ RAILWAY_STATIC_URL }}",
+        "MONGO_PASSWORD": "${{ MONGO_ROOT_PASSWORD }}"
+      }
+    }
+  }
+}
