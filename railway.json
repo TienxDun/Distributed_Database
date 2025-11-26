@@ -4,7 +4,7 @@
     "dockerfilePath": "app/Dockerfile"
   },
   "deploy": {
-    "startCommand": "docker-compose up -d"
+    "startCommand": "php -S 0.0.0.0:$PORT -t public"
   },
   "environments": {
     "production": {
