@@ -51,6 +51,13 @@
                             </span>
                         </button>
                     </a>
+                    <button class="btn-settings-modern" onclick="showSiteStatus()">
+                        <span class="settings-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">🔍</span>
+                        <span class="settings-text">
+                            <strong>Site Status</strong>
+                            <small>Trạng thái hệ thống</small>
+                        </span>
+                    </button>
                     <button class="btn-settings-modern" onclick="openSettingsModal()">
                         <span class="settings-icon">⚙️</span>
                         <span class="settings-text">
@@ -284,6 +291,28 @@
             <div class="modal-footer">
                 <button class="btn btn-secondary" type="button" onclick="resetToDefault()">🔄 Khôi phục mặc định</button>
                 <button class="btn btn-cancel" type="button" onclick="closeSettingsModal()">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Site Status Modal -->
+    <div id="siteStatusModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3>🔍 Trạng Thái Hệ Thống Phân Tán</h3>
+                <span class="close" onclick="closeSiteStatusModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="site-status-content">
+                    <div class="loading-spinner" style="text-align: center; padding: 2rem;">
+                        <div class="spinner"></div>
+                        <div style="margin-top: 1rem; color: #666;">Đang kiểm tra trạng thái hệ thống...</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="refreshSiteStatus()">🔄 Làm mới</button>
+                <button class="btn btn-cancel" onclick="closeSiteStatusModal()">Đóng</button>
             </div>
         </div>
     </div>

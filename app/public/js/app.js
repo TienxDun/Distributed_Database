@@ -7,7 +7,7 @@
 import { loadData, deleteRecord, deleteCTDaoTao, deleteDangKy, showTab, toggleSiteColumnVisibility } from './modules/crud.js';
 
 // Import modal functions
-import { openCreateModal, openEditModal, closeModal, submitForm } from './modules/modal.js';
+import { openCreateModal, openEditModal, closeModal, submitForm, showSiteStatus, closeSiteStatusModal, refreshSiteStatus } from './modules/modal.js';
 
 // Import settings functions
 import { openSettingsModal, closeSettingsModal, loadSettings, updateBackgroundColor, updateBackgroundColorFromText, applyPresetColor, resetToDefault } from './modules/settings.js';
@@ -76,6 +76,10 @@ window.updateBackgroundColor = updateBackgroundColor;
 window.updateBackgroundColorFromText = updateBackgroundColorFromText;
 window.applyPresetColor = applyPresetColor;
 window.resetToDefault = resetToDefault;
+
+window.showSiteStatus = showSiteStatus;
+window.closeSiteStatusModal = closeSiteStatusModal;
+window.refreshSiteStatus = refreshSiteStatus;
 
 window.callGlobalQuery = callGlobalQuery;
 

@@ -1778,3 +1778,135 @@ table td.site-c {
         font-size: 1.2rem;
     }
 }
+
+/* Site Status Styles */
+.site-status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.site-status-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    border: 2px solid var(--border);
+    transition: all 0.3s ease;
+}
+
+.site-status-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.site-status-card.healthy {
+    border-color: var(--success);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(5, 150, 105, 0.05));
+}
+
+.site-status-card.unhealthy {
+    border-color: var(--danger);
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(220, 38, 38, 0.05));
+}
+
+.site-status-card.unknown {
+    border-color: var(--secondary);
+    background: linear-gradient(135deg, rgba(100, 116, 139, 0.05), rgba(71, 85, 105, 0.05));
+}
+
+.site-status-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.site-status-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.site-status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.site-status-indicator.healthy {
+    background: var(--success);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+.site-status-indicator.unhealthy {
+    background: var(--danger);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+}
+
+.site-status-indicator.unknown {
+    background: var(--secondary);
+    box-shadow: 0 0 10px rgba(100, 116, 139, 0.5);
+}
+
+.site-status-metric {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.site-status-metric-label {
+    color: #64748b;
+}
+
+.site-status-metric-value {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.site-status-details {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.overall-status {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+}
+
+.overall-status.healthy {
+    border: 2px solid var(--success);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.05));
+}
+
+.overall-status.degraded {
+    border: 2px solid #f59e0b;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.05));
+}
+
+.overall-status.critical {
+    border: 2px solid var(--danger);
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.05));
+}
+
+.overall-status-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.overall-status-subtitle {
+    color: #64748b;
+    font-size: 0.9rem;
+}

@@ -353,3 +353,132 @@ export async function submitForm() {
         setButtonLoading(submitBtn, false);
     }
 }
+
+/**
+ * Site Status Modal Functions
+ */
+
+/**
+ * Show site status modal
+ */
+export async function showSiteStatus() {
+    const modal = document.getElementById('siteStatusModal');
+    modal.classList.add('show');
+    await loadSiteStatus();
+}
+
+/**
+ * Close site status modal
+ */
+export function closeSiteStatusModal() {
+    const modal = document.getElementById('siteStatusModal');
+    modal.classList.remove('show');
+}
+
+/**
+ * Load and display site status
+ */
+async function loadSiteStatus() {
+    const content = document.getElementById('site-status-content');
+    
+    try {
+        const { API_BASE } = await import('../config.js');
+        console.log('Fetching from:', `${API_BASE}/health`);
+        const response = await fetch(`${API_BASE}/health`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const text = await response.text();
+        console.log('Response text:', text.substring(0, 200));
+        
+        const data = JSON.parse(text);
+        
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        
+        content.innerHTML = buildSiteStatusHTML(data);
+    } catch (error) {
+        console.error('Site status error:', error);
+        content.innerHTML = `
+            <div style="text-align: center; padding: 2rem; color: #ef4444;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">❌</div>
+                <div style="font-weight: 600; margin-bottom: 0.5rem;">Không thể kiểm tra trạng thái hệ thống</div>
+                <div style="color: #64748b; font-size: 0.9rem;">${error.message}</div>
+                <div style="color: #64748b; font-size: 0.8rem; margin-top: 1rem;">Kiểm tra console để biết thêm chi tiết</div>
+            </div>
+        `;
+    }
+}
+
+/**
+ * Refresh site status
+ */
+export async function refreshSiteStatus() {
+    await loadSiteStatus();
+}
+
+/**
+ * Build HTML for site status display
+ */
+function buildSiteStatusHTML(data) {
+    const statusConfig = {
+        healthy: { icon: '✅', color: 'green', text: 'Hoạt động tốt' },
+        degraded: { icon: '⚠️', color: 'orange', text: 'Hoạt động hạn chế' },
+        critical: { icon: '❌', color: 'red', text: 'Nguy hiểm' }
+    };
+    
+    const overall = statusConfig[data.overall_status] || statusConfig.critical;
+    
+    let html = `
+        <div class="overall-status ${data.overall_status}">
+            <div class="overall-status-title">${overall.icon} ${overall.text.toUpperCase()}</div>
+            <div class="overall-status-subtitle">
+                ${data.healthy_sites}/${data.total_sites} sites hoạt động | Cập nhật: ${data.timestamp}
+            </div>
+        </div>
+        
+        <div class="site-status-grid">
+    `;
+    
+    for (const [siteKey, site] of Object.entries(data.sites)) {
+        const statusClass = site.status;
+        const indicatorClass = site.status;
+        const responseTime = site.response_time > 0 ? `${site.response_time}ms` : 'N/A';
+        
+        html += `
+            <div class="site-status-card ${statusClass}">
+                <div class="site-status-header">
+                    <div class="site-status-name">${site.name}</div>
+                    <div class="site-status-indicator ${indicatorClass}"></div>
+                </div>
+                
+                <div class="site-status-metric">
+                    <span class="site-status-metric-label">Trạng thái:</span>
+                    <span class="site-status-metric-value">${site.status === 'healthy' ? '✅ Hoạt động' : site.status === 'unhealthy' ? '❌ Không khả dụng' : '❓ Không xác định'}</span>
+                </div>
+                
+                <div class="site-status-metric">
+                    <span class="site-status-metric-label">Thời gian phản hồi:</span>
+                    <span class="site-status-metric-value">${responseTime}</span>
+                </div>
+                
+                <div class="site-status-details">
+                    ${site.details}
+                </div>
+            </div>
+        `;
+    }
+    
+    html += `
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem; color: #64748b; font-size: 0.9rem;">
+            💡 Mẹo: Thời gian phản hồi dưới 100ms là tốt, 100-500ms là chấp nhận được, trên 500ms cần kiểm tra.
+        </div>
+    `;
+    
+    return html;
+}
