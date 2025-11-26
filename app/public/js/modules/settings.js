@@ -8,7 +8,7 @@ const DEFAULT_BG_COLOR = '#f8fafc';
 
 // Auto-refresh variables
 let autoRefreshInterval = null;
-let autoRefreshEnabled = false;
+let autoRefreshEnabled = true; // Default to enabled
 let autoRefreshTime = 30000; // 30 seconds default
 
 /**
@@ -40,12 +40,22 @@ export function loadSettings() {
     // Load auto-refresh settings
     if (settings.autoRefreshEnabled !== undefined) {
         autoRefreshEnabled = settings.autoRefreshEnabled;
-        document.getElementById('autoRefreshEnabled').checked = autoRefreshEnabled;
+    } else {
+        autoRefreshEnabled = true; // Default to enabled
+    }
+
+    // Update toggle button
+    const toggleBtn = document.getElementById('autoRefreshToggle');
+    if (toggleBtn) {
+        if (autoRefreshEnabled) {
+            toggleBtn.classList.add('active');
+        } else {
+            toggleBtn.classList.remove('active');
+        }
     }
 
     if (settings.autoRefreshTime) {
         autoRefreshTime = settings.autoRefreshTime;
-        document.getElementById('autoRefreshTime').value = autoRefreshTime / 1000; // Convert to seconds
     }
 
     // Apply auto-refresh settings
@@ -125,8 +135,12 @@ export function resetToDefault() {
     updateBackgroundColor(false);
 
     // Reset auto-refresh
-    autoRefreshEnabled = false;
+    autoRefreshEnabled = true; // Default to enabled
     autoRefreshTime = 30000;
+    const toggleBtn = document.getElementById('autoRefreshToggle');
+    if (toggleBtn) {
+        toggleBtn.classList.add('active');
+    }
     updateAutoRefresh();
 
     alert('✅ Đã khôi phục cài đặt mặc định!');
@@ -136,7 +150,15 @@ export function resetToDefault() {
  * Toggle auto-refresh
  */
 export function toggleAutoRefresh() {
-    autoRefreshEnabled = document.getElementById('autoRefreshEnabled').checked;
+    autoRefreshEnabled = !autoRefreshEnabled;
+    const toggleBtn = document.getElementById('autoRefreshToggle');
+    if (toggleBtn) {
+        if (autoRefreshEnabled) {
+            toggleBtn.classList.add('active');
+        } else {
+            toggleBtn.classList.remove('active');
+        }
+    }
     updateAutoRefresh();
     saveSettings();
 }
@@ -165,13 +187,13 @@ function updateAutoRefresh() {
     // Set up new interval if enabled
     if (autoRefreshEnabled) {
         autoRefreshInterval = setInterval(() => {
-            const activeTab = document.querySelector('.tab-content.active');
-            if (activeTab && activeTab.id !== 'global') {
-                console.log(`[Auto-refresh] Refreshing ${activeTab.id} data`);
-                // Import and call loadData
-                import('../modules/crud.js').then(crudModule => {
-                    crudModule.loadData(activeTab.id, true); // Skip loading overlay
-                });
+            // Check if page is visible (not in background tab)
+            if (!document.hidden) {
+                console.log(`[Auto-refresh] Refreshing stats data every ${autoRefreshTime/1000}s`);
+                // Import and call loadStatistics from stats.js
+                if (window.loadStats) {
+                    window.loadStats();
+                }
             }
         }, autoRefreshTime);
 

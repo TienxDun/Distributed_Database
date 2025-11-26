@@ -44,10 +44,6 @@
         <div class="sidebar-section">
             <h3 class="sidebar-section-title">⚙️ Tools</h3>
             <ul class="sidebar-nav">
-                <li><button class="sidebar-btn" onclick="toggleSiteStatusPanel()">
-                    <span class="sidebar-icon">🔍</span>
-                    <span class="sidebar-text">Site Status</span>
-                </button></li>
                 <li><button class="sidebar-btn" onclick="openSettingsModal()">
                     <span class="sidebar-icon">⚙️</span>
                     <span class="sidebar-text">Settings</span>
@@ -238,25 +234,5 @@
         </div>
     </div>
 
-    <!-- Site Status Panel (Left Side) -->
-    <div id="siteStatusPanel" class="site-status-panel">
-        <div class="site-status-panel-header">
-            <h3>🔍 Site Status</h3>
-            <div class="site-status-panel-controls">
-                <button onclick="refreshSiteStatus()" id="panel-refresh-btn" title="Làm mới">
-                    <span id="panel-refresh-icon">🔄</span>
-                </button>
-                <button onclick="toggleSiteStatusPanel()" title="Đóng">&times;</button>
-            </div>
-        </div>
-        <div class="site-status-panel-content">
-            <div id="site-status-compact">
-                <div class="loading-spinner" style="text-align: center; padding: 2rem;">
-                    <div class="spinner" style="width: 30px; height: 30px;"></div>
-                    <div style="margin-top: 0.5rem; color: #666; font-size: 0.9rem;">Loading...</div>
-                </div>
-            </div>
-        </div>
-    </div>
 </body>
 </html>

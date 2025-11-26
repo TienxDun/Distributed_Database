@@ -12,6 +12,49 @@
     <link rel="stylesheet" href="css/responsive.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4"></script>
     <script type="module" src="js/stats.js"></script>
+    <style>
+        /* Toggle Button Styles */
+        .toggle-btn {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            border-radius: 13px;
+            background: #ccc;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            outline: none;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-btn.active {
+            background: var(--primary, #2563eb);
+        }
+
+        .toggle-btn .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-btn.active .toggle-slider {
+            transform: translateX(24px);
+        }
+
+        .toggle-btn:hover {
+            box-shadow: 0 0 8px rgba(37, 99, 235, 0.3);
+        }
+
+        .toggle-btn.active:hover {
+            box-shadow: 0 0 8px rgba(37, 99, 235, 0.5);
+        }
+    </style>
 </head>
 <body>
     <!-- Loading Overlay -->
@@ -46,10 +89,6 @@
         <div class="sidebar-section">
             <h3 class="sidebar-section-title">⚙️ Tools</h3>
             <ul class="sidebar-nav">
-                <li><button class="sidebar-btn" onclick="toggleSiteStatusPanel()">
-                    <span class="sidebar-icon">🔍</span>
-                    <span class="sidebar-text">Site Status</span>
-                </button></li>
                 <li><button class="sidebar-btn" onclick="openSettingsModal()">
                     <span class="sidebar-icon">⚙️</span>
                     <span class="sidebar-text">Settings</span>
@@ -200,22 +239,14 @@
                     <h3 style="margin-bottom: 1.5rem; color: var(--text); font-size: 1.1rem;">🔄 Tự động làm mới</h3>
 
                     <div class="form-group">
-                        <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; font-weight: 600; font-size: 0.95rem;">
-                            <input type="checkbox" id="autoRefreshEnabled" onchange="toggleAutoRefresh()"
-                                style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary);">
-                            Bật tự động làm mới dữ liệu
+                        <label style="display: flex; align-items: center; gap: 0.75rem; font-weight: 600; font-size: 0.95rem;">
+                            <span>Tự động làm mới dữ liệu</span>
+                            <button id="autoRefreshToggle" class="toggle-btn active" onclick="toggleAutoRefresh()">
+                                <div class="toggle-slider"></div>
+                            </button>
                         </label>
                         <small style="display: block; margin-top: 0.5rem; color: var(--secondary);">
-                            Tự động làm mới dữ liệu của tab hiện tại theo khoảng thời gian đã thiết lập
-                        </small>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="autoRefreshTime" style="font-weight: 600; font-size: 0.95rem;">Thời gian làm mới (giây):</label>
-                        <input type="number" id="autoRefreshTime" value="30" min="10" max="300" onchange="updateAutoRefreshTime()"
-                            style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 8px; font-size: 1rem;">
-                        <small style="display: block; margin-top: 0.5rem; color: var(--secondary);">
-                            Khoảng thời gian giữa các lần làm mới (10-300 giây)
+                            Tự động làm mới dữ liệu của tab hiện tại mỗi 30 giây
                         </small>
                     </div>
                 </div>
@@ -227,25 +258,5 @@
         </div>
     </div>
 
-    <!-- Site Status Panel (Left Side) -->
-    <div id="siteStatusPanel" class="site-status-panel">
-        <div class="site-status-panel-header">
-            <h3>🔍 Site Status</h3>
-            <div class="site-status-panel-controls">
-                <button onclick="refreshSiteStatus()" id="panel-refresh-btn" title="Làm mới">
-                    <span id="panel-refresh-icon">🔄</span>
-                </button>
-                <button onclick="toggleSiteStatusPanel()" title="Đóng">&times;</button>
-            </div>
-        </div>
-        <div class="site-status-panel-content">
-            <div id="site-status-compact">
-                <div class="loading-spinner" style="text-align: center; padding: 2rem;">
-                    <div class="spinner" style="width: 30px; height: 30px;"></div>
-                    <div style="margin-top: 0.5rem; color: #666; font-size: 0.9rem;">Loading...</div>
-                </div>
-            </div>
-        </div>
-    </div>
 </body>
 </html>

@@ -1,6 +1,6 @@
 /**
  * Common script for all pages
- * Provides shared functionality for sidebar, settings, and site status
+ * Provides shared functionality for sidebar and settings
  */
 
 // Import required modules
