@@ -26,7 +26,7 @@
 - [🧪 Testing Strategy](#-testing-strategy)
 - [🚀 Deployment](#-deployment)
 - [📚 References](#-references)
-- [🎯 Future Enhancements](#-future-enhancements)
+- [🎯 Tính năng đã hoàn thành và nâng cấp tương lai](#-tính-năng-đã-hoàn-thành-và-nâng-cấp-tương-lai)
 
 ---
 
@@ -453,60 +453,109 @@ function handle{Module}($method, $query) {
   4. SV đủ điều kiện tốt nghiệp
 
 **`logs.php` & `stats.php`**:
-- Read from MongoDB
-- Aggregation pipelines
-- Real-time analytics
+- **Nhật ký kiểm tra (logs.php)**: Hiển thị lịch sử thao tác từ MongoDB
+  - Lọc theo bảng, thao tác, thời gian
+  - Phân trang với 50 bản ghi/trang
+  - Tìm kiếm theo mã bản ghi
+  - Xuất CSV cho báo cáo
+- **Thống kê (stats.php)**: Phân tích dữ liệu thời gian thực
+  - Biểu đồ Chart.js cho metrics API
+  - Thống kê theo ngày/tháng
+  - Top queries chậm, lỗi thường gặp
+  - Xuất biểu đồ PNG
 
 ### 4. Frontend (JavaScript ES6 Modules)
 
-#### Structure:
+#### Cấu trúc thư mục
 
 ```
 js/
-├── app.js              # Entry point, initialize
-├── config.js           # Constants, field configs
+├── app.js              # Điểm khởi đầu, khởi tạo ứng dụng
+├── config.js           # Cấu hình hằng số, định nghĩa trường dữ liệu
 ├── modules/
-│   ├── crud.js         # CRUD operations
-│   ├── modal.js        # Dynamic form modals
-│   ├── view.js         # Render tables
-│   ├── settings.js     # Site toggle, theme
-│   └── global-query.js # Complex queries
+│   ├── crud.js         # Các thao tác CRUD (tạo, đọc, cập nhật, xóa)
+│   ├── modal.js        # Modal động cho form nhập liệu
+│   ├── view.js         # Hiển thị bảng dữ liệu
+│   ├── settings.js     # Cài đặt (chế độ tối, cột hiển thị)
+│   └── global-query.js # Truy vấn phức tạp toàn cục
 └── utils/
-    ├── api.js          # Fetch wrappers
-    ├── dom.js          # DOM helpers, alerts
-    └── validation.js   # Form validation
+    ├── api.js          # Gói gọn các lệnh gọi API
+    ├── dom.js          # Trợ giúp DOM, thông báo
+    └── validation.js   # Xác thực dữ liệu form
 ```
 
-#### Key features:
+#### Tính năng chính
 
 **`config.js`**:
-- `API_BASE = 'http://localhost:8080'`
-- `FIELDS_CONFIG`: Form field definitions cho mỗi module
-- `PRIMARY_KEYS`: Xác định PK cho edit/delete
+- `API_BASE = 'http://localhost:8080'` - Địa chỉ API backend
+- `FIELDS_CONFIG`: Định nghĩa các trường form cho từng module
+- `PRIMARY_KEYS`: Xác định khóa chính để chỉnh sửa/xóa
 
-**`crud.js`**:
+**`crud.js`** - Quản lý dữ liệu:
 
 ```javascript
-loadData(module)    // GET /{module}
-deleteRecord(id)    // DELETE /{module}?id={id}
-createRecord(data)  // POST /{module}
-updateRecord(id, data) // PUT /{module}?id={id}
+loadData(module)        // Tải dữ liệu từ API GET /{module}
+deleteRecord(id)        // Xóa bản ghi DELETE /{module}?id={id}
+createRecord(data)      // Tạo mới POST /{module}
+updateRecord(id, data)  // Cập nhật PUT /{module}?id={id}
 ```
 
-**`modal.js`**:
-- Dynamic form generation từ `FIELDS_CONFIG`
-- Select boxes load options từ API (FK references)
-- Validation: required, min, max, maxlength
+**`modal.js`** - Form động:
+- Tạo form tự động từ `FIELDS_CONFIG`
+- Hộp chọn (select) tải dữ liệu từ API (quan hệ khóa ngoại)
+- Xác thực: bắt buộc, độ dài tối thiểu/tối đa
 
-**`view.js`**:
-- Render HTML tables từ JSON data
-- Dynamic columns dựa trên data keys
-- Site column toggle
-- Row actions: Edit, Delete buttons
+**`view.js`** - Hiển thị dữ liệu:
+- Render bảng HTML từ dữ liệu JSON
+- Cột động dựa trên khóa dữ liệu
+- Chuyển đổi hiển thị cột site
+- Nút hành động: Chỉnh sửa, Xóa
 
-**`settings.js`**:
-- Site column visibility toggle (localStorage)
-- Global query interface
+**`settings.js`** - Cài đặt người dùng:
+- Chuyển đổi hiển thị cột site (lưu localStorage)
+- Giao diện truy vấn toàn cục
+- **Mới**: Chế độ tối/sáng, cài đặt auto-refresh
+
+#### Tính năng giao diện người dùng mới
+
+**🎨 Giao diện responsive**:
+- Thiết kế tương thích mọi thiết bị (điện thoại, máy tính bảng, máy tính)
+- Sử dụng CSS Grid và Flexbox cho bố cục linh hoạt
+
+**📊 Biểu đồ tương tác**:
+- Thư viện Chart.js để hiển thị dữ liệu thời gian thực
+- Biểu đồ đường, cột, tròn cho thống kê
+- Cập nhật tự động mỗi 30 giây
+
+**🔄 Tự động làm mới (Auto-refresh)**:
+- Nút bật/tắt tự động làm mới dữ liệu
+- Khoảng thời gian có thể cấu hình (10s - 5min)
+- Chỉ hoạt động khi tab đang active
+
+**⚙️ Bảng cài đặt**:
+- Modal cài đặt với nhiều tùy chọn
+- Lưu trữ cài đặt trong localStorage
+- Chế độ tối/sáng với CSS variables
+
+**📱 Trải nghiệm người dùng**:
+- Loading indicators khi tải dữ liệu
+- Thông báo toast cho hành động thành công/thất bại
+- Xác thực form real-time
+- Phím tắt bàn phím (Enter để lưu, Escape để hủy)
+
+#### CSS kiến trúc module
+
+```
+css/
+├── base.css       # Reset, typography, colors
+├── layout.css     # Grid system, containers
+├── components.css # Buttons, forms, modals, tables
+└── responsive.css # Media queries cho mobile
+```
+
+- Sử dụng CSS custom properties (variables) cho theme
+- BEM methodology cho class naming
+- Dark mode với data attribute
 
 ---
 
@@ -809,21 +858,33 @@ docker-compose up -d       # 6 containers
 
 ---
 
-## 🎯 Future Enhancements
+## 🎯 Tính năng đã hoàn thành và nâng cấp tương lai
 
-### Short-term
+### Đã hoàn thành (v1.0)
+
+- [x] **Auto-refresh**: Tự động làm mới dữ liệu với khoảng thời gian cấu hình
+- [x] **Settings panel**: Modal cài đặt với chế độ tối, theme switching
+- [x] **Interactive Charts**: Chart.js cho biểu đồ thống kê thời gian thực
+- [x] **Pagination**: Phân trang cho datasets lớn
+- [x] **Export logs**: Xuất CSV và Excel cho báo cáo
+- [x] **Modular CSS**: Kiến trúc CSS với BEM methodology
+- [x] **Responsive Design**: Tương thích mọi thiết bị
+- [x] **Real-time notifications**: Toast messages cho feedback
+
+### Short-term (v1.1)
+
 - [ ] Implement caching layer (Redis)
 - [ ] Add input sanitization (XSS prevention)
-- [ ] Pagination cho large datasets
-- [ ] Export logs (CSV, Excel)
-
-### Mid-term
-- [ ] Real-time notifications (WebSocket)
 - [ ] User authentication & authorization (JWT)
+
+### Mid-term (v2.0)
+
 - [ ] Role-based access control (RBAC)
 - [ ] Versioning cho audit logs (time-travel queries)
+- [ ] WebSocket cho real-time updates
 
-### Long-term
+### Long-term (v3.0)
+
 - [ ] Microservices architecture (separate API per site)
 - [ ] Event sourcing (Kafka)
 - [ ] GraphQL API
@@ -831,5 +892,5 @@ docker-compose up -d       # 6 containers
 
 ---
 
-**📝 Tài liệu cập nhật**: November 25, 2025  
+**📝 Tài liệu cập nhật**: November 26, 2025  
 **✍️ Tác giả**: HUFLIT Distributed Database Team
