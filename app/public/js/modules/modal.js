@@ -355,61 +355,74 @@ export async function submitForm() {
 }
 
 /**
- * Site Status Modal Functions
+ * Site Status Functions
  */
 
 /**
- * Show site status modal
+ * Toggle site status panel
  */
-export async function showSiteStatus() {
-    const modal = document.getElementById('siteStatusModal');
-    modal.classList.add('show');
-    await loadSiteStatus();
-}
-
-/**
- * Close site status modal
- */
-export function closeSiteStatusModal() {
-    const modal = document.getElementById('siteStatusModal');
-    modal.classList.remove('show');
+export function toggleSiteStatusPanel() {
+    const panel = document.getElementById('siteStatusPanel');
+    panel.classList.toggle('open');
+    
+    // Load status if panel is opening and not loaded yet
+    if (panel.classList.contains('open')) {
+        const content = document.getElementById('site-status-compact');
+        if (content.children.length === 1 && content.children[0].classList.contains('loading-spinner')) {
+            loadSiteStatus();
+        }
+    }
 }
 
 /**
  * Load and display site status
  */
-async function loadSiteStatus() {
-    const content = document.getElementById('site-status-content');
-    
+export async function loadSiteStatus() {
+    const content = document.getElementById('site-status-compact');
+    const refreshBtn = document.getElementById('panel-refresh-btn');
+    const refreshIcon = document.getElementById('panel-refresh-icon');
+
     try {
+        // Show loading state
+        if (refreshBtn) {
+            refreshBtn.disabled = true;
+            refreshIcon.textContent = '⏳';
+        }
+
         const { API_BASE } = await import('../config.js');
-        console.log('Fetching from:', `${API_BASE}/health`);
         const response = await fetch(`${API_BASE}/health`);
-        
+
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        
+
         const text = await response.text();
-        console.log('Response text:', text.substring(0, 200));
-        
         const data = JSON.parse(text);
-        
+
         if (data.error) {
             throw new Error(data.error);
         }
-        
-        content.innerHTML = buildSiteStatusHTML(data);
+
+        content.innerHTML = buildCompactSiteStatusHTML(data);
+
     } catch (error) {
         console.error('Site status error:', error);
         content.innerHTML = `
-            <div style="text-align: center; padding: 2rem; color: #ef4444;">
-                <div style="font-size: 3rem; margin-bottom: 1rem;">❌</div>
-                <div style="font-weight: 600; margin-bottom: 0.5rem;">Không thể kiểm tra trạng thái hệ thống</div>
-                <div style="color: #64748b; font-size: 0.9rem;">${error.message}</div>
-                <div style="color: #64748b; font-size: 0.8rem; margin-top: 1rem;">Kiểm tra console để biết thêm chi tiết</div>
+            <div style="text-align: center; padding: 2rem; color: #ef4444; font-size: 0.8rem;">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">❌</div>
+                <div style="font-weight: 600; margin-bottom: 0.5rem;">Lỗi tải dữ liệu</div>
+                <div style="color: #64748b; margin-bottom: 1rem;">${error.message}</div>
+                <button class="btn btn-primary" onclick="refreshSiteStatus()" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;">
+                    🔄 Thử lại
+                </button>
             </div>
         `;
+    } finally {
+        // Reset refresh button
+        if (refreshBtn) {
+            refreshBtn.disabled = false;
+            refreshIcon.textContent = '🔄';
+        }
     }
 }
 
@@ -418,6 +431,57 @@ async function loadSiteStatus() {
  */
 export async function refreshSiteStatus() {
     await loadSiteStatus();
+}
+
+/**
+ * Build compact HTML for site status panel
+ */
+function buildCompactSiteStatusHTML(data) {
+    const statusConfig = {
+        healthy: { icon: '✅', color: 'green', text: 'Hoạt động tốt' },
+        degraded: { icon: '⚠️', color: 'orange', text: 'Hoạt động hạn chế' },
+        critical: { icon: '❌', color: 'red', text: 'Nguy hiểm' }
+    };
+    
+    const overall = statusConfig[data.overall_status] || statusConfig.critical;
+    
+    let html = `
+        <div class="site-status-compact-overall ${data.overall_status}">
+            ${overall.icon} ${overall.text.toUpperCase()}<br>
+            <small>${data.healthy_sites}/${data.total_sites} sites</small>
+        </div>
+        
+        <div class="site-status-compact-grid">
+    `;
+    
+    for (const [siteKey, site] of Object.entries(data.sites)) {
+        const statusClass = site.status;
+        const responseTime = site.response_time > 0 ? `${site.response_time}ms` : 'N/A';
+        const statusText = site.status === 'healthy' ? '✅ OK' : site.status === 'unhealthy' ? '❌ Down' : '❓ Unknown';
+        
+        html += `
+            <div class="site-status-compact-card ${statusClass}">
+                <div class="site-status-compact-name">${site.name.replace('Site ', 'S').replace('Global DB', 'Global')}</div>
+                <div class="site-status-compact-metrics">
+                    <div class="site-status-compact-status">
+                        <span class="site-status-compact-indicator ${statusClass}"></span>
+                        ${statusText.split(' ')[0]}
+                    </div>
+                    <div class="site-status-compact-response">${responseTime}</div>
+                </div>
+            </div>
+        `;
+    }
+    
+    html += `
+        </div>
+        
+        <div style="text-align: center; margin-top: 1rem; color: #64748b; font-size: 0.7rem;">
+            Cập nhật: ${new Date().toLocaleTimeString('vi-VN')}
+        </div>
+    `;
+    
+    return html;
 }
 
 /**
@@ -436,7 +500,7 @@ function buildSiteStatusHTML(data) {
         <div class="overall-status ${data.overall_status}">
             <div class="overall-status-title">${overall.icon} ${overall.text.toUpperCase()}</div>
             <div class="overall-status-subtitle">
-                ${data.healthy_sites}/${data.total_sites} sites hoạt động | Cập nhật: ${data.timestamp}
+                ${data.healthy_sites}/${data.total_sites} sites hoạt động
             </div>
         </div>
         

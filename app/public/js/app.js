@@ -7,7 +7,7 @@
 import { loadData, deleteRecord, deleteCTDaoTao, deleteDangKy, showTab, toggleSiteColumnVisibility } from './modules/crud.js';
 
 // Import modal functions
-import { openCreateModal, openEditModal, closeModal, submitForm, showSiteStatus, closeSiteStatusModal, refreshSiteStatus } from './modules/modal.js';
+import { openCreateModal, openEditModal, closeModal, submitForm, refreshSiteStatus, toggleSiteStatusPanel } from './modules/modal.js';
 
 // Import settings functions
 import { openSettingsModal, closeSettingsModal, loadSettings, updateBackgroundColor, updateBackgroundColorFromText, applyPresetColor, resetToDefault } from './modules/settings.js';
@@ -19,11 +19,60 @@ import { loadDataById, loadCTDaoTaoByFilter, loadDangKyByMaSV } from './modules/
 import { callGlobalQuery } from './modules/global-query.js';
 
 /**
+ * Toggle sidebar visibility
+ */
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const mainContent = document.querySelector('.main-content');
+    
+    sidebar.classList.toggle('collapsed');
+    mainContent.classList.toggle('sidebar-collapsed');
+    
+    // Save preference to localStorage
+    const isCollapsed = sidebar.classList.contains('collapsed');
+    localStorage.setItem('sidebarCollapsed', isCollapsed);
+}
+
+/**
+ * Refresh current active tab
+ */
+function refreshCurrentTab() {
+    const activeTab = document.querySelector('.tab-btn.active');
+    if (activeTab) {
+        const tabId = activeTab.onclick.toString().match(/'([^']+)'/)[1];
+        loadData(tabId);
+    }
+}
+
+/**
+ * Clear all result sections
+ */
+function clearAllResults() {
+    const results = document.querySelectorAll('.result');
+    results.forEach(result => {
+        result.innerHTML = '';
+    });
+    
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        alert.innerHTML = '';
+        alert.style.display = 'none';
+    });
+}
+
+/**
  * Initialize application on page load
  */
 function initializeApp() {
     // Load settings from localStorage
     loadSettings();
+    
+    // Load sidebar state
+    const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+    if (sidebarCollapsed) {
+        document.querySelector('.sidebar').classList.add('collapsed');
+        document.querySelector('.main-content').classList.add('sidebar-collapsed');
+    }
     
     // Load default tab data
     loadData('khoa');
@@ -77,9 +126,12 @@ window.updateBackgroundColorFromText = updateBackgroundColorFromText;
 window.applyPresetColor = applyPresetColor;
 window.resetToDefault = resetToDefault;
 
-window.showSiteStatus = showSiteStatus;
-window.closeSiteStatusModal = closeSiteStatusModal;
 window.refreshSiteStatus = refreshSiteStatus;
+window.toggleSiteStatusPanel = toggleSiteStatusPanel;
+
+window.toggleSidebar = toggleSidebar;
+window.refreshCurrentTab = refreshCurrentTab;
+window.clearAllResults = clearAllResults;
 
 window.callGlobalQuery = callGlobalQuery;
 

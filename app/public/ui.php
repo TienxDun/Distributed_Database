@@ -15,68 +15,91 @@
         </div>
     </div>
 
-    <div class="container">
-        <div class="header">
-            <h1>🎓 HUFLIT Distributed Database</h1>
-            <p>Full CRUD Interface - Hệ thống Cơ sở dữ liệu Phân tán</p>
-            <div style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                <div class="site-toggle-container">
-                    <label class="site-toggle-label" for="toggleSiteColumn">
-                        <input type="checkbox" id="toggleSiteColumn" checked onchange="toggleSiteColumnVisibility()" class="site-toggle-checkbox">
-                        <div class="site-toggle-slider">
-                            <span class="site-toggle-icon">🗺️</span>
-                        </div>
-                        <span class="site-toggle-text">
-                            <strong>Hiển thị cột Site</strong>
-                            <small>Phân mảnh dữ liệu phân tán</small>
-                        </span>
-                    </label>
-                </div>
-                <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-                    <a href="logs.php" style="text-decoration: none;">
-                        <button class="btn-settings-modern" style="border: none; cursor: pointer;">
-                            <span class="settings-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">📋</span>
-                            <span class="settings-text">
-                                <strong>Audit Logs</strong>
-                                <small>Lịch sử thay đổi</small>
-                            </span>
-                        </button>
-                    </a>
-                    <a href="stats.php" style="text-decoration: none;">
-                        <button class="btn-settings-modern" style="border: none; cursor: pointer;">
-                            <span class="settings-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">📊</span>
-                            <span class="settings-text">
-                                <strong>Statistics</strong>
-                                <small>Thống kê & phân tích</small>
-                            </span>
-                        </button>
-                    </a>
-                    <button class="btn-settings-modern" onclick="showSiteStatus()">
-                        <span class="settings-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">🔍</span>
-                        <span class="settings-text">
-                            <strong>Site Status</strong>
-                            <small>Trạng thái hệ thống</small>
-                        </span>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h2>🎓 HUFLIT</h2>
+            <p>Distributed DB</p>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="sidebar-section-title">📊 Navigation</h3>
+            <ul class="sidebar-nav">
+                <li><a href="logs.php" class="sidebar-link">
+                    <span class="sidebar-icon">📋</span>
+                    <span class="sidebar-text">Audit Logs</span>
+                </a></li>
+                <li><a href="stats.php" class="sidebar-link">
+                    <span class="sidebar-icon">📊</span>
+                    <span class="sidebar-text">Statistics</span>
+                </a></li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="sidebar-section-title">⚙️ Tools</h3>
+            <ul class="sidebar-nav">
+                <li><button class="sidebar-btn" onclick="toggleSiteStatusPanel()">
+                    <span class="sidebar-icon">🔍</span>
+                    <span class="sidebar-text">Site Status</span>
+                </button></li>
+                <li><button class="sidebar-btn" onclick="openSettingsModal()">
+                    <span class="sidebar-icon">⚙️</span>
+                    <span class="sidebar-text">Settings</span>
+                </button></li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="sidebar-section-title">🗺️ Data Sites</h3>
+            <div class="site-toggle-container">
+                <label class="site-toggle-label" for="toggleSiteColumn">
+                    <input type="checkbox" id="toggleSiteColumn" checked onchange="toggleSiteColumnVisibility()" class="site-toggle-checkbox">
+                    <div class="site-toggle-slider">
+                        <span class="site-toggle-icon">🗺️</span>
+                    </div>
+                    <span class="site-toggle-text">
+                        <strong>Show Site Column</strong>
+                        <small>Distributed data</small>
+                    </span>
+                </label>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="topbar">
+            <button class="sidebar-toggle" onclick="toggleSidebar()">
+                <span class="hamburger-icon">☰</span>
+            </button>
+            <div class="topbar-title">
+                <h1>🎓 HUFLIT Distributed Database</h1>
+                <p>Full CRUD Interface - Hệ thống Cơ sở dữ liệu Phân tán</p>
+            </div>
+            <div class="topbar-actions">
+                <div class="quick-actions">
+                    <button class="quick-action-btn" onclick="refreshCurrentTab()" title="Refresh">
+                        <span>🔄</span>
                     </button>
-                    <button class="btn-settings-modern" onclick="openSettingsModal()">
-                        <span class="settings-icon">⚙️</span>
-                        <span class="settings-text">
-                            <strong>Cài đặt giao diện</strong>
-                            <small>Tùy chỉnh màu sắc</small>
-                        </span>
+                    <button class="quick-action-btn" onclick="clearAllResults()" title="Clear Results">
+                        <span>🗑️</span>
                     </button>
                 </div>
             </div>
         </div>
 
-        <div class="tabs">
-            <button class="tab-btn active" onclick="showTab('khoa')">Khoa</button>
-            <button class="tab-btn" onclick="showTab('monhoc')">Môn Học</button>
-            <button class="tab-btn" onclick="showTab('sinhvien')">Sinh Viên</button>
-            <button class="tab-btn" onclick="showTab('ctdaotao')">CT Đào Tạo</button>
-            <button class="tab-btn" onclick="showTab('dangky')">Đăng Ký</button>
-            <button class="tab-btn" onclick="showTab('global')">Truy Vấn Toàn Cục</button>
-        </div>
+        <div class="content-wrapper">
+            <div class="tabs-container">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="showTab('khoa')">Khoa</button>
+                    <button class="tab-btn" onclick="showTab('monhoc')">Môn Học</button>
+                    <button class="tab-btn" onclick="showTab('sinhvien')">Sinh Viên</button>
+                    <button class="tab-btn" onclick="showTab('ctdaotao')">CT Đào Tạo</button>
+                    <button class="tab-btn" onclick="showTab('dangky')">Đăng Ký</button>
+                    <button class="tab-btn" onclick="showTab('global')">Truy Vấn Toàn Cục</button>
+                </div>
+            </div>
 
         <!-- Khoa Module -->
         <div id="khoa" class="tab-content active">
@@ -225,6 +248,7 @@
             </div>
         </div>
     </div>
+    </div>
 
     <!-- Generic Modal for Create/Edit -->
     <div id="crudModal" class="modal">
@@ -295,24 +319,23 @@
         </div>
     </div>
 
-    <!-- Site Status Modal -->
-    <div id="siteStatusModal" class="modal">
-        <div class="modal-content" style="max-width: 800px;">
-            <div class="modal-header">
-                <h3>🔍 Trạng Thái Hệ Thống Phân Tán</h3>
-                <span class="close" onclick="closeSiteStatusModal()">&times;</span>
+    <!-- Site Status Panel (Left Side) -->
+    <div id="siteStatusPanel" class="site-status-panel">
+        <div class="site-status-panel-header">
+            <h3>🔍 Site Status</h3>
+            <div class="site-status-panel-controls">
+                <button onclick="refreshSiteStatus()" id="panel-refresh-btn" title="Làm mới">
+                    <span id="panel-refresh-icon">🔄</span>
+                </button>
+                <button onclick="toggleSiteStatusPanel()" title="Đóng">&times;</button>
             </div>
-            <div class="modal-body">
-                <div id="site-status-content">
-                    <div class="loading-spinner" style="text-align: center; padding: 2rem;">
-                        <div class="spinner"></div>
-                        <div style="margin-top: 1rem; color: #666;">Đang kiểm tra trạng thái hệ thống...</div>
-                    </div>
+        </div>
+        <div class="site-status-panel-content">
+            <div id="site-status-compact">
+                <div class="loading-spinner" style="text-align: center; padding: 2rem;">
+                    <div class="spinner" style="width: 30px; height: 30px;"></div>
+                    <div style="margin-top: 0.5rem; color: #666; font-size: 0.9rem;">Loading...</div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" onclick="refreshSiteStatus()">🔄 Làm mới</button>
-                <button class="btn btn-cancel" onclick="closeSiteStatusModal()">Đóng</button>
             </div>
         </div>
     </div>
