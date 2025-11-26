@@ -1,7 +1,7 @@
 {
   "build": {
     "builder": "dockerfile",
-    "dockerfilePath": "Dockerfile"
+    "dockerfilePath": "app/Dockerfile"
   },
   "deploy": {
     "startCommand": "docker-compose up -d"
