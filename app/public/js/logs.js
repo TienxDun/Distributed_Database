@@ -1,6 +1,6 @@
 // Logs page JavaScript
 import { toggleSiteStatusPanel } from './modules/modal.js';
-import { loadSettings, openSettingsModal, closeSettingsModal, updateBackgroundColor, updateBackgroundColorFromText, applyPresetColor, resetToDefault } from './modules/settings.js';
+import { loadSettings, openSettingsModal, closeSettingsModal, updateBackgroundColor, updateBackgroundColorFromText, applyPresetColor, resetToDefault, updateAutoRefreshTime } from './modules/settings.js';
 
 // Module variables
 let currentPage = 1;
@@ -26,13 +26,13 @@ window.updateBackgroundColor = updateBackgroundColor;
 window.updateBackgroundColorFromText = updateBackgroundColorFromText;
 window.applyPresetColor = applyPresetColor;
 window.resetToDefault = resetToDefault;
+window.updateAutoRefreshTime = updateAutoRefreshTime;
 
 // Expose logs functions to global scope
 window.loadLogs = loadLogs;
 window.applyFilters = applyFilters;
 window.resetFilters = resetFilters;
 window.changePage = changePage;
-window.toggleAutoRefresh = toggleAutoRefresh;
 
 // Initialize on page load
 function initializePage() {
@@ -230,6 +230,8 @@ function toggleAutoRefresh() {
         }
     }
 }
+
+window.toggleAutoRefresh = toggleAutoRefresh;
 
 // Load logs on page load
 loadLogs();

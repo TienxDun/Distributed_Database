@@ -10,7 +10,7 @@ import { loadData, deleteRecord, deleteCTDaoTao, deleteDangKy, showTab, toggleSi
 import { openCreateModal, openEditModal, closeModal, submitForm, refreshSiteStatus, toggleSiteStatusPanel } from './modules/modal.js';
 
 // Import settings functions
-import { openSettingsModal, closeSettingsModal, loadSettings, updateBackgroundColor, updateBackgroundColorFromText, applyPresetColor, resetToDefault } from './modules/settings.js';
+import { openSettingsModal, closeSettingsModal, loadSettings, updateBackgroundColor, updateBackgroundColorFromText, applyPresetColor, resetToDefault, toggleAutoRefresh, updateAutoRefreshTime, getAutoRefreshStatus } from './modules/settings.js';
 
 // Import view/search functions
 import { loadDataById, loadCTDaoTaoByFilter, loadDangKyByMaSV } from './modules/view.js';
@@ -125,6 +125,8 @@ window.updateBackgroundColor = updateBackgroundColor;
 window.updateBackgroundColorFromText = updateBackgroundColorFromText;
 window.applyPresetColor = applyPresetColor;
 window.resetToDefault = resetToDefault;
+window.toggleAutoRefresh = toggleAutoRefresh;
+window.updateAutoRefreshTime = updateAutoRefreshTime;
 
 window.refreshSiteStatus = refreshSiteStatus;
 window.toggleSiteStatusPanel = toggleSiteStatusPanel;

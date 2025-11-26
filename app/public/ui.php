@@ -107,7 +107,12 @@
 
         <!-- Khoa Module -->
         <div id="khoa" class="tab-content active">
-            <h2 class="module-title">Quản lý Khoa</h2>
+            <h2 class="module-title">
+                Quản lý Khoa
+                <button class="btn-refresh" onclick="refreshCurrentTab()" title="Làm mới dữ liệu">
+                    🔄
+                </button>
+            </h2>
             
             <div id="khoa-alert" class="alert"></div>
             
@@ -127,7 +132,12 @@
 
         <!-- MonHoc Module -->
         <div id="monhoc" class="tab-content">
-            <h2 class="module-title">Quản lý Môn Học</h2>
+            <h2 class="module-title">
+                Quản lý Môn Học
+                <button class="btn-refresh" onclick="refreshCurrentTab()" title="Làm mới dữ liệu">
+                    🔄
+                </button>
+            </h2>
             
             <div id="monhoc-alert" class="alert"></div>
             
@@ -147,7 +157,12 @@
 
         <!-- SinhVien Module -->
         <div id="sinhvien" class="tab-content">
-            <h2 class="module-title">Quản lý Sinh Viên</h2>
+            <h2 class="module-title">
+                Quản lý Sinh Viên
+                <button class="btn-refresh" onclick="refreshCurrentTab()" title="Làm mới dữ liệu">
+                    🔄
+                </button>
+            </h2>
             
             <div id="sinhvien-alert" class="alert"></div>
             
@@ -167,7 +182,12 @@
 
         <!-- CTDaoTao Module -->
         <div id="ctdaotao" class="tab-content">
-            <h2 class="module-title">Chương Trình Đào Tạo</h2>
+            <h2 class="module-title">
+                Chương Trình Đào Tạo
+                <button class="btn-refresh" onclick="refreshCurrentTab()" title="Làm mới dữ liệu">
+                    🔄
+                </button>
+            </h2>
             
             <div id="ctdaotao-alert" class="alert"></div>
             
@@ -191,7 +211,12 @@
 
         <!-- DangKy Module -->
         <div id="dangky" class="tab-content">
-            <h2 class="module-title">Đăng Ký Học Phần</h2>
+            <h2 class="module-title">
+                Đăng Ký Học Phần
+                <button class="btn-refresh" onclick="refreshCurrentTab()" title="Làm mới dữ liệu">
+                    🔄
+                </button>
+            </h2>
             
             <div id="dangky-alert" class="alert"></div>
             
@@ -313,6 +338,30 @@
                             <button onclick="applyPresetColor('#f3e8ff')" style="padding: 0.5rem; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; background: #f3e8ff; aspect-ratio: 1;" title="Tím nhạt"></button>
                             <button onclick="applyPresetColor('#cffafe')" style="padding: 0.5rem; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; background: #cffafe; aspect-ratio: 1;" title="Cyan nhạt"></button>
                         </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3 style="margin-bottom: 1.5rem; color: var(--text); font-size: 1.1rem;">🔄 Tự động làm mới</h3>
+
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; font-weight: 600; font-size: 0.95rem;">
+                            <input type="checkbox" id="autoRefreshEnabled" onchange="toggleAutoRefresh()"
+                                style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary);">
+                            Bật tự động làm mới dữ liệu
+                        </label>
+                        <small style="display: block; margin-top: 0.5rem; color: var(--secondary);">
+                            Tự động làm mới dữ liệu của tab hiện tại theo khoảng thời gian đã thiết lập
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="autoRefreshTime" style="font-weight: 600; font-size: 0.95rem;">Thời gian làm mới (giây):</label>
+                        <input type="number" id="autoRefreshTime" value="30" min="10" max="300" onchange="updateAutoRefreshTime()"
+                            style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 8px; font-size: 1rem;">
+                        <small style="display: block; margin-top: 0.5rem; color: var(--secondary);">
+                            Khoảng thời gian giữa các lần làm mới (10-300 giây)
+                        </small>
                     </div>
                 </div>
             </div>

@@ -1,6 +1,6 @@
 // Stats page JavaScript
 import { toggleSiteStatusPanel } from './modules/modal.js';
-import { loadSettings, openSettingsModal, closeSettingsModal, updateBackgroundColor, updateBackgroundColorFromText, applyPresetColor, resetToDefault } from './modules/settings.js';
+import { loadSettings, openSettingsModal, closeSettingsModal, updateBackgroundColor, updateBackgroundColorFromText, applyPresetColor, resetToDefault, toggleAutoRefresh, updateAutoRefreshTime } from './modules/settings.js';
 
 // Module variables
 let charts = {};
@@ -25,6 +25,8 @@ window.updateBackgroundColor = updateBackgroundColor;
 window.updateBackgroundColorFromText = updateBackgroundColorFromText;
 window.applyPresetColor = applyPresetColor;
 window.resetToDefault = resetToDefault;
+window.toggleAutoRefresh = toggleAutoRefresh;
+window.updateAutoRefreshTime = updateAutoRefreshTime;
 
 // Expose stats functions to global scope
 window.loadStats = loadStatistics;

@@ -186,20 +186,30 @@ export async function updateRecord(module, id, formData) {
 }
 
 /**
- * Show current active tab
+ * Show tab and refresh data
  * @param {string} tabName - Tab name
  */
 export function showTab(tabName) {
+    // Get current active tab
+    const currentActiveTab = document.querySelector('.tab-content.active');
+
+    // Hide all tabs and remove active class from buttons
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    
+
+    // Show selected tab and activate button
     document.getElementById(tabName).classList.add('active');
     event.target.classList.add('active');
-    
-    // Load data when switching tabs (except global)
+
+    // Always refresh data when switching tabs (except global)
     if (tabName !== 'global') {
-        loadData(tabName);
+        // Add a small delay to ensure smooth transition
+        setTimeout(() => {
+            loadData(tabName);
+        }, 100);
     }
+
+    console.log(`[showTab] Switched to ${tabName}, data refreshed`);
 }
 
 /**
