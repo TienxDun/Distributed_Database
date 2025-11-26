@@ -228,12 +228,12 @@ DangKy (
 **Quan hệ FK**:
 
 ```mermaid
-graph TD
-    Khoa[Khoa<br/>(root)] -->|1:N| SinhVien[SinhVien]
-    Khoa -->|1:N| CTDaoTao[CTDaoTao]
-    SinhVien -->|1:N| DangKy[DangKy]
-    CTDaoTao -->|N:1| MonHoc1[MonHoc]
-    DangKy -->|N:1| MonHoc2[MonHoc]
+erDiagram
+    Khoa ||--o{ SinhVien : "1:N"
+    Khoa ||--o{ CTDaoTao : "1:N"
+    SinhVien ||--o{ DangKy : "1:N"
+    CTDaoTao ||--|| MonHoc : "N:1"
+    DangKy ||--|| MonHoc : "N:1"
 ```
 
 ### 2. MongoDB (Port 27017)
