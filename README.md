@@ -104,6 +104,35 @@ graph TB
     class MONGO mongo
 ```
 
+### Luồng dữ liệu trong hệ thống
+
+```mermaid
+sequenceDiagram
+    participant U as Người dùng
+    participant UI as Web UI
+    participant API as API Gateway
+    participant PHP as PHP Application
+    participant GLOBAL as Global DB
+    participant SITE as Site DB (A/B/C)
+    participant MONGO as MongoDB
+
+    U->>UI: Truy cập giao diện
+    UI->>API: Gửi request CRUD
+    API->>PHP: Xử lý request
+
+    PHP->>GLOBAL: Query partitioned view
+    GLOBAL->>SITE: Route to correct site
+    SITE-->>GLOBAL: Return data
+    GLOBAL-->>PHP: Aggregated result
+
+    PHP->>MONGO: Log operation
+    MONGO-->>PHP: Confirm log
+
+    PHP-->>API: Response data
+    API-->>UI: Update interface
+    UI-->>U: Hiển thị kết quả
+```
+
 ### Thiết kế cơ sở dữ liệu
 
 - **3 Sites SQL Server**: Phân mảnh theo `MaKhoa` (A: <'M', B: 'M'-'S', C: ≥'S')
