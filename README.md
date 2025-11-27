@@ -162,41 +162,6 @@ sequenceDiagram
 
 ---
 
-## 🚀 Deploy Online (MIỄN PHÍ)
-
-### 💰 **Deploy với chi phí = 0**
-
-Dự án này có thể deploy hoàn toàn **MIỄN PHÍ** lên cloud platforms:
-
-#### 🎯 **Quick Start (15 phút)**
-```bash
-# 1. Chuẩn bị
-cp .env.example .env  # Edit với password mạnh
-
-# 2. Railway: SQL Server (5 phút)
-# Truy cập railway.app → Deploy from GitHub
-
-# 3. Render: Web + MongoDB (10 phút)
-# Truy cập render.com → Deploy Web Service + MongoDB
-
-# 4. Done! Website online tại:
-# https://your-app.onrender.com/ui.php
-```
-
-#### 📋 **Hướng dẫn chi tiết**
-- **Quick Start**: [QUICK_START.md](QUICK_START.md)
-- **TODO List**: [TODO_DEPLOY.md](TODO_DEPLOY.md)
-- **Free Deploy Guide**: [FREE_DEPLOY.md](FREE_DEPLOY.md)
-- **All Options**: [DEPLOY_GUIDE.md](DEPLOY_GUIDE.md)
-
-#### 🎯 **Kết quả**
-- ✅ **Domain**: Auto-generated (SSL miễn phí)
-- ✅ **Database**: SQL Server 3 sites + MongoDB
-- ✅ **Scaling**: Auto-scaling
-- ✅ **Monitoring**: Built-in dashboards
-
----
-
 ## 🎯 Demo
 
 **Repository**: [GitHub](https://github.com/TienxDun/Distributed_Database)

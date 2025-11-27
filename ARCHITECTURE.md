@@ -24,7 +24,6 @@
 - [🔐 Key Design Decisions](#-key-design-decisions)
 - [📈 Performance Considerations](#-performance-considerations)
 - [🧪 Testing Strategy](#-testing-strategy)
-- [🚀 Deployment](#-deployment)
 - [📚 References](#-references)
 - [🎯 Tính năng đã hoàn thành và nâng cấp tương lai](#-tính-năng-đã-hoàn-thành-và-nâng-cấp-tương-lai)
 
@@ -791,41 +790,6 @@ sequenceDiagram
 - JMeter / k6 scripts
 - Concurrent inserts vào 3 sites
 - Distributed query performance
-
----
-
-## 🚀 Deployment
-
-### Development (Current)
-
-```bash
-docker-compose up -d       # 6 containers
-.\init_databases.ps1       # Init DB schemas + seed data
-```
-
-### Production (Recommendations)
-
-**1. Database tier**:
-- SQL Server: Always On Availability Groups (HA)
-- MongoDB: Replica Set 3 nodes
-- Backup: Daily full + hourly incremental
-
-**2. Application tier**:
-- PHP: Switch to Nginx + PHP-FPM
-- Load balancer: HAProxy / Nginx upstream
-- Caching: Redis cho session + reference data
-
-**3. Monitoring**:
-- DB: SQL Server Profiler, MongoDB Atlas
-- App: Logging to ELK stack (Elasticsearch, Logstash, Kibana)
-- Metrics: Prometheus + Grafana
-
-**4. Security**:
-- HTTPS (Let's Encrypt)
-- SQL injection prevention (prepared statements ✅ đã có)
-- MongoDB authentication ✅
-- Rate limiting (Nginx limit_req)
-- CORS whitelist (hiện tại `*`)
 
 ---
 
