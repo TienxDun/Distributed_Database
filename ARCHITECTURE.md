@@ -21,10 +21,10 @@
   - [UPDATE Flow (cross-site move)](#update-flow-cross-site-move)
   - [SYNC Flow (MonHoc)](#sync-flow-monhoc)
   - [QUERY Flow (Global complex query)](#query-flow-global-complex-query)
-- [🔐 Key Design Decisions](#-key-design-decisions)
-- [📈 Performance Considerations](#-performance-considerations)
-- [🧪 Testing Strategy](#-testing-strategy)
-- [📚 References](#-references)
+- [🔐 Quyết định thiết kế chính](#-quyết-định-thiết-kế-chính)
+- [📈 Cân nhắc hiệu suất](#-cân-nhắc-hiệu-suất)
+- [🧪 Chiến lược kiểm thử](#-chiến-lược-kiểm-thử)
+- [📚 Tài liệu tham khảo](#-tài-liệu-tham-khảo)
 - [🎯 Tính năng đã hoàn thành và nâng cấp tương lai](#-tính-năng-đã-hoàn-thành-và-nâng-cấp-tương-lai)
 
 ---
@@ -671,7 +671,7 @@ sequenceDiagram
 
 ---
 
-## 🔐 Key Design Decisions
+## 🔐 Quyết định thiết kế chính
 
 ### 1. Horizontal Partitioning (Phân mảnh ngang)
 
@@ -738,7 +738,7 @@ sequenceDiagram
 
 ---
 
-## 📈 Performance Considerations
+## 📈 Cân nhắc hiệu suất
 
 ### 1. Indexes
 
@@ -775,7 +775,7 @@ sequenceDiagram
 
 ---
 
-## 🧪 Testing Strategy
+## 🧪 Chiến lược kiểm thử
 
 ### Unit Tests (Future)
 - Mock PDO connections
@@ -793,10 +793,10 @@ sequenceDiagram
 
 ---
 
-## 📚 References
+## 📚 Tài liệu tham khảo
 
 ### SQL Server
-- [Linked Servers Documentation](https://learn.microsoft.com/en-us/sql/relational-databases/linked-servers/)
+- [Tài liệu Linked Servers](https://learn.microsoft.com/en-us/sql/relational-databases/linked-servers/)
 - [Partitioned Views](https://learn.microsoft.com/en-us/sql/t-sql/statements/create-view-transact-sql)
 - [INSTEAD OF Triggers](https://learn.microsoft.com/en-us/sql/t-sql/statements/create-trigger-transact-sql)
 
