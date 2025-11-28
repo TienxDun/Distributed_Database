@@ -10,8 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     exit(0);
 }
 
-require_once '../common.php';
-require_once '../request_logger.php';
+require_once __DIR__ . '/../common.php';
+require_once __DIR__ . '/../request_logger.php';
 
 // Start logging
 RequestLogger::start();

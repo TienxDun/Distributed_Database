@@ -1,6 +1,6 @@
 <?php
-require_once '../common.php';
-require_once '../mongo_helper.php';
+require_once __DIR__ . '/../common.php';
+require_once __DIR__ . '/../mongo_helper.php';
 
 function determineSite($maKhoa) {
     if ($maKhoa < 'M') return 'Site_A';

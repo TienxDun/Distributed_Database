@@ -1,5 +1,5 @@
 <?php
-require_once '../mongo_helper.php';
+require_once __DIR__ . '/../mongo_helper.php';
 
 function handleStats($method, $query) {
     if ($method !== 'GET') {
