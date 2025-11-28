@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="HUFLIT Distributed Database - Audit Logs system for tracking database changes and operations">
     <title>Audit Logs - HUFLIT MongoDB</title>
+    <link rel="icon" type="image/x-icon" href="css/favicon.ico">
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
@@ -60,8 +61,8 @@
                         <span class="site-toggle-icon">🗺️</span>
                     </div>
                     <span class="site-toggle-text">
-                        <strong>Show Site Column</strong>
-                        <small>Distributed data</small>
+                        <div class="site-toggle-main-text">Show Site Column</div>
+                        <div class="site-toggle-sub-text">Distributed data</div>
                     </span>
                 </label>
             </div>
@@ -69,7 +70,7 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content glass">
         <div class="topbar">
             <button class="sidebar-toggle" onclick="toggleSidebar()">
                 <span class="hamburger-icon">☰</span>

@@ -99,13 +99,27 @@
 }
 
 .logs-container {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px) saturate(180%);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
     border-radius: 20px;
     padding: 2rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: var(--glass-shadow);
+    border: 1px solid var(--glass-border);
     overflow-x: auto;
+    position: relative;
+    overflow: hidden;
+}
+
+.logs-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    pointer-events: none;
+    z-index: 1;
 }
 
 .logs-table {
@@ -116,6 +130,8 @@
     overflow: hidden;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    position: relative;
+    z-index: 2;
 }
 
 .logs-table thead th {
@@ -343,17 +359,31 @@
 
 /* Stats card for logs page - modern minimalist style */
 .stats-grid .stat-card {
-    background: white;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
     padding: 1.5rem;
     border-radius: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--glass-shadow);
+    border: 1px solid var(--glass-border);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 2px solid transparent;
     position: relative;
     min-height: 120px;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    overflow: hidden;
+}
+
+.stats-grid .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    pointer-events: none;
+    z-index: 1;
 }
 
 .stats-grid .stat-card:hover {
@@ -364,17 +394,31 @@
 
 /* Stats card for stats page - modern minimalist style */
 .stats-overview .stat-card {
-    background: white;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
     padding: 1.5rem;
     border-radius: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--glass-shadow);
+    border: 1px solid var(--glass-border);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 2px solid transparent;
     position: relative;
     min-height: 120px;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    overflow: hidden;
+}
+
+.stats-overview .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    pointer-events: none;
+    z-index: 1;
 }
 
 .stats-overview .stat-card:hover {
@@ -388,6 +432,8 @@
     align-items: center;
     gap: 1rem;
     margin-bottom: 0.75rem;
+    position: relative;
+    z-index: 2;
 }
 
 .stat-icon {
@@ -399,6 +445,8 @@
     justify-content: center;
     font-size: 1.25rem;
     flex-shrink: 0;
+    position: relative;
+    z-index: 2;
 }
 
 .stat-icon.blue {
@@ -430,6 +478,8 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    position: relative;
+    z-index: 2;
 }
 
 .stat-label {
@@ -440,6 +490,8 @@
     letter-spacing: 0.5px;
     margin-bottom: 0.5rem;
     line-height: 1.2;
+    position: relative;
+    z-index: 2;
 }
 
 .stat-value {
@@ -447,6 +499,8 @@
     font-weight: 700;
     color: var(--text);
     line-height: 1.2;
+    position: relative;
+    z-index: 2;
 }
 
 .stat-value.blue { color: #2563eb; }
@@ -468,16 +522,30 @@
 }
 
 .chart-container {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px) saturate(180%);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
     border-radius: 20px;
     padding: 2rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: var(--glass-shadow);
+    border: 1px solid var(--glass-border);
     transition: all 0.3s;
     min-height: 450px;
     display: flex;
     flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.chart-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    pointer-events: none;
+    z-index: 1;
 }
 
 .chart-container:hover {
@@ -494,6 +562,8 @@
     gap: 0.75rem;
     padding-bottom: 1rem;
     border-bottom: 2px solid var(--border);
+    position: relative;
+    z-index: 2;
 }
 
 .chart-wrapper {
@@ -502,6 +572,7 @@
     width: 100%;
     flex: 1;
     min-height: 350px;
+    z-index: 2;
 }
 
 .chart-wrapper canvas {

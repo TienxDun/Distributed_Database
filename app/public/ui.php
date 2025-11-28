@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="HUFLIT Distributed Database - Full CRUD Interface for managing distributed database system with SQL Server and MongoDB">
     <title>HUFLIT Distributed Database - CRUD Interface</title>
+    <link rel="icon" type="image/x-icon" href="css/favicon.ico">
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
@@ -22,7 +23,7 @@
     <!-- Sidebar Navigation -->
     <nav class="sidebar">
         <div class="sidebar-header">
-            <h2>🎓 HUFLIT</h2>
+            <h2>HUFLIT</h2>
             <p>Distributed DB</p>
         </div>
 
@@ -59,8 +60,8 @@
                         <span class="site-toggle-icon">🗺️</span>
                     </div>
                     <span class="site-toggle-text">
-                        <strong>Show Site Column</strong>
-                        <small>Distributed data</small>
+                        <div class="site-toggle-main-text">Show Site Column</div>
+                        <div class="site-toggle-sub-text">Distributed data</div>
                     </span>
                 </label>
             </div>
@@ -68,7 +69,7 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content glass">
         <div class="topbar">
             <button class="sidebar-toggle" onclick="toggleSidebar()">
                 <span class="hamburger-icon">☰</span>
