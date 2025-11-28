@@ -16,6 +16,9 @@
     --glass-border: rgba(255, 255, 255, 0.25);
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     --glass-blur: blur(12px);
+    
+    /* Font Variables */
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 * {
@@ -25,8 +28,8 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: var(--font-family);
+    background: #FFFFF0; /* Ivory white background */
     background-attachment: fixed;
     color: var(--text);
     line-height: 1.6;

@@ -1,14 +1,13 @@
 /**
  * Common script for all pages
- * Provides shared functionality for sidebar and settings
+ * Provides shared functionality for sidebar
  */
 
 // Import required modules
-import { loadSettings, openSettingsModal, closeSettingsModal, updateBackgroundColor, updateBackgroundColorFromText, applyPresetColor, resetToDefault } from './modules/settings.js';
+// (No imports needed currently)
 
 // Module variables
 let currentPage = 1;
-let autoRefreshInterval = null;
 let charts = {};
 
 // Expose functions to global scope
@@ -24,17 +23,8 @@ window.toggleSidebar = function() {
     localStorage.setItem('sidebarCollapsed', isCollapsed);
 };
 
-window.openSettingsModal = openSettingsModal;
-window.closeSettingsModal = closeSettingsModal;
-window.updateBackgroundColor = updateBackgroundColor;
-window.updateBackgroundColorFromText = updateBackgroundColorFromText;
-window.applyPresetColor = applyPresetColor;
-window.resetToDefault = resetToDefault;
-
 // Initialize on page load
 function initializeCommon() {
-    loadSettings();
-
     // Load sidebar state
     const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
     if (sidebarCollapsed) {

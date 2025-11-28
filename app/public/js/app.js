@@ -10,7 +10,7 @@ import { loadData, deleteRecord, deleteCTDaoTao, deleteDangKy, showTab, toggleSi
 import { openCreateModal, openEditModal, closeModal, submitForm } from './modules/modal.js';
 
 // Import settings functions
-import { openSettingsModal, closeSettingsModal, loadSettings, updateBackgroundColor, updateBackgroundColorFromText, applyPresetColor, resetToDefault, toggleAutoRefresh, updateAutoRefreshTime, getAutoRefreshStatus } from './modules/settings.js';
+// Removed: import { getAutoRefreshStatus, loadAutoRefreshSettings } from './modules/settings.js';
 
 // Import view/search functions
 import { loadDataById, loadCTDaoTaoByFilter, loadDangKyByMaSV } from './modules/view.js';
@@ -64,8 +64,7 @@ function clearAllResults() {
  * Initialize application on page load
  */
 function initializeApp() {
-    // Load settings from localStorage
-    loadSettings();
+    // Removed: loadAutoRefreshSettings();
     
     // Load sidebar state
     const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
@@ -88,13 +87,9 @@ function setupEventListeners() {
     // Close modal when clicking outside
     window.addEventListener('click', (event) => {
         const crudModal = document.getElementById('crudModal');
-        const settingsModal = document.getElementById('settingsModal');
         
         if (event.target === crudModal) {
             closeModal();
-        }
-        if (event.target === settingsModal) {
-            closeSettingsModal();
         }
     });
 }
@@ -118,15 +113,6 @@ window.submitForm = submitForm;
 window.deleteRecord = deleteRecord;
 window.deleteCTDaoTao = deleteCTDaoTao;
 window.deleteDangKy = deleteDangKy;
-
-window.openSettingsModal = openSettingsModal;
-window.closeSettingsModal = closeSettingsModal;
-window.updateBackgroundColor = updateBackgroundColor;
-window.updateBackgroundColorFromText = updateBackgroundColorFromText;
-window.applyPresetColor = applyPresetColor;
-window.resetToDefault = resetToDefault;
-window.toggleAutoRefresh = toggleAutoRefresh;
-window.updateAutoRefreshTime = updateAutoRefreshTime;
 
 window.toggleSidebar = toggleSidebar;
 window.refreshCurrentTab = refreshCurrentTab;

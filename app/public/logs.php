@@ -6,6 +6,10 @@
     <meta name="description" content="HUFLIT Distributed Database - Audit Logs system for tracking database changes and operations">
     <title>Audit Logs - HUFLIT MongoDB</title>
     <link rel="icon" type="image/x-icon" href="css/favicon.ico">
+    <!-- Google Fonts for Vietnamese support -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Noto+Sans:wght@400;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&family=Lato:wght@400;700&family=Nunito:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
@@ -39,16 +43,6 @@
                     <span class="sidebar-icon">📊</span>
                     <span class="sidebar-text">Statistics</span>
                 </a></li>
-            </ul>
-        </div>
-
-        <div class="sidebar-section">
-            <h3 class="sidebar-section-title">⚙️ Tools</h3>
-            <ul class="sidebar-nav">
-                <li><button class="sidebar-btn" onclick="openSettingsModal()">
-                    <span class="sidebar-icon">⚙️</span>
-                    <span class="sidebar-text">Settings</span>
-                </button></li>
             </ul>
         </div>
 
@@ -144,81 +138,5 @@
     </div>
 
     <script type="module" src="js/logs.js"></script>
-</body>
-</html>
-
-    <!-- Settings Modal -->
-    <div id="settingsModal" class="modal">
-        <div class="modal-content" style="max-width: 500px;">
-            <div class="modal-header">
-                <h2>⚙️ Cài đặt giao diện</h2>
-                <button class="modal-close" onclick="closeSettingsModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="settings-section">
-                    <h3 style="margin-bottom: 1.5rem; color: var(--text); font-size: 1.1rem;">🎨 Màu nền</h3>
-
-                    <div class="form-group">
-                        <label for="bgColor" style="font-weight: 600; font-size: 0.95rem;">Chọn màu nền:</label>
-                        <div style="display: flex; gap: 1rem; align-items: center;">
-                            <input type="color" id="bgColor" value="#f8fafc" oninput="updateBackgroundColor()"
-                                style="width: 80px; height: 80px; border: 3px solid var(--border); border-radius: 12px; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-                            <div style="flex: 1;">
-                                <input type="text" id="bgColorText" value="#f8fafc" onchange="updateBackgroundColorFromText()"
-                                    placeholder="#RRGGBB"
-                                    style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 8px; font-family: monospace; font-size: 1rem; font-weight: 600;">
-                                <small style="display: block; margin-top: 0.5rem; color: var(--secondary);">
-                                    Ví dụ: #ffffff (trắng), #000000 (đen), #f0f0f0 (xám nhạt)
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="margin-top: 2rem; padding: 1rem; background: rgba(37, 99, 235, 0.05); border-radius: 8px; border-left: 4px solid var(--primary);">
-                        <h4 style="margin-bottom: 0.75rem; color: var(--primary); font-size: 0.9rem;">💡 Gợi ý màu sắc</h4>
-                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem;">
-                            <button onclick="applyPresetColor('#ffffff')" style="padding: 0.5rem; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; background: #ffffff; aspect-ratio: 1;" title="Trắng"></button>
-                            <button onclick="applyPresetColor('#f8fafc')" style="padding: 0.5rem; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; background: #f8fafc; aspect-ratio: 1;" title="Xám nhạt"></button>
-                            <button onclick="applyPresetColor('#e0e7ff')" style="padding: 0.5rem; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; background: #e0e7ff; aspect-ratio: 1;" title="Xanh nhạt"></button>
-                            <button onclick="applyPresetColor('#fef3c7')" style="padding: 0.5rem; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; background: #fef3c7; aspect-ratio: 1;" title="Vàng nhạt"></button>
-                            <button onclick="applyPresetColor('#dcfce7')" style="padding: 0.5rem; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; background: #dcfce7; aspect-ratio: 1;" title="Xanh lá nhạt"></button>
-                            <button onclick="applyPresetColor('#fee2e2')" style="padding: 0.5rem; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; background: #fee2e2; aspect-ratio: 1;" title="Đỏ nhạt"></button>
-                            <button onclick="applyPresetColor('#f3e8ff')" style="padding: 0.5rem; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; background: #f3e8ff; aspect-ratio: 1;" title="Tím nhạt"></button>
-                            <button onclick="applyPresetColor('#cffafe')" style="padding: 0.5rem; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; background: #cffafe; aspect-ratio: 1;" title="Cyan nhạt"></button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="settings-section">
-                    <h3 style="margin-bottom: 1.5rem; color: var(--text); font-size: 1.1rem;">🔄 Tự động làm mới</h3>
-
-                    <div class="form-group">
-                        <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; font-weight: 600; font-size: 0.95rem;">
-                            <input type="checkbox" id="autoRefreshEnabled" onchange="toggleAutoRefresh()"
-                                style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary);">
-                            Bật tự động làm mới dữ liệu
-                        </label>
-                        <small style="display: block; margin-top: 0.5rem; color: var(--secondary);">
-                            Tự động làm mới dữ liệu của tab hiện tại theo khoảng thời gian đã thiết lập
-                        </small>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="autoRefreshTime" style="font-weight: 600; font-size: 0.95rem;">Thời gian làm mới (giây):</label>
-                        <input type="number" id="autoRefreshTime" value="30" min="10" max="300" onchange="updateAutoRefreshTime()"
-                            style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 8px; font-size: 1rem;">
-                        <small style="display: block; margin-top: 0.5rem; color: var(--secondary);">
-                            Khoảng thời gian giữa các lần làm mới (10-300 giây)
-                        </small>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" type="button" onclick="resetToDefault()">🔄 Khôi phục mặc định</button>
-                <button class="btn btn-cancel" type="button" onclick="closeSettingsModal()">Đóng</button>
-            </div>
-        </div>
-    </div>
-
 </body>
 </html>

@@ -1,5 +1,5 @@
 // Stats page JavaScript
-import { loadSettings, openSettingsModal, closeSettingsModal, updateBackgroundColor, updateBackgroundColorFromText, applyPresetColor, resetToDefault, toggleAutoRefresh, updateAutoRefreshTime } from './modules/settings.js';
+// Removed: import { toggleAutoRefresh, updateAutoRefreshTime, loadAutoRefreshSettings } from './modules/settings.js';
 
 // Module variables
 let charts = {};
@@ -17,14 +17,8 @@ window.toggleSidebar = function() {
     localStorage.setItem('sidebarCollapsed', isCollapsed);
 };
 
-window.openSettingsModal = openSettingsModal;
-window.closeSettingsModal = closeSettingsModal;
-window.updateBackgroundColor = updateBackgroundColor;
-window.updateBackgroundColorFromText = updateBackgroundColorFromText;
-window.applyPresetColor = applyPresetColor;
-window.resetToDefault = resetToDefault;
-window.toggleAutoRefresh = toggleAutoRefresh;
-window.updateAutoRefreshTime = updateAutoRefreshTime;
+// Removed: window.toggleAutoRefresh = toggleAutoRefresh;
+// Removed: window.updateAutoRefreshTime = updateAutoRefreshTime;
 
 // Expose stats functions to global scope
 window.loadStats = loadStatistics;
@@ -42,7 +36,7 @@ window.resetCharts = function() {
 
 // Initialize on page load
 function initializePage() {
-    loadSettings();
+    // Removed: loadAutoRefreshSettings();
 
     // Load sidebar state
     const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';

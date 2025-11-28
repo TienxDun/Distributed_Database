@@ -1,5 +1,5 @@
 // Logs page JavaScript
-import { loadSettings, openSettingsModal, closeSettingsModal, updateBackgroundColor, updateBackgroundColorFromText, applyPresetColor, resetToDefault, updateAutoRefreshTime } from './modules/settings.js';
+// Removed: import { updateAutoRefreshTime, loadAutoRefreshSettings } from './modules/settings.js';
 
 // Module variables
 let currentPage = 1;
@@ -17,13 +17,7 @@ window.toggleSidebar = function() {
     localStorage.setItem('sidebarCollapsed', isCollapsed);
 };
 
-window.openSettingsModal = openSettingsModal;
-window.closeSettingsModal = closeSettingsModal;
-window.updateBackgroundColor = updateBackgroundColor;
-window.updateBackgroundColorFromText = updateBackgroundColorFromText;
-window.applyPresetColor = applyPresetColor;
-window.resetToDefault = resetToDefault;
-window.updateAutoRefreshTime = updateAutoRefreshTime;
+// Removed: window.updateAutoRefreshTime = updateAutoRefreshTime;
 
 // Expose logs functions to global scope
 window.loadLogs = loadLogs;
@@ -33,7 +27,7 @@ window.changePage = changePage;
 
 // Initialize on page load
 function initializePage() {
-    loadSettings();
+    // Removed: loadAutoRefreshSettings();
 
     // Load sidebar state
     const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
