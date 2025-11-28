@@ -1,5 +1,4 @@
 // Logs page JavaScript
-// Removed: import { updateAutoRefreshTime, loadAutoRefreshSettings } from './modules/settings.js';
 
 // Module variables
 let currentPage = 1;

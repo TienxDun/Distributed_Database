@@ -9,9 +9,6 @@ import { loadData, deleteRecord, deleteCTDaoTao, deleteDangKy, showTab, toggleSi
 // Import modal functions
 import { openCreateModal, openEditModal, closeModal, submitForm } from './modules/modal.js';
 
-// Import settings functions
-// Removed: import { getAutoRefreshStatus, loadAutoRefreshSettings } from './modules/settings.js';
-
 // Import view/search functions
 import { loadDataById, loadCTDaoTaoByFilter, loadDangKyByMaSV } from './modules/view.js';
 

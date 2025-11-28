@@ -45,23 +45,22 @@ function handleGlobal($method, $query) {
                         case '4': // Danh sách sinh viên đủ điều kiện tốt nghiệp
                             $stmt = $pdo->query("SELECT s.MaSV, s.HoTen
                                                  FROM SinhVien_Global s
-                                                 WHERE (
-                                                   -- Số môn học bắt buộc
-                                                   SELECT COUNT(*)
+                                                 WHERE NOT EXISTS (
+                                                   -- Không có môn học bắt buộc nào chưa hoàn thành
+                                                   SELECT 1
                                                    FROM CTDaoTao_Global c
-                                                   WHERE c.MaKhoa = s.MaKhoa AND c.KhoaHoc = s.KhoaHoc
-                                                 ) = (
-                                                   -- Số môn học đã hoàn thành (điểm >= 5)
-                                                   SELECT COUNT(*)
-                                                   FROM CTDaoTao_Global c
-                                                   JOIN DangKy_Global d ON c.MaMH = d.MaMon AND d.DiemThi >= 5
-                                                   WHERE c.MaKhoa = s.MaKhoa AND c.KhoaHoc = s.KhoaHoc AND d.MaSV = s.MaSV
-                                                 ) AND (
+                                                   LEFT JOIN DangKy_Global d ON c.MaMH = d.MaMon 
+                                                     AND d.MaSV = s.MaSV 
+                                                     AND d.DiemThi >= 5
+                                                   WHERE c.MaKhoa = s.MaKhoa 
+                                                     AND c.KhoaHoc = s.KhoaHoc
+                                                     AND d.MaSV IS NULL  -- Môn bắt buộc chưa có đăng ký đạt
+                                                 ) AND EXISTS (
                                                    -- Đảm bảo có ít nhất 1 môn học bắt buộc
-                                                   SELECT COUNT(*)
+                                                   SELECT 1
                                                    FROM CTDaoTao_Global c
                                                    WHERE c.MaKhoa = s.MaKhoa AND c.KhoaHoc = s.KhoaHoc
-                                                 ) > 0");
+                                                 )");
                             sendResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
                             break;
                         default:

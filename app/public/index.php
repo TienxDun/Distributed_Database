@@ -33,7 +33,7 @@ $routes = [
 $method = $_SERVER['REQUEST_METHOD'];
 
 if (array_key_exists($path, $routes)) {
-    $routeFile = '../routes/' . $routes[$path] . '.php';
+    $routeFile = './routes/' . $routes[$path] . '.php';
     if (file_exists($routeFile)) {
         require_once $routeFile;
         $functionName = 'handle' . ucfirst($routes[$path]);
@@ -46,7 +46,7 @@ if (array_key_exists($path, $routes)) {
         sendResponse(['error' => 'Route file not found'], 500);
     }
 } else {
-    require_once '../routes/default.php';
+    require_once './routes/default.php';
     handleDefault($method, $query);
 }
-?> 
+?>

@@ -15,8 +15,7 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $blockedFiles = [
     'ui.php',
     'logs.php', 
-    'stats.php',
-    'index.php'
+    'stats.php'
 ];
 
 // Check if request is for a blocked file
@@ -32,5 +31,5 @@ foreach ($blockedFiles as $file) {
     }
 }
 
-// Allow all other requests (API endpoints, CSS, JS, etc.)
-return false;
+// Include API router for all other requests
+require_once __DIR__ . '/index.php';

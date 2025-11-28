@@ -1,5 +1,4 @@
 // Stats page JavaScript
-// Removed: import { toggleAutoRefresh, updateAutoRefreshTime, loadAutoRefreshSettings } from './modules/settings.js';
 
 // Module variables
 let charts = {};
