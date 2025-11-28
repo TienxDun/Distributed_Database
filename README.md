@@ -1,6 +1,6 @@
 # 🎓 Hệ thống Cơ sở dữ liệu phân tán HUFLIT
 
-> Đồ án môn Cơ sở dữ liệu phân tán - SQL Server (3 sites) + MongoDB (nhật ký kiểm tra) + Triển khai Docker
+> Đồ án môn Cơ sở dữ liệu phân tán - Sử dụng SQL Server (3 sites phân tán) + MongoDB (nhật ký kiểm tra) + Triển khai bằng Docker
 
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)](https://docker.com)
 [![PHP](https://img.shields.io/badge/PHP-777BB4?style=flat&logo=php&logoColor=white)](https://php.net)
@@ -14,21 +14,21 @@
 
 ### Yêu cầu hệ thống
 
-- **Docker Desktop** 4.0+
-- **PowerShell** 7.0+
-- **RAM**: 4GB+ (khuyến nghị 8GB)
+- **Docker Desktop** phiên bản 4.0 trở lên
+- **PowerShell** phiên bản 7.0 trở lên
+- **RAM**: 4GB trở lên (khuyến nghị 8GB)
 
 ### Cài đặt và chạy
 
 ```powershell
-# Khởi động containers
+# Khởi động các container
 docker-compose up -d
 
 # Khởi tạo cơ sở dữ liệu
 .\init_databases.ps1
 ```
 
-**URLs:**
+**Các URL truy cập:**
 
 - 🏠 **Giao diện chính**: [http://localhost:8081/ui.php](http://localhost:8081/ui.php)
 - 📋 **Nhật ký kiểm tra**: [http://localhost:8081/logs.php](http://localhost:8081/logs.php)
@@ -137,7 +137,7 @@ sequenceDiagram
 
 - **3 Sites SQL Server**: Phân mảnh theo `MaKhoa` (A: <'M', B: 'M'-'S', C: ≥'S')
 - **Cơ sở dữ liệu toàn cục**: Máy chủ liên kết + Khung nhìn phân mảnh
-- **MongoDB**: Nhật ký kiểm tra & phân tích
+- **MongoDB**: Nhật ký kiểm tra & phân tích dữ liệu
 
 ---
 
@@ -158,7 +158,7 @@ sequenceDiagram
 | `/sinhvien` | GET, POST, PUT, DELETE | Thao tác sinh viên |
 | `/global?type=1-4` | GET | Truy vấn toàn cục |
 | `/logs` | GET | Nhật ký kiểm tra |
-| `/stats` | GET | Thống kê |
+| `/stats` | GET | Thống kê hệ thống |
 
 ---
 
