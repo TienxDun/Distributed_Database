@@ -61,6 +61,18 @@ function renderSidebar($page) {
                     </span>
                 </label>
             </div>
+        <div class="sidebar-section">
+            <h3 class="sidebar-section-title">🎨 Theme</h3>
+            <div class="theme-selector">
+                <input type="radio" id="theme-blue" name="theme" value="blue">
+                <label for="theme-blue" class="theme-option" data-theme="blue" title="Xanh đại dương"></label>
+                
+                <input type="radio" id="theme-pink" name="theme" value="pink">
+                <label for="theme-pink" class="theme-option" data-theme="pink" title="Hồng đào"></label>
+                
+                <input type="radio" id="theme-green" name="theme" value="green" checked>
+                <label for="theme-green" class="theme-option" data-theme="green" title="Xanh rừng"></label>
+            </div>
         </div>
     </nav>
 <?php

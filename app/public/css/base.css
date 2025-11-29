@@ -21,6 +21,35 @@
     --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
+/* ==================== THEMES ==================== */
+
+body.theme-blue {
+    --primary: #3b82f6;
+    --bg: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --text: #1e40af;
+    --border: #93c5fd;
+    background: var(--bg);
+}
+
+body.theme-pink {
+    --primary: #ec4899;
+    --bg: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --text: #be185d;
+    --border: #f9a8d4;
+    background: var(--bg);
+}
+
+body.theme-green {
+    --primary: #10b981;
+    --bg: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --text: #047857;
+    --border: #6ee7b7;
+    background: var(--bg);
+}
+
 * {
     margin: 0;
     padding: 0;
