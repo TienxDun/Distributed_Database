@@ -16,21 +16,6 @@ import { loadDataById, loadCTDaoTaoByFilter, loadDangKyByMaSV } from './modules/
 import { callGlobalQuery } from './modules/global-query.js';
 
 /**
- * Toggle sidebar visibility
- */
-function toggleSidebar() {
-    const sidebar = document.querySelector('.sidebar');
-    const mainContent = document.querySelector('.main-content');
-    
-    sidebar.classList.toggle('collapsed');
-    mainContent.classList.toggle('sidebar-collapsed');
-    
-    // Save preference to localStorage
-    const isCollapsed = sidebar.classList.contains('collapsed');
-    localStorage.setItem('sidebarCollapsed', isCollapsed);
-}
-
-/**
  * Refresh current active tab
  */
 function refreshCurrentTab() {
@@ -111,7 +96,6 @@ window.deleteRecord = deleteRecord;
 window.deleteCTDaoTao = deleteCTDaoTao;
 window.deleteDangKy = deleteDangKy;
 
-window.toggleSidebar = toggleSidebar;
 window.refreshCurrentTab = refreshCurrentTab;
 window.clearAllResults = clearAllResults;
 

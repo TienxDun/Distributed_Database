@@ -4,18 +4,6 @@
 let charts = {};
 
 // Expose functions to global scope
-window.toggleSidebar = function() {
-    const sidebar = document.querySelector('.sidebar');
-    const mainContent = document.querySelector('.main-content');
-
-    sidebar.classList.toggle('collapsed');
-    mainContent.classList.toggle('sidebar-collapsed');
-
-    // Save preference to localStorage
-    const isCollapsed = sidebar.classList.contains('collapsed');
-    localStorage.setItem('sidebarCollapsed', isCollapsed);
-};
-
 // Removed: window.toggleAutoRefresh = toggleAutoRefresh;
 // Removed: window.updateAutoRefreshTime = updateAutoRefreshTime;
 

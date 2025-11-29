@@ -1,0 +1,68 @@
+<?php
+/**
+ * Shared Sidebar Component
+ * @param string $page - Current page ('ui', 'logs', 'stats')
+ */
+
+function renderSidebar($page) {
+    $headers = [
+        'ui' => ['title' => 'HUFLIT', 'subtitle' => 'Distributed DB'],
+        'logs' => ['title' => '📋 Logs', 'subtitle' => 'Audit System'],
+        'stats' => ['title' => '📊 Stats', 'subtitle' => 'Analytics Dashboard']
+    ];
+
+    $navLinks = [
+        'ui' => [
+            ['href' => 'logs.php', 'icon' => '📋', 'text' => 'Audit Logs'],
+            ['href' => 'stats.php', 'icon' => '📊', 'text' => 'Statistics']
+        ],
+        'logs' => [
+            ['href' => 'ui.php', 'icon' => '🏠', 'text' => 'Home'],
+            ['href' => 'stats.php', 'icon' => '📊', 'text' => 'Statistics']
+        ],
+        'stats' => [
+            ['href' => 'ui.php', 'icon' => '🏠', 'text' => 'Home'],
+            ['href' => 'logs.php', 'icon' => '📋', 'text' => 'Audit Logs']
+        ]
+    ];
+
+    $header = $headers[$page];
+    $links = $navLinks[$page];
+?>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h2><?php echo $header['title']; ?></h2>
+            <p><?php echo $header['subtitle']; ?></p>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="sidebar-section-title">📊 Navigation</h3>
+            <ul class="sidebar-nav">
+                <?php foreach ($links as $link): ?>
+                <li><a href="<?php echo $link['href']; ?>" class="sidebar-link">
+                    <span class="sidebar-icon"><?php echo $link['icon']; ?></span>
+                    <span class="sidebar-text"><?php echo $link['text']; ?></span>
+                </a></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="sidebar-section-title">🗺️ Data Sites</h3>
+            <div class="site-toggle-container">
+                <label class="site-toggle-label" for="toggleSiteColumn">
+                    <input type="checkbox" id="toggleSiteColumn" checked onchange="toggleSiteColumnVisibility()" class="site-toggle-checkbox">
+                    <div class="site-toggle-slider">
+                        <span class="site-toggle-icon">🗺️</span>
+                    </div>
+                    <span class="site-toggle-text">
+                        <div class="site-toggle-main-text">Show Site Column</div>
+                        <div class="site-toggle-sub-text">Distributed data</div>
+                    </span>
+                </label>
+            </div>
+        </div>
+    </nav>
+<?php
+}
+?>
