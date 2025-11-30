@@ -22,10 +22,62 @@
   - [SYNC Flow (MonHoc)](#sync-flow-monhoc)
   - [QUERY Flow (Global complex query)](#query-flow-global-complex-query)
 - [🔐 Quyết định thiết kế chính](#-quyết-định-thiết-kế-chính)
-- [📈 Cân nhắc hiệu suất](#-cân-nhắc-hiệu-suất)
+- [🔐 Security Considerations - Cân nhắc bảo mật](#-security-considerations---cân-nhắc-bảo-mật)
+- [📈 Performance Considerations - Cân nhắc hiệu suất](#-performance-considerations---cân-nhắc-hiệu-suất)
 - [🧪 Chiến lược kiểm thử](#-chiến-lược-kiểm-thử)
 - [📚 Tài liệu tham khảo](#-tài-liệu-tham-khảo)
 - [🎯 Tính năng đã hoàn thành và nâng cấp tương lai](#-tính-năng-đã-hoàn-thành-và-nâng-cấp-tương-lai)
+
+---
+
+## 📊 Tổng quan kiến trúc
+
+### Mô hình phân tán
+
+```mermaid
+graph TD
+    subgraph "Lớp Khách hàng"
+        Browser[Trình duyệt<br/>UI.php]
+        Postman[Postman<br/>REST API]
+        Mobile[Ứng dụng di động<br/>Tương lai]
+    end
+
+    subgraph "Lớp Ứng dụng"
+        subgraph "Ứng dụng PHP (Docker)"
+            API[Máy chủ API<br/>Cổng 8080]
+            UI[Máy chủ giao diện web<br/>Cổng 8081]
+            Router[Bộ định tuyến<br/>index.php]
+            Routes[Các tuyến<br/>Trình xử lý]
+            Logger[Ghi nhật ký yêu cầu<br/>Quản lý]
+        end
+    end
+
+    subgraph "Database Layer"
+        subgraph "SQL Server Cluster"
+            Global[GLOBAL<br/>HUFLIT<br/>Linked Servers<br/>Partitioned Views<br/>INSTEAD OF Triggers]
+            subgraph "Routing Logic (by MaKhoa)"
+                SiteA[SITE A<br/>A-L]
+                SiteB[SITE B<br/>M-R]
+                SiteC[SITE C<br/>S-Z]
+            end
+        end
+        Mongo[MongoDB<br/>Logs<br/>audit_logs<br/>query_history]
+    end
+
+    Browser --> API
+    Postman --> API
+    Mobile --> API
+    API --> Router
+    UI --> Router
+    Router --> Routes
+    Routes --> Logger
+    Routes --> Global
+    Global --> SiteA
+    Global --> SiteB
+    Global --> SiteC
+    Routes --> Mongo
+    Logger --> Mongo
+```
 
 ---
 
@@ -100,32 +152,55 @@ SITE_C -> mssql_site_c:1433
 
 - Kết nối trực tiếp đến 3 sites
 - Cho phép truy vấn cross-database với cú pháp: `[SITE_A].SiteA.dbo.TableName`
-- Xác thực: tài khoản sa với mật khẩu từ .env
+- Xác thực: tài khoản sa với mật khẩu từ biến môi trường
 
 ##### b) Partitioned Views
 
 ```sql
-VIEW Khoa_Global AS
-  SELECT * FROM [SITE_A].SiteA.dbo.Khoa
-  UNION ALL
-  SELECT * FROM [SITE_B].SiteB.dbo.Khoa
-  UNION ALL
-  SELECT * FROM [SITE_C].SiteC.dbo.Khoa
-```
+CREATE VIEW Khoa_Global AS
+SELECT * FROM [SITE_A].SiteA.dbo.Khoa
+UNION ALL
+SELECT * FROM [SITE_B].SiteB.dbo.Khoa
+UNION ALL
+SELECT * FROM [SITE_C].SiteC.dbo.Khoa;
 
-**5 Global Views**:
-- `Khoa_Global` - Union tất cả khoa từ 3 sites
-- `MonHoc_Global` - DISTINCT union (môn học có thể trùng)
-- `SinhVien_Global` - Union sinh viên từ 3 sites
-- `CTDaoTao_Global` - Union chương trình đào tạo
-- `DangKy_Global` - Union đăng ký môn học
+CREATE VIEW MonHoc_Global AS
+SELECT DISTINCT * FROM (
+    SELECT * FROM [SITE_A].SiteA.dbo.MonHoc
+    UNION ALL
+    SELECT * FROM [SITE_B].SiteB.dbo.MonHoc
+    UNION ALL
+    SELECT * FROM [SITE_C].SiteC.dbo.MonHoc
+) AS AllMonHoc;
+
+CREATE VIEW CTDaoTao_Global AS
+SELECT * FROM [SITE_A].SiteA.dbo.CTDaoTao
+UNION ALL
+SELECT * FROM [SITE_B].SiteB.dbo.CTDaoTao
+UNION ALL
+SELECT * FROM [SITE_C].SiteC.dbo.CTDaoTao;
+
+CREATE VIEW SinhVien_Global AS
+SELECT * FROM [SITE_A].SiteA.dbo.SinhVien
+UNION ALL
+SELECT * FROM [SITE_B].SiteB.dbo.SinhVien
+UNION ALL
+SELECT * FROM [SITE_C].SiteC.dbo.SinhVien;
+
+CREATE VIEW DangKy_Global AS
+SELECT * FROM [SITE_A].SiteA.dbo.DangKy
+UNION ALL
+SELECT * FROM [SITE_B].SiteB.dbo.DangKy
+UNION ALL
+SELECT * FROM [SITE_C].SiteC.dbo.DangKy;
+```
 
 **Đặc điểm**:
 - Chỉ đọc theo mặc định (UNION ALL)
 - Cho phép truy vấn như bảng thường
 - Không thể INSERT/UPDATE/DELETE trực tiếp → Cần triggers
 
-##### c) Trigger INSTEAD OF
+##### c) INSTEAD OF Triggers
 
 **Nhiệm vụ**: Chặn thao tác trên Partition Views, định tuyến đến site đúng
 
@@ -138,90 +213,69 @@ IF MaKhoa >= 'S'       -> SITE_C (S-Z)
 ```
 
 **15 triggers** (5 bảng × 3 thao tác):
-
-1. **Khoa_Global**: 3 triggers (INSERT, UPDATE, DELETE)
-2. **MonHoc_Global**: 3 triggers (đồng bộ 3 sites đồng thời)
-3. **SinhVien_Global**: 3 triggers (cho phép di chuyển cross-site)
-4. **CTDaoTao_Global**: 3 triggers (xác thực FK)
-5. **DangKy_Global**: 3 triggers (xác thực join phân tán)
-
-**Ví dụ trigger INSERT Khoa**:
-
-```sql
-CREATE TRIGGER TR_Khoa_Global_Insert ON Khoa_Global INSTEAD OF INSERT
-AS BEGIN
-  -- 1. Xác thực: Kiểm tra trùng lặp
-  IF EXISTS (SELECT 1 FROM Khoa_Global WHERE MaKhoa IN (SELECT MaKhoa FROM inserted))
-    RAISERROR('Mã khoa đã tồn tại!', 16, 1);
-
-  -- 2. Định tuyến đến site phù hợp
-  IF @MaKhoa < 'M'
-    INSERT INTO [SITE_A].SiteA.dbo.Khoa ...
-  ELSE IF @MaKhoa >= 'M' AND < 'S'
-    INSERT INTO [SITE_B].SiteB.dbo.Khoa ...
-  ELSE
-    INSERT INTO [SITE_C].SiteC.dbo.Khoa ...
-END
-```
+- Khoa_Global: INSERT, UPDATE, DELETE
+- MonHoc_Global: INSERT, UPDATE, DELETE (đồng bộ 3 sites)
+- SinhVien_Global: INSERT, UPDATE, DELETE (cho phép di chuyển cross-site)
+- CTDaoTao_Global: INSERT, UPDATE, DELETE
+- DangKy_Global: INSERT, UPDATE, DELETE
 
 #### Site Databases (Ports 14334-14336)
 
 **Site A (Cổng 14334)** - Cơ sở dữ liệu: SiteA
 - **Phân mảnh**: MaKhoa < 'M' (A, B, C, ..., L)
 - **Ràng buộc kiểm tra**: `CHECK (MaKhoa < 'M')`
-- **Ví dụ khoa**: CNTT, DLKS, KTTC, KTDN, LUAT
 
 **Site B (Cổng 14335)** - Cơ sở dữ liệu: SiteB
 - **Phân mảnh**: MaKhoa >= 'M' AND < 'S' (M, N, O, P, Q, R)
 - **Ràng buộc kiểm tra**: `CHECK (MaKhoa >= 'M' AND MaKhoa < 'S')`
-- **Ví dụ khoa**: MMT, NNA, NNPH, NNTR, QTKD
 
 **Site C (Cổng 14336)** - Cơ sở dữ liệu: SiteC
 - **Phân mảnh**: MaKhoa >= 'S' (S, T, U, ..., Z)
 - **Ràng buộc kiểm tra**: `CHECK (MaKhoa >= 'S')`
-- **Ví dụ khoa**: SPQT, TCNH, VHXH
 
 **Schema mỗi site** (giống hệt nhau):
 
 ```sql
 -- 1. Khoa (FK root)
-Khoa (
-  MaKhoa NVARCHAR(10) PK,
+CREATE TABLE Khoa (
+  MaKhoa NVARCHAR(10) PRIMARY KEY,
   TenKhoa NVARCHAR(100) NOT NULL,
-  CHECK CONSTRAINT (phân mảnh)
-)
+  CHECK (MaKhoa < 'M') -- Site A
+  -- CHECK (MaKhoa >= 'M' AND MaKhoa < 'S') -- Site B
+  -- CHECK (MaKhoa >= 'S') -- Site C
+);
 
 -- 2. MonHoc (độc lập, sao chép trên các sites)
-MonHoc (
-  MaMH NVARCHAR(10) PK,
+CREATE TABLE MonHoc (
+  MaMH NVARCHAR(10) PRIMARY KEY,
   TenMH NVARCHAR(100) NOT NULL
-)
+);
 
 -- 3. SinhVien (liên kết với Khoa)
-SinhVien (
-  MaSV NVARCHAR(10) PK,
+CREATE TABLE SinhVien (
+  MaSV NVARCHAR(10) PRIMARY KEY,
   HoTen NVARCHAR(100) NOT NULL,
-  MaKhoa NVARCHAR(10) FK -> Khoa(MaKhoa),
+  MaKhoa NVARCHAR(10) FOREIGN KEY REFERENCES Khoa(MaKhoa),
   KhoaHoc INT NOT NULL,
-  CHECK CONSTRAINT (same as Khoa)
-)
+  CHECK (MaKhoa < 'M') -- Same as Khoa
+);
 
 -- 4. CTDaoTao (chương trình đào tạo)
-CTDaoTao (
-  MaKhoa NVARCHAR(10) FK -> Khoa(MaKhoa),
+CREATE TABLE CTDaoTao (
+  MaKhoa NVARCHAR(10) FOREIGN KEY REFERENCES Khoa(MaKhoa),
   KhoaHoc INT NOT NULL,
-  MaMH NVARCHAR(10) FK -> MonHoc(MaMH),
-  PK (MaKhoa, KhoaHoc, MaMH),
-  CHECK CONSTRAINT (same as Khoa)
-)
+  MaMH NVARCHAR(10) FOREIGN KEY REFERENCES MonHoc(MaMH),
+  PRIMARY KEY (MaKhoa, KhoaHoc, MaMH),
+  CHECK (MaKhoa < 'M') -- Same as Khoa
+);
 
--- 5. DangKy (đăng ký)
-DangKy (
-  MaSV NVARCHAR(10) FK -> SinhVien(MaSV),
-  MaMon NVARCHAR(10) FK -> MonHoc(MaMH),
+-- 5. DangKy (đăng ký môn học)
+CREATE TABLE DangKy (
+  MaSV NVARCHAR(10) FOREIGN KEY REFERENCES SinhVien(MaSV),
+  MaMon NVARCHAR(10) FOREIGN KEY REFERENCES MonHoc(MaMH),
   DiemThi DECIMAL(4,2) NULL,
-  PK (MaSV, MaMon)
-)
+  PRIMARY KEY (MaSV, MaMon)
+);
 ```
 
 **Quan hệ FK**:
@@ -666,129 +720,6 @@ sequenceDiagram
     API->>Browser: sendResponse([{MaSV: "...", HoTen: "..."}], 200)
     Browser->>Browser: Render results in table
 ```
-
----
-
-## 🔐 Quyết định thiết kế chính
-
-### 1. Horizontal Partitioning (Phân mảnh ngang)
-
-**Chiến lược**: Range partitioning theo MaKhoa
-
-- **Ưu điểm**:
-  - Cân bằng tải tự nhiên (phân bố đều khoa)
-  - Cách ly: Lỗi 1 site không ảnh hưởng sites khác
-  - Khả năng mở rộng: Dễ thêm sites mới
-
-- **Nhược điểm**:
-  - Truy vấn cross-site phức tạp (cần JOIN qua linked servers)
-  - Di chuyển dữ liệu (chuyển khoa) tốn kém
-
-**Thay thế được xem xét**: Hash partitioning → Bị loại vì khó query range
-
-### 2. Replication vs Partitioning
-
-**MonHoc: Full Replication** (có ở cả 3 sites)
-- **Lý do**: Môn học cần thiết cho FK từ CTDaoTao và DangKy ở mọi site
-- **Thỏa hiệp**: Tốn storage nhưng giảm cross-site queries
-- **Đồng bộ**: INSTEAD OF triggers đảm bảo consistency
-
-**Khoa, SinhVien, CTDaoTao, DangKy: Partitioning**
-- **Lý do**: Dữ liệu lớn, không cần replicate
-- **Ưu điểm**: Giảm redundancy, dễ maintain
-
-### 3. INSTEAD OF Triggers vs Application Logic
-
-**Tại sao dùng triggers?**
-- ✅ Logic tập trung tại DB layer
-- ✅ Code ứng dụng đơn giản (chỉ cần INSERT vào view)
-- ✅ Đảm bảo tính nhất quán (transaction tại DB)
-- ✅ Nhiều clients có thể dùng (REST, gRPC, direct SQL)
-
-**Thỏa hiệp**:
-- ❌ Khó debug hơn (thực thi trigger không visible)
-- ❌ Overhead hiệu suất (lặp cursor)
-- ❌ Migration phức tạp (trigger code phải sync)
-
-### 4. MongoDB cho Audit Logs
-
-**Tại sao không dùng SQL Server?**
-- ✅ Không có schema: Dễ thêm fields mới (IP, user_agent, ...)
-- ✅ Thông lượng ghi cao: Tối ưu cho logging
-- ✅ Dữ liệu time-series: Hỗ trợ native cho temporal queries
-- ✅ Pipeline tổng hợp: Phân tích mạnh mẽ
-
-**Trường hợp sử dụng**:
-- Tuân thủ: Dấu vết kiểm tra cho yêu cầu quy định
-- Debug: Trace lại history của 1 record
-- Phân tích: Mẫu sử dụng, slow queries, tỷ lệ lỗi
-
-### 5. PHP Built-in Server (không dùng Apache/Nginx)
-
-**Thiết lập phát triển**:
-- ✅ Nhẹ, nhanh khởi động
-- ✅ Không cần config phức tạp
-- ✅ Tự động tải lại khi code change (volume mount)
-
-**Sản xuất**:
-- ❌ **KHÔNG khuyến khích** (đơn luồng)
-- ✅ Nên dùng: Nginx + PHP-FPM hoặc Apache mod_php
-
----
-
-## 📈 Cân nhắc hiệu suất
-
-### 1. Indexes
-
-**SQL Server**:
-- Primary Keys → Clustered index tự động
-- Foreign Keys → Nên thêm non-clustered index
-- Views → Không thể index trực tiếp (dùng indexed views cho read-heavy)
-
-**MongoDB**:
-- `{timestamp: -1}` → Sort queries nhanh
-- `{table: 1, timestamp: -1}` → Filter + sort composite
-
-### 2. Tối ưu hóa truy vấn
-
-**Tránh**:
-- `SELECT *` từ Global views (query tất cả sites)
-- N+1 queries (load danh sách rồi query detail từng record)
-
-**Thực hành tốt nhất**:
-- Filter sớm: `WHERE MaKhoa = 'CNTT'` → chỉ query Site A
-- Phân trang: `LIMIT` + `OFFSET`
-- Caching: Browser cache cho reference data (Khoa list)
-
-### 3. Quản lý giao dịch
-
-**Giao dịch trigger**:
-- Auto-commit OFF trong trigger body
-- Rõ ràng `BEGIN TRANSACTION` ... `COMMIT` cho cross-site operations
-- Rollback nếu bất kỳ site nào fail
-
-**PHP PDO**:
-- `PDO::ERRMODE_EXCEPTION` → Exception khi lỗi
-- Try-catch để handle gracefully
-
----
-
-## 🧪 Chiến lược kiểm thử
-
-### Kiểm thử đơn vị (Tương lai)
-- Mock PDO connections
-- Test routing logic (determineSite)
-- Validate field constraints
-
-### Kiểm thử tích hợp
-- `db/test_triggers.sql` - 29 test cases
-- Cover: CRUD, FK violations, cross-site moves
-
-### Kiểm thử tải (Tương lai)
-- JMeter / k6 scripts
-- Concurrent inserts vào 3 sites
-- Distributed query performance
-
 ---
 
 ## 📚 Tài liệu tham khảo
@@ -807,39 +738,5 @@ sequenceDiagram
 
 ---
 
-## 🎯 Tính năng đã hoàn thành và nâng cấp tương lai
-
-### Đã hoàn thành (v1.0)
-
-- [x] **Auto-refresh**: Tự động làm mới dữ liệu với khoảng thời gian cấu hình
-- [x] **Settings panel**: Modal cài đặt với chế độ tối, theme switching
-- [x] **Interactive Charts**: Chart.js cho biểu đồ thống kê thời gian thực
-- [x] **Pagination**: Phân trang cho datasets lớn
-- [x] **Export logs**: Xuất CSV và Excel cho báo cáo
-- [x] **Modular CSS**: Kiến trúc CSS với BEM methodology
-- [x] **Responsive Design**: Tương thích mọi thiết bị
-- [x] **Real-time notifications**: Toast messages cho feedback
-
-### Ngắn hạn (v1.1)
-
-- [ ] Implement caching layer (Redis)
-- [ ] Add input sanitization (XSS prevention)
-- [ ] User authentication & authorization (JWT)
-
-### Trung hạn (v2.0)
-
-- [ ] Role-based access control (RBAC)
-- [ ] Versioning cho audit logs (time-travel queries)
-- [ ] WebSocket cho real-time updates
-
-### Dài hạn (v3.0)
-
-- [ ] Microservices architecture (separate API per site)
-- [ ] Event sourcing (Kafka)
-- [ ] GraphQL API
-- [ ] Machine learning analytics (anomaly detection)
-
----
-
-**📝 Tài liệu cập nhật**: November 26, 2025  
+**📝 Tài liệu cập nhật**: December 2024  
 **✍️ Tác giả**: HUFLIT Distributed Database Team
