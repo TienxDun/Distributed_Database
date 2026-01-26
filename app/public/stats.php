@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="HUFLIT Distributed Database - Statistics Dashboard with analytics and performance metrics">
+    <meta name="description"
+        content="HUFLIT Distributed Database - Statistics Dashboard with analytics and performance metrics">
     <title>Statistics Dashboard - HUFLIT MongoDB</title>
     <link rel="icon" type="image/x-icon" href="css/favicon.ico">
     <!-- Google Fonts for Vietnamese support -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Noto+Sans:wght@400;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&family=Lato:wght@400;700&family=Nunito:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
@@ -107,6 +110,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay">
@@ -116,10 +120,11 @@
         </div>
     </div>
 
-    <?php include 'sidebar.php'; renderSidebar('stats'); ?>
+    <?php include 'sidebar.php';
+    renderSidebar('stats'); ?>
 
     <!-- Main Content -->
-    <div class="main-content glass">
+    <div class="main-content">
         <div class="topbar">
             <button class="sidebar-toggle" onclick="toggleSidebar()">
                 <span class="hamburger-icon">☰</span>
@@ -175,7 +180,8 @@
                     <h3>⚡ Thời gian phản hồi trung bình (ms)</h3>
                     <div class="chart-wrapper">
                         <canvas id="responseTimeChart" style="width: 100%; height: 100%;"></canvas>
-                        <div id="responseTimeMessage" style="text-align: center; padding: 20px; color: #666; display: none;">
+                        <div id="responseTimeMessage"
+                            style="text-align: center; padding: 20px; color: #666; display: none;">
                             Đang tải dữ liệu...
                         </div>
                     </div>
@@ -193,4 +199,5 @@
 
 
 </body>
+
 </html>

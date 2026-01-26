@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: distributed-database-api
+    env: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./app/Dockerfile
+    startCommand: php -S 0.0.0.0:80 -t public public/router.php
+    envVars:
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: 5432
+      - key: DB_NAME
+        value: huflit
+      - key: DB_USER
+        sync: false
+      - key: DB_PASS
+        sync: false
+      - key: MONGO_HOST
+        sync: false
+      - key: MONGO_PORT
+        value: 27017
+      - key: MONGO_USER
+        sync: false
+      - key: MONGO_PASSWORD
+        sync: false
+      - key: MONGO_URI
+        sync: false

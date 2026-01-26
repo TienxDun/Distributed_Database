@@ -6,11 +6,11 @@ services:
     networks:
       - huflit-network
     environment: 
-      - DB_HOST=mssql_global 
-      - DB_PORT=1433 
-      - DB_NAME=HUFLIT 
-      - DB_USER=sa 
-      - DB_PASS=${MSSQL_SA_PASSWORD}
+      - DB_HOST=postgres 
+      - DB_PORT=5432 
+      - DB_NAME=huflit 
+      - DB_USER=admin 
+      - DB_PASS=${POSTGRES_PASSWORD}
       - MONGO_HOST=mongodb
       - MONGO_PORT=27017
       - MONGO_USER=admin
@@ -20,7 +20,7 @@ services:
     volumes:
       - ./app:/var/www/html
     depends_on: 
-      - mssql_global
+      - postgres
       - mongodb
 
   app_php:
@@ -30,11 +30,11 @@ services:
     networks:
       - huflit-network
     environment: 
-      - DB_HOST=mssql_global 
-      - DB_PORT=1433 
-      - DB_NAME=HUFLIT 
-      - DB_USER=sa 
-      - DB_PASS=${MSSQL_SA_PASSWORD}
+      - DB_HOST=postgres 
+      - DB_PORT=5432 
+      - DB_NAME=huflit 
+      - DB_USER=admin 
+      - DB_PASS=${POSTGRES_PASSWORD}
       - MONGO_HOST=mongodb
       - MONGO_PORT=27017
       - MONGO_USER=admin
@@ -44,67 +44,25 @@ services:
     volumes:
       - ./app:/var/www/html
     depends_on: 
-      - mssql_global
+      - postgres
       - mongodb
   
-  mssql_global:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: mssql_global
+  postgres:
+    image: postgres:16
+    container_name: postgres
     networks:
       - huflit-network
     environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
-      - MSSQL_PID=Developer
+      - POSTGRES_DB=huflit
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
-      - "14333:1433"
+      - "5432:5432"
     volumes:
-      - ./db/global:/docker-entrypoint-initdb.d
-      - sqlserver_data_global:/var/opt/mssql
-  mssql_site_a:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: mssql_site_a
-    networks:
-      - huflit-network
-    environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
-      - MSSQL_PID=Developer
-    ports:
-      - "14334:1433"
-    volumes:
-      - ./db/site_a:/docker-entrypoint-initdb.d
-      - sqlserver_data_a:/var/opt/mssql
-
-  mssql_site_b:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: mssql_site_b
-    networks:
-      - huflit-network
-    environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
-      - MSSQL_PID=Developer
-    ports:
-      - "14335:1433"
-    volumes:
-      - ./db/site_b:/docker-entrypoint-initdb.d
-      - sqlserver_data_b:/var/opt/mssql
-
-  mssql_site_c:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: mssql_site_c
-    networks:
-      - huflit-network
-    environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
-      - MSSQL_PID=Developer
-    ports:
-      - "14336:1433"
-    volumes:
-      - ./db/site_c:/docker-entrypoint-initdb.d
-      - sqlserver_data_c:/var/opt/mssql
+      - ./db/global/init_postgres.sql:/docker-entrypoint-initdb.d/01_init.sql
+      - ./db/global/triggers_postgres.sql:/docker-entrypoint-initdb.d/02_triggers.sql
+      - ./db/global/seed_postgres.sql:/docker-entrypoint-initdb.d/03_seed.sql
+      - postgres_data:/var/lib/postgresql/data
 
   mongodb:
     image: mongo:latest
@@ -122,13 +80,8 @@ services:
       - mongodb_data:/data/db
       - mongodb_config:/data/configdb
 
-  
-
 volumes:
-  sqlserver_data_a:
-  sqlserver_data_b:
-  sqlserver_data_c:
-  sqlserver_data_global:
+  postgres_data:
   mongodb_data:
   mongodb_config:
     

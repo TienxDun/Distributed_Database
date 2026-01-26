@@ -1,26 +1,13 @@
 FROM php:8.4-cli
 
-# System dependencies
+# System dependencies for Postgres and general tools
 RUN apt-get update && apt-get install -y \
-    gnupg2 curl apt-transport-https apt-utils \
-    unixodbc-dev libgssapi-krb5-2 \
-    libssl-dev pkg-config \
+    libpq-dev \
+    git zip unzip \
     && rm -rf /var/lib/apt/lists/*
 
-# Microsoft repo key + repo list
-RUN curl -sSL https://packages.microsoft.com/keys/microsoft.asc | \
-    gpg --dearmor > /etc/apt/trusted.gpg.d/microsoft.gpg \
-    && echo "deb [arch=amd64] https://packages.microsoft.com/debian/12/prod bookworm main" \
-    > /etc/apt/sources.list.d/mssql-release.list
-
-# Install Microsoft ODBC driver + tools
-RUN apt-get update \
-    && ACCEPT_EULA=Y apt-get install -y msodbcsql18 mssql-tools18 \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install sqlsrv + pdo_sqlsrv via PECL
-RUN pecl install sqlsrv pdo_sqlsrv \
-    && docker-php-ext-enable sqlsrv pdo_sqlsrv
+# Install pdo_pgsql
+RUN docker-php-ext-install pdo pdo_pgsql
 
 # Install MongoDB PHP driver
 RUN pecl install mongodb \

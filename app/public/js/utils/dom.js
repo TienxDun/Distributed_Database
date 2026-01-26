@@ -64,7 +64,7 @@ export function showAlert(module, message, type = 'success') {
     const alertDiv = document.getElementById(`${module}-alert`);
     alertDiv.className = `alert alert-${type} show`;
     alertDiv.textContent = message;
-    
+
     setTimeout(() => {
         alertDiv.classList.remove('show');
     }, 5000);
@@ -99,43 +99,48 @@ export function createTableWithActions(data, module) {
 
     const headers = Object.keys(data[0]);
     let table = '<table><thead><tr>';
-    
+
+    // Helper to identify Site column case-insensitively
+    const isSiteColumn = (h) => h.toLowerCase() === 'site';
+
     // Create headers
     headers.forEach(h => {
         // Skip Site column if toggle is off
-        if (h === 'Site' && !showSiteColumn) return;
+        if (isSiteColumn(h) && !showSiteColumn) return;
         // Add special class for Site header
-        const headerClass = h === 'Site' ? ' class="site-header"' : '';
-        table += `<th${headerClass}>${h}</th>`;
+        const headerClass = isSiteColumn(h) ? ' class="site-header"' : '';
+        // Display header (capitalize first letter if it's 'site')
+        const displayHeader = isSiteColumn(h) ? 'Site' : h;
+        table += `<th${headerClass}>${displayHeader}</th>`;
     });
     table += '<th>Thao tác</th></tr></thead><tbody>';
-    
+
     // Create rows
     data.forEach(row => {
         table += '<tr>';
         headers.forEach(h => {
             // Skip Site column if toggle is off
-            if (h === 'Site' && !showSiteColumn) return;
-            
+            if (isSiteColumn(h) && !showSiteColumn) return;
+
             const value = row[h] !== null && row[h] !== undefined ? row[h] : '';
             let cellClass = '';
-            
+
             // Add class for Site column
-            if (h === 'Site') {
+            if (isSiteColumn(h)) {
                 if (value === 'Site A') cellClass = ' class="site-a"';
                 else if (value === 'Site B') cellClass = ' class="site-b"';
                 else if (value === 'Site C') cellClass = ' class="site-c"';
             }
-            
+
             table += `<td${cellClass}>${value}</td>`;
         });
-        
+
         // Action buttons
         table += '<td class="action-buttons">';
         table += getActionButtons(module, row);
         table += '</td></tr>';
     });
-    
+
     table += '</tbody></table>';
     return table;
 }
@@ -148,7 +153,7 @@ export function createTableWithActions(data, module) {
  */
 function getActionButtons(module, row) {
     let buttons = '';
-    
+
     if (module === 'khoa') {
         buttons += `<button class="btn-edit" onclick='window.openEditModal("${module}", ${JSON.stringify(row)})'>✏️ Sửa</button>`;
         buttons += `<button class="btn-delete" onclick='window.deleteRecord("${module}", "${row.MaKhoa}")'>🗑️ Xóa</button>`;
@@ -164,7 +169,7 @@ function getActionButtons(module, row) {
         buttons += `<button class="btn-edit" onclick='window.openEditModal("${module}", ${JSON.stringify(row)})'>✏️ Cập nhật điểm</button>`;
         buttons += `<button class="btn-delete" onclick='window.deleteDangKy("${row.MaSV}", "${row.MaMon}")'>🗑️ Xóa</button>`;
     }
-    
+
     return buttons;
 }
 
@@ -178,7 +183,7 @@ export function renderResult(module, data, countLabel = 'Tổng số') {
     const resultDiv = document.getElementById(`${module}-result`);
     const count = Array.isArray(data) ? data.length : 0;
     const countText = `<div style="background: #e0f2fe; color: #1e293b; padding: 0.5rem 1rem; border-radius: 6px; margin-bottom: 1rem; display: inline-block; font-weight: 600;">📊 ${countLabel}: ${count} bản ghi</div>`;
-    
+
     resultDiv.innerHTML = countText + createTableWithActions(data, module);
     resultDiv.className = 'result show';
 }

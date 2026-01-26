@@ -13,18 +13,18 @@ export async function apiGet(endpoint) {
     // Add cache-busting timestamp to prevent browser caching
     const separator = endpoint.includes('?') ? '&' : '?';
     const cacheBuster = `${separator}_t=${Date.now()}`;
-    
+
     const response = await fetch(`${API_BASE}${endpoint}${cacheBuster}`, {
         cache: 'no-store'  // Use fetch API's cache option instead of headers
     });
-    
+
     if (!response.ok) {
         if (response.status === 404) {
             throw new Error('Không tìm thấy dữ liệu');
         }
         throw new Error(`HTTP ${response.status}`);
     }
-    
+
     return await response.json();
 }
 
@@ -34,7 +34,7 @@ export async function apiGet(endpoint) {
  * @param {Object} data - Request body data
  * @returns {Promise<any>} Response data
  */
-export async function apiPost(endpoint, data) {
+export async function apiPost(endpoint, data = {}) {
     const response = await fetch(`${API_BASE}${endpoint}`, {
         method: 'POST',
         headers: {
@@ -42,12 +42,12 @@ export async function apiPost(endpoint, data) {
         },
         body: JSON.stringify(data)
     });
-    
+
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || 'Có lỗi xảy ra');
     }
-    
+
     return await response.json();
 }
 
@@ -65,12 +65,12 @@ export async function apiPut(endpoint, data) {
         },
         body: JSON.stringify(data)
     });
-    
+
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || 'Có lỗi xảy ra');
     }
-    
+
     return await response.json();
 }
 
@@ -83,12 +83,12 @@ export async function apiDelete(endpoint) {
     const response = await fetch(`${API_BASE}${endpoint}`, {
         method: 'DELETE'
     });
-    
+
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || 'Có lỗi xảy ra');
     }
-    
+
     return await response.json();
 }
 
@@ -99,13 +99,13 @@ export async function apiDelete(endpoint) {
  */
 export function buildQueryString(params) {
     const searchParams = new URLSearchParams();
-    
+
     for (const [key, value] of Object.entries(params)) {
         if (value !== null && value !== undefined && value !== '') {
             searchParams.append(key, value);
         }
     }
-    
+
     const queryString = searchParams.toString();
     return queryString ? `?${queryString}` : '';
 }
@@ -127,15 +127,15 @@ export async function fetchOptionsForField(endpoint, valueField, labelFields) {
         console.log(`[fetchOptions] Using cached options for ${endpoint}`);
         return optionsCache[cacheKey];
     }
-    
+
     try {
         console.log(`[fetchOptions] Fetching options from ${endpoint}`);
         const data = await apiGet(endpoint);
-        
+
         if (!Array.isArray(data) || data.length === 0) {
             return [];
         }
-        
+
         // Format data into {value, label} format
         const options = data.map(item => {
             const value = item[valueField];
@@ -143,11 +143,11 @@ export async function fetchOptionsForField(endpoint, valueField, labelFields) {
             const label = labelFields.map(field => item[field]).filter(Boolean).join(' - ');
             return { value, label };
         });
-        
+
         // Cache the result
         optionsCache[cacheKey] = options;
         console.log(`[fetchOptions] Cached ${options.length} options for ${endpoint}`);
-        
+
         return options;
     } catch (error) {
         console.error(`[fetchOptions] Error fetching options from ${endpoint}:`, error);

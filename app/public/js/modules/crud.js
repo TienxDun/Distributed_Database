@@ -3,7 +3,7 @@
  */
 
 import { apiGet, apiPost, apiPut, apiDelete, buildQueryString } from '../utils/api.js';
-import { showLoading, hideLoading, getLoadingState, showAlert, renderResult, showResultError, showResultLoading } from '../utils/dom.js';
+import { showLoading, hideLoading, getLoadingState, showAlert, renderResult, showResultError, showResultLoading, setSiteColumnVisibility } from '../utils/dom.js';
 import { PRIMARY_KEYS } from '../config.js';
 
 /**
@@ -13,7 +13,7 @@ import { PRIMARY_KEYS } from '../config.js';
  */
 export async function loadData(module, skipLoading = false) {
     if (!skipLoading && getLoadingState()) return;
-    
+
     showResultLoading(module, 'Đang tải dữ liệu...');
     if (!skipLoading) {
         showLoading('Đang tải dữ liệu...');
@@ -41,17 +41,17 @@ export async function loadData(module, skipLoading = false) {
 export async function deleteRecord(module, id) {
     if (getLoadingState()) return;
     if (!confirm(`Bạn có chắc muốn xóa bản ghi này?`)) return;
-    
+
     showLoading('Đang xóa dữ liệu...');
 
     try {
         const result = await apiDelete(`/${module}?id=${id}`);
         console.log(`[deleteRecord] ${module}: Deleted ID ${id}`);
         showAlert(module, result.message || 'Xóa thành công!', 'success');
-        
+
         // Small delay to ensure backend has processed the deletion
         await new Promise(resolve => setTimeout(resolve, 100));
-        
+
         // Clear current result and reload
         showResultLoading(module, 'Đang tải lại...');
         showLoading('Đang tải lại dữ liệu...');
@@ -74,7 +74,7 @@ export async function deleteRecord(module, id) {
 export async function deleteCTDaoTao(maKhoa, khoaHoc, maMH) {
     if (getLoadingState()) return;
     if (!confirm(`Xóa môn ${maMH} khỏi CTĐT khoa ${maKhoa} khóa ${khoaHoc}?`)) return;
-    
+
     showLoading('Đang xóa môn học khỏi CTĐT...');
 
     try {
@@ -86,10 +86,10 @@ export async function deleteCTDaoTao(maKhoa, khoaHoc, maMH) {
         const result = await apiDelete(`/ctdaotao${queryString}`);
         console.log(`[deleteCTDaoTao] Deleted: ${maKhoa}-${khoaHoc}-${maMH}`);
         showAlert('ctdaotao', result.message || 'Xóa thành công!', 'success');
-        
+
         // Small delay to ensure backend has processed the deletion
         await new Promise(resolve => setTimeout(resolve, 100));
-        
+
         // Clear current result and reload
         showResultLoading('ctdaotao', 'Đang tải lại...');
         showLoading('Đang tải lại dữ liệu...');
@@ -111,7 +111,7 @@ export async function deleteCTDaoTao(maKhoa, khoaHoc, maMH) {
 export async function deleteDangKy(maSV, maMon) {
     if (getLoadingState()) return;
     if (!confirm(`Hủy đăng ký môn ${maMon} của sinh viên ${maSV}?`)) return;
-    
+
     showLoading('Đang hủy đăng ký...');
 
     try {
@@ -122,10 +122,10 @@ export async function deleteDangKy(maSV, maMon) {
         const result = await apiDelete(`/dangky${queryString}`);
         console.log(`[deleteDangKy] Deleted: ${maSV}-${maMon}`);
         showAlert('dangky', result.message || 'Xóa thành công!', 'success');
-        
+
         // Small delay to ensure backend has processed the deletion
         await new Promise(resolve => setTimeout(resolve, 100));
-        
+
         // Clear current result and reload
         showResultLoading('dangky', 'Đang tải lại...');
         showLoading('Đang tải lại dữ liệu...');
@@ -147,7 +147,7 @@ export async function deleteDangKy(maSV, maMon) {
  */
 export async function createRecord(module, formData) {
     showLoading('Đang thêm dữ liệu...');
-    
+
     try {
         const result = await apiPost(`/${module}`, formData);
         return result;
@@ -165,10 +165,10 @@ export async function createRecord(module, formData) {
  */
 export async function updateRecord(module, id, formData) {
     showLoading('Đang cập nhật...');
-    
+
     try {
         let queryString;
-        
+
         if (module === 'dangky' && typeof id === 'object') {
             queryString = buildQueryString({
                 masv: id.masv,
@@ -177,7 +177,7 @@ export async function updateRecord(module, id, formData) {
         } else {
             queryString = `?id=${encodeURIComponent(id)}`;
         }
-        
+
         const result = await apiPut(`/${module}${queryString}`, formData);
         return result;
     } finally {
@@ -217,15 +217,29 @@ export function showTab(tabName) {
  */
 export function toggleSiteColumnVisibility() {
     const checked = document.getElementById('toggleSiteColumn').checked;
-    
-    // Import and use setSiteColumnVisibility from dom.js
-    import('../utils/dom.js').then(domModule => {
-        domModule.setSiteColumnVisibility(checked);
-        
-        // Reload current module data to apply changes
-        const activeTab = document.querySelector('.tab-content.active');
-        if (activeTab && activeTab.id !== 'global') {
-            loadData(activeTab.id);
+
+    setSiteColumnVisibility(checked);
+
+    // Find the currently active tab button to know which data to reload
+    const activeTabBtn = document.querySelector('.tab-btn.active');
+
+    if (activeTabBtn) {
+        // Extract tab ID from the onclick attribute: onclick="showTab('khoa')"
+        // Regex matches the content inside single quotes
+        const match = activeTabBtn.getAttribute('onclick').match(/'([^']+)'/);
+
+        if (match && match[1]) {
+            const tabId = match[1];
+
+            // Allow reloading for all tabs except global queries (which have their own result containers)
+            if (tabId !== 'global') {
+                const resultDiv = document.getElementById(`${tabId}-result`);
+                // Only reload if data is already loaded (to avoid double load on init)
+                if (resultDiv && resultDiv.innerHTML !== '') {
+                    console.log(`[toggleSiteColumnVisibility] Reloading ${tabId} with visibility: ${checked}`);
+                    loadData(tabId, true);
+                }
+            }
         }
-    });
+    }
 }
