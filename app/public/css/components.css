@@ -207,6 +207,144 @@
     background: rgba(139, 92, 246, 0.05);
 }
 
+/* --- Site Table Container --- */
+.site-table-container {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--glass-border);
+    overflow: hidden;
+    position: relative;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    margin-top: 0.75rem;
+    padding: 0.5rem;
+}
+
+.site-table-container:hover {
+    border-color: var(--glass-border-light);
+    box-shadow: var(--shadow-md), var(--shadow-glow);
+    transform: translateY(-2px);
+}
+
+.site-table-container:hover {
+    border-color: var(--glass-border-light);
+    box-shadow: var(--shadow-md), var(--shadow-glow);
+    transform: translateY(-2px);
+}
+
+/* Scroll indicator for horizontal scroll */
+.site-table-container::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, transparent, rgba(0,0,0,0.1));
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.site-table-container:hover::after {
+    opacity: 1;
+}
+
+.site-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.875rem;
+}
+
+.site-table th {
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-align: left;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--glass-border);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.site-table td {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+    transition: var(--transition);
+    vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 80px;
+    max-width: 200px;
+}
+
+/* Cột Masv (đầu tiên) - luôn hiển thị đầy đủ */
+.site-table td:nth-child(1) {
+    white-space: nowrap;
+    text-overflow: clip;
+    overflow: visible;
+    min-width: 120px;
+    max-width: 140px;
+}
+
+/* Cột Hoten (thứ hai) - có thể ellipsis */
+.site-table td:nth-child(2) {
+    min-width: 150px;
+    max-width: 200px;
+}
+
+/* Cột Makhoa (thứ ba) */
+.site-table td:nth-child(3) {
+    min-width: 80px;
+    max-width: 100px;
+}
+
+/* Cột Khoahoc (thứ tư) */
+.site-table td:nth-child(4) {
+    min-width: 80px;
+    max-width: 100px;
+}
+
+.site-table th:nth-child(1) {
+    min-width: 120px;
+    max-width: 140px;
+}
+
+.site-table th:nth-child(2) {
+    min-width: 150px;
+    max-width: 200px;
+}
+
+.site-table th:nth-child(3) {
+    min-width: 80px;
+    max-width: 100px;
+}
+
+.site-table th:nth-child(4) {
+    min-width: 80px;
+    max-width: 100px;
+}
+
+.site-table tr:last-child td {
+    border-bottom: none;
+}
+
+.site-table tr:hover td {
+    background: rgba(139, 92, 246, 0.05);
+}
+
 /* --- Forms --- */
 .form-group {
     margin-bottom: 1.5rem;
@@ -1320,10 +1458,48 @@
         align-self: center;
     }
 
-    .pagination-btn {
-        min-width: 32px;
-        height: 32px;
+/* Responsive adjustments for site table containers */
+@media (max-width: 768px) {
+    .site-table-container {
+        margin-top: 0.5rem;
+        padding: 0.25rem;
+    }
+
+    .site-table-container::after {
+        width: 15px;
+        height: 15px;
+    }
+
+    .site-table td, .site-table th {
+        padding: 0.75rem 1rem;
+        font-size: 0.8rem;
+        min-width: 60px;
+    }
+
+    .site-table td:nth-child(1), .site-table th:nth-child(1) {
+        min-width: 100px;
+        max-width: 120px;
+    }
+
+    .site-table td:nth-child(2), .site-table th:nth-child(2) {
+        min-width: 120px;
+        max-width: 160px;
+    }
+}
+
+@media (max-width: 480px) {
+    .site-table-container {
+        padding: 0.125rem;
+    }
+
+    .site-table td, .site-table th {
+        padding: 0.5rem 0.75rem;
         font-size: 0.75rem;
+    }
+
+    /* Ẩn cột Khoahoc trên mobile rất nhỏ */
+    .site-table th:nth-child(4), .site-table td:nth-child(4) {
+        display: none;
     }
 }
 

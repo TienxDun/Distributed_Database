@@ -2,12 +2,6 @@
 require_once __DIR__ . '/../common.php';
 require_once __DIR__ . '/../mongo_helper.php';
 
-function determineSite($maKhoa) {
-    if ($maKhoa < 'M') return 'Site_A';
-    if ($maKhoa >= 'M' && $maKhoa < 'S') return 'Site_B';
-    return 'Site_C';
-}
-
 function handleDangKy($method, $query) {
     try {
         $pdo = getDBConnection();
@@ -69,7 +63,7 @@ function handleDangKy($method, $query) {
                 $stmt = $pdo->prepare("SELECT MaKhoa FROM SinhVien_Global WHERE MaSV = ?");
                 $stmt->execute([$data['MaSV']]);
                 $sv = $stmt->fetch(PDO::FETCH_ASSOC);
-                $site = $sv ? determineSite($sv['MaKhoa']) : 'Global';
+                $site = ($sv && isset($sv['MaKhoa'])) ? determineSite($sv['MaKhoa']) : 'Global';
                 $logData = ['MaSV' => $data['MaSV'], 'MaMon' => $data['MaMon'], 'DiemThi' => $diemThi];
                 MongoHelper::logAudit('DangKy', 'INSERT', $logData, null, $site);
                 
@@ -99,7 +93,7 @@ function handleDangKy($method, $query) {
                 $stmt = $pdo->prepare("SELECT MaKhoa FROM SinhVien_Global WHERE MaSV = ?");
                 $stmt->execute([$query['masv']]);
                 $sv = $stmt->fetch(PDO::FETCH_ASSOC);
-                $site = $sv ? determineSite($sv['MaKhoa']) : 'Global';
+                $site = ($sv && isset($sv['MaKhoa'])) ? determineSite($sv['MaKhoa']) : 'Global';
                 $newData = ['MaSV' => $query['masv'], 'MaMon' => $query['mamon'], 'DiemThi' => $data['DiemThi']];
                 MongoHelper::logAudit('DangKy', 'UPDATE', $newData, $oldData, $site);
                 
@@ -125,7 +119,7 @@ function handleDangKy($method, $query) {
                     $stmt = $pdo->prepare("SELECT MaKhoa FROM SinhVien_Global WHERE MaSV = ?");
                     $stmt->execute([$query['masv']]);
                     $sv = $stmt->fetch(PDO::FETCH_ASSOC);
-                    $site = $sv ? determineSite($sv['MaKhoa']) : 'Global';
+                    $site = ($sv && isset($sv['MaKhoa'])) ? determineSite($sv['MaKhoa']) : 'Global';
                     MongoHelper::logAudit('DangKy', 'DELETE', null, $oldData, $site);
                 }
                 

@@ -43,6 +43,27 @@ async function seedDatabase() {
 }
 
 /**
+ * Initialize empty database schema
+ */
+async function initDatabase() {
+    console.log('🏗️ Button clicked: Initialize Database');
+    if (!confirm('CẢNH BÁO: Hành động này sẽ xóa toàn bộ schemas hiện có và tạo lại schema trống. Bạn có chắc chắn muốn tiếp tục?')) {
+        return;
+    }
+
+    showLoading('Đang khởi tạo database schema...');
+    try {
+        const result = await apiPost('/maintenance?action=init');
+        alert(result.message);
+        exploreData(); // Refresh explorer
+    } catch (error) {
+        alert('Lỗi: ' + error.message);
+    } finally {
+        hideLoading();
+    }
+}
+
+/**
  * Explore raw data from different sites
  */
 async function exploreData() {
@@ -68,12 +89,12 @@ function renderSiteTable(containerId, rows) {
     const container = document.getElementById(`${containerId}-table`);
 
     if (!rows || rows.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding: 1rem; color: var(--slate-500); font-style:italic; background: var(--slate-50); border-radius: var(--radius-sm);">Không có dữ liệu</div>';
+        container.innerHTML = '<div style="text-align:center; padding: 2rem 1rem; color: var(--slate-500); font-style:italic; background: rgba(255,255,255,0.02); border-radius: var(--radius-md); border: 1px dashed var(--glass-border);">Không có dữ liệu</div>';
         return;
     }
 
     const headers = Object.keys(rows[0]);
-    let html = '<table class="table">';
+    let html = '<table class="site-table">';
     html += '<thead><tr>';
     headers.forEach(h => {
         const displayHeader = h.charAt(0).toUpperCase() + h.slice(1);
@@ -97,6 +118,7 @@ function renderSiteTable(containerId, rows) {
 // Expose functions to global window scope
 window.resetDatabase = resetDatabase;
 window.seedDatabase = seedDatabase;
+window.initDatabase = initDatabase;
 window.exploreData = exploreData;
 
 // Initial load

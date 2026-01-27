@@ -2,6 +2,8 @@
  * DOM manipulation utilities
  */
 
+import { PRIMARY_KEYS } from '../config.js';
+
 // Global state
 let isLoading = false;
 let showSiteColumn = true;
@@ -162,21 +164,22 @@ export function createTableWithActions(data, module) {
  */
 function getActionButtons(module, row) {
     let buttons = '';
+    const primaryKey = PRIMARY_KEYS[module];
 
     if (module === 'khoa') {
         buttons += `<button class="btn-edit" onclick='window.openEditModal("${module}", ${JSON.stringify(row)})'>✏️ Sửa</button>`;
-        buttons += `<button class="btn-delete" onclick='window.deleteRecord("${module}", "${row.MaKhoa}")'>🗑️ Xóa</button>`;
+        buttons += `<button class="btn-delete" onclick='window.deleteRecord("${module}", "${row[primaryKey]}")'>🗑️ Xóa</button>`;
     } else if (module === 'monhoc') {
         buttons += `<button class="btn-edit" onclick='window.openEditModal("${module}", ${JSON.stringify(row)})'>✏️ Sửa</button>`;
-        buttons += `<button class="btn-delete" onclick='window.deleteRecord("${module}", "${row.MaMH}")'>🗑️ Xóa</button>`;
+        buttons += `<button class="btn-delete" onclick='window.deleteRecord("${module}", "${row[primaryKey]}")'>🗑️ Xóa</button>`;
     } else if (module === 'sinhvien') {
         buttons += `<button class="btn-edit" onclick='window.openEditModal("${module}", ${JSON.stringify(row)})'>✏️ Sửa</button>`;
-        buttons += `<button class="btn-delete" onclick='window.deleteRecord("${module}", "${row.MaSV}")'>🗑️ Xóa</button>`;
+        buttons += `<button class="btn-delete" onclick='window.deleteRecord("${module}", "${row[primaryKey]}")'>🗑️ Xóa</button>`;
     } else if (module === 'ctdaotao') {
-        buttons += `<button class="btn-delete" onclick='window.deleteCTDaoTao("${row.MaKhoa}", "${row.KhoaHoc}", "${row.MaMH}")'>🗑️ Xóa</button>`;
+        buttons += `<button class="btn-delete" onclick='window.deleteCTDaoTao("${row.makhoa}", "${row.khoahoc}", "${row.mamh}")'>🗑️ Xóa</button>`;
     } else if (module === 'dangky') {
         buttons += `<button class="btn-edit" onclick='window.openEditModal("${module}", ${JSON.stringify(row)})'>✏️ Cập nhật điểm</button>`;
-        buttons += `<button class="btn-delete" onclick='window.deleteDangKy("${row.MaSV}", "${row.MaMon}")'>🗑️ Xóa</button>`;
+        buttons += `<button class="btn-delete" onclick='window.deleteDangKy("${row.masv}", "${row.mamon}")'>🗑️ Xóa</button>`;
     }
 
     return buttons;

@@ -138,10 +138,16 @@ class MongoHelper
             if (!$manager)
                 return 0;
 
-            $command = new MongoDB\Driver\Command([
-                'count' => 'audit_logs',
-                'query' => $filter
-            ]);
+            $query = empty($filter) ? new stdClass() : json_decode(json_encode($filter), false);
+
+            $commandArray = [
+                'count' => 'audit_logs'
+            ];
+            if (!empty($filter)) {
+                $commandArray['query'] = $query;
+            }
+
+            $command = new MongoDB\Driver\Command($commandArray);
 
             $cursor = $manager->executeCommand('huflit_logs', $command);
             $result = $cursor->toArray();

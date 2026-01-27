@@ -4,48 +4,15 @@
  * Updated for Modern UI Redesign
  */
 
-function renderSidebar($page)
+function renderSidebar($activePage = 'ui')
 {
-    $navConfig = [
-        'ui' => [
-            'label' => 'Main Navigation',
-            'items' => [
-                ['href' => 'ui.php', 'icon' => '🏠', 'text' => 'Trang chủ', 'active' => true],
-                ['href' => 'logs.php', 'icon' => '📋', 'text' => 'Logs Hệ thống', 'active' => false],
-                ['href' => 'stats.php', 'icon' => '📊', 'text' => 'Thống kê', 'active' => false],
-                ['href' => 'maintenance.php', 'icon' => '⚙️', 'text' => 'Quản trị Admin', 'active' => false],
-            ]
-        ],
-        'logs' => [
-            'label' => 'Main Navigation',
-            'items' => [
-                ['href' => 'ui.php', 'icon' => '🏠', 'text' => 'Trang chủ', 'active' => false],
-                ['href' => 'logs.php', 'icon' => '📋', 'text' => 'Logs Hệ thống', 'active' => true],
-                ['href' => 'stats.php', 'icon' => '📊', 'text' => 'Thống kê', 'active' => false],
-                ['href' => 'maintenance.php', 'icon' => '⚙️', 'text' => 'Quản trị Admin', 'active' => false],
-            ]
-        ],
-        'stats' => [
-            'label' => 'Main Navigation',
-            'items' => [
-                ['href' => 'ui.php', 'icon' => '🏠', 'text' => 'Trang chủ', 'active' => false],
-                ['href' => 'logs.php', 'icon' => '📋', 'text' => 'Logs Hệ thống', 'active' => false],
-                ['href' => 'stats.php', 'icon' => '📊', 'text' => 'Thống kê', 'active' => true],
-                ['href' => 'maintenance.php', 'icon' => '⚙️', 'text' => 'Quản trị Admin', 'active' => false],
-            ]
-        ],
-        'maintenance' => [
-            'label' => 'Main Navigation',
-            'items' => [
-                ['href' => 'ui.php', 'icon' => '🏠', 'text' => 'Trang chủ', 'active' => false],
-                ['href' => 'logs.php', 'icon' => '📋', 'text' => 'Logs Hệ thống', 'active' => false],
-                ['href' => 'stats.php', 'icon' => '📊', 'text' => 'Thống kê', 'active' => false],
-                ['href' => 'maintenance.php', 'icon' => '⚙️', 'text' => 'Quản trị Admin', 'active' => true],
-            ]
-        ]
+    $navItems = [
+        ['href' => 'ui.php', 'icon' => '🏠', 'text' => 'Trang chủ'],
+        ['href' => 'logs.php', 'icon' => '📋', 'text' => 'Logs Hệ thống'],
+        ['href' => 'stats.php', 'icon' => '📊', 'text' => 'Thống kê'],
+        ['href' => 'maintenance.php', 'icon' => '⚙️', 'text' => 'Quản trị Admin'],
     ];
 
-    $currentNav = $navConfig[$page] ?? $navConfig['ui'];
     ?>
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -56,12 +23,13 @@ function renderSidebar($page)
         </div>
 
         <div class="sidebar-content">
-            <div class="nav-section-title"><?php echo $currentNav['label']; ?></div>
+            <div class="nav-section-title">Main Navigation</div>
             <nav class="nav-list">
-                <?php foreach ($currentNav['items'] as $item): ?>
-                    <a href="<?php echo $item['href']; ?>" class="nav-item <?php echo $item['active'] ? 'active' : ''; ?>">
+                <?php foreach ($navItems as $item): ?>
+                    <a href="<?php echo htmlspecialchars($item['href']); ?>"
+                       class="nav-item <?php echo basename($item['href'], '.php') === $activePage ? 'active' : ''; ?>">
                         <span class="nav-icon"><?php echo $item['icon']; ?></span>
-                        <span class="nav-text"><?php echo $item['text']; ?></span>
+                        <span class="nav-text"><?php echo htmlspecialchars($item['text']); ?></span>
                     </a>
                 <?php endforeach; ?>
             </nav>

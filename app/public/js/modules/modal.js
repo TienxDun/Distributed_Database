@@ -74,7 +74,9 @@ export async function openEditModal(module, data) {
     if (Array.isArray(primaryKey)) {
         // Composite key (e.g., dangky)
         if (module === 'dangky') {
-            editingId = { masv: data.MaSV, mamon: data.MaMon };
+            editingId = { masv: data.masv, mamon: data.mamon };
+        } else if (module === 'ctdaotao') {
+            editingId = { makhoa: data.makhoa, khoahoc: data.khoahoc, mamh: data.mamh };
         }
     } else {
         editingId = data[primaryKey];

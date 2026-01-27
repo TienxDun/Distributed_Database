@@ -1,0 +1,130 @@
+/* Maintenance Page Specific Styles */
+.site-card {
+    background: rgba(17, 24, 39, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    min-height: 420px;
+    overflow: hidden;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.site-card:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5), 0 0 40px rgba(139, 92, 246, 0.15);
+    transform: translateY(-2px);
+}
+
+.site-card-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+    position: relative;
+}
+
+.site-card.a .site-card-header {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+}
+
+.site-card.b .site-card-header {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
+}
+
+.site-card.c .site-card-header {
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(20, 184, 166, 0.1) 100%);
+}
+
+.site-table-container {
+    flex: 1;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.site-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.875rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(31, 41, 55, 0.5);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+}
+
+.site-table th {
+    background: rgba(139, 92, 246, 0.1);
+    color: #d1d5db;
+    font-weight: 600;
+    text-align: left;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.site-table td {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    color: #d1d5db;
+    vertical-align: middle;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.site-table tr:hover td {
+    background: rgba(139, 92, 246, 0.05);
+}
+
+.site-status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    box-shadow: 0 0 10px currentColor;
+}
+
+.site-card.a .site-status-indicator {
+    background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%);
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
+}
+
+.site-card.b .site-status-indicator {
+    background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
+}
+
+.site-card.c .site-status-indicator {
+    background: linear-gradient(135deg, #06b6d4 0%, #14b8a6 100%);
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.6);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .site-card {
+        min-height: 380px;
+    }
+    .site-card-header {
+        padding: 1rem 1.5rem;
+    }
+    .site-table-container {
+        padding: 1rem;
+    }
+    .site-table th,
+    .site-table td {
+        padding: 0.75rem 1rem;
+        font-size: 0.8rem;
+    }
+}

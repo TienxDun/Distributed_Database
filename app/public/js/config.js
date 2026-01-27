@@ -213,9 +213,9 @@ export const MODAL_TITLES = {
 };
 
 export const PRIMARY_KEYS = {
-    khoa: 'MaKhoa',
-    monhoc: 'MaMH',
-    sinhvien: 'MaSV',
-    ctdaotao: ['MaKhoa', 'KhoaHoc', 'MaMH'],
-    dangky: ['MaSV', 'MaMon']
+    khoa: 'makhoa',
+    monhoc: 'mamh',
+    sinhvien: 'masv',
+    ctdaotao: ['makhoa', 'khoahoc', 'mamh'],
+    dangky: ['masv', 'mamon']
 };

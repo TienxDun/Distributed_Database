@@ -34,20 +34,25 @@ $routes = [
 $method = $_SERVER['REQUEST_METHOD'];
 
 if (array_key_exists($path, $routes)) {
-    $routeFile = './routes/' . $routes[$path] . '.php';
-    if (file_exists($routeFile)) {
-        require_once $routeFile;
-        $functionName = 'handle' . ucfirst($routes[$path]);
-        if (function_exists($functionName)) {
-            $functionName($method, $query);
-        } else {
-            sendResponse(['error' => 'Handler not found'], 500);
+    $routeFile = '/var/www/html/routes/' . $routes[$path] . '.php';
+    if (is_file($routeFile)) {
+        try {
+            require_once $routeFile;
+            $functionName = 'handle' . ucfirst($routes[$path]);
+            if (function_exists($functionName)) {
+                $functionName($method, $query);
+            } else {
+                sendResponse(['error' => 'Handler not found'], 500);
+            }
+        } catch (Exception $e) {
+            RequestLogger::end(0, 500);
+            sendResponse(['error' => 'Internal server error: ' . $e->getMessage()], 500);
         }
     } else {
         sendResponse(['error' => 'Route file not found'], 500);
     }
 } else {
-    require_once './routes/default.php';
+    require_once '../routes/default.php';
     handleDefault($method, $query);
 }
 ?>

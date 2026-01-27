@@ -56,6 +56,11 @@ function handleLogs($method, $query) {
             if (isset($logArray['_id'])) {
                 $logArray['_id'] = (string)$logArray['_id'];
             }
+            
+            // Add table_name and data_preview for UI
+            $logArray['table_name'] = $logArray['table'] ?? 'undefined';
+            $logArray['data_preview'] = isset($logArray['data']) ? json_encode($logArray['data'], JSON_UNESCAPED_UNICODE) : 'N/A';
+            
             $result[] = $logArray;
         }
         

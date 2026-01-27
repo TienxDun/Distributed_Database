@@ -13,14 +13,18 @@
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/maintenance.css">
 </head>
 
 <body>
 
     <div class="app-container">
         <!-- Sidebar -->
-        <?php include 'sidebar.php';
-        renderSidebar('maintenance'); ?>
+        <?php
+        include 'sidebar.php';
+        include 'maintenance_components.php';
+        renderSidebar('maintenance');
+        ?>
 
         <!-- Main Wrapper -->
         <main class="main-wrapper">
@@ -42,37 +46,36 @@
                     </div>
 
                     <!-- Actions Grid -->
-                    <div
-                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                        <?php
+                        renderActionCard(
+                            'Initialize Empty Database',
+                            'Khởi tạo database với schema trống, không có dữ liệu mẫu.',
+                            'Khởi tạo DB trống',
+                            'btn-primary',
+                            'initDatabase()',
+                            'border-primary',
+                            '🏗️'
+                        );
 
-                        <!-- Reset DB -->
-                        <div class="card" style="border-top: 4px solid var(--danger);">
-                            <div class="card-body" style="text-align: center;">
-                                <div style="font-size: 3rem; margin-bottom: 1rem;">🧹</div>
-                                <h3
-                                    style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--danger);">
-                                    Reset Database</h3>
-                                <p style="color: var(--slate-500); margin-bottom: 1.5rem;">
-                                    Xóa toàn bộ dữ liệu hiện có trong tất cả các Site để làm sạch hệ thống.
-                                </p>
-                                <button class="btn btn-danger w-100" onclick="resetDatabase()">Xác nhận Xóa
-                                    sạch</button>
-                            </div>
-                        </div>
+                        renderActionCard(
+                            'Reset Database',
+                            'Xóa toàn bộ dữ liệu hiện có trong tất cả các Site để làm sạch hệ thống.',
+                            'Xác nhận Xóa sạch',
+                            'btn-danger',
+                            'resetDatabase()',
+                            'border-danger'
+                        );
 
-                        <!-- Seed DB -->
-                        <div class="card" style="border-top: 4px solid var(--success);">
-                            <div class="card-body" style="text-align: center;">
-                                <div style="font-size: 3rem; margin-bottom: 1rem;">🌱</div>
-                                <h3
-                                    style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--success);">
-                                    Seed Sample Data</h3>
-                                <p style="color: var(--slate-500); margin-bottom: 1.5rem;">
-                                    Nạp lại bộ dữ liệu mẫu chuẩn (Khoa, Sinh viên, Môn học...).
-                                </p>
-                                <button class="btn btn-success w-100" onclick="seedDatabase()">Nạp dữ liệu mẫu</button>
-                            </div>
-                        </div>
+                        renderActionCard(
+                            'Seed Sample Data',
+                            'Nạp lại bộ dữ liệu mẫu chuẩn (Khoa, Sinh viên, Môn học...).',
+                            'Nạp dữ liệu mẫu',
+                            'btn-success',
+                            'seedDatabase()',
+                            'border-success'
+                        );
+                        ?>
                     </div>
 
                     <!-- Site Explorer -->
@@ -94,31 +97,35 @@
                                 So sánh dữ liệu thực tế được lưu trữ tại các phân mảnh (Sites) khác nhau.
                             </p>
 
-                            <div
-                                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
-                                <!-- Site A -->
-                                <div class="site-card a" id="site-card-a">
-                                    <div class="site-card-header">
-                                        SITE A
-                                    </div>
-                                    <div id="site-a-table" style="font-size: 0.85rem; overflow-x: auto;"></div>
-                                </div>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                                <?php
+                                // Sample data for initial load - in real app this would come from AJAX
+                                $sampleDataA = [
+                                    ['Makhoa' => 'CNTT', 'Tenkhoa' => 'Công nghệ thông tin'],
+                                    ['Makhoa' => 'DLKS', 'Tenkhoa' => 'Du lịch khách sạn'],
+                                    ['Makhoa' => 'KTTC', 'Tenkhoa' => 'Kế toán tài chính'],
+                                    ['Makhoa' => 'LLCT', 'Tenkhoa' => 'Luật công ty']
+                                ];
 
-                                <!-- Site B -->
-                                <div class="site-card b" id="site-card-b">
-                                    <div class="site-card-header">
-                                        SITE B
-                                    </div>
-                                    <div id="site-b-table" style="font-size: 0.85rem; overflow-x: auto;"></div>
-                                </div>
+                                renderSiteCard('a', 'site a', 'a', $sampleDataA);
 
-                                <!-- Site C -->
-                                <div class="site-card c" id="site-card-c">
-                                    <div class="site-card-header">
-                                        SITE C
-                                    </div>
-                                    <div id="site-c-table" style="font-size: 0.85rem; overflow-x: auto;"></div>
-                                </div>
+                                $sampleDataB = [
+                                    ['Makhoa' => 'NN', 'Tenkhoa' => 'Ngôn ngữ'],
+                                    ['Makhoa' => 'NVPD', 'Tenkhoa' => 'Ngôn ngữ và Văn hóa Phương Đông'],
+                                    ['Makhoa' => 'QHQT', 'Tenkhoa' => 'Quan hệ quốc tế'],
+                                    ['Makhoa' => 'QTKD', 'Tenkhoa' => 'Quản trị kinh doanh']
+                                ];
+
+                                renderSiteCard('b', 'site b', 'b', $sampleDataB);
+
+                                $sampleDataC = [
+                                    ['Makhoa' => 'SLCT', 'Tenkhoa' => 'Sư phạm Lịch sử'],
+                                    ['Makhoa' => 'SUAT', 'Tenkhoa' => 'Sư phạm Anh'],
+                                    ['Makhoa' => 'TLKS', 'Tenkhoa' => 'Thể dục thể thao']
+                                ];
+
+                                renderSiteCard('c', 'site c', 'c', $sampleDataC);
+                                ?>
                             </div>
                         </div>
                     </div>
@@ -129,20 +136,16 @@
     </div>
 
     <!-- LOADING OVERLAY -->
-    <div id="loadingOverlay"
-        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:2000; align-items:center; justify-content:center;">
+    <div id="loadingOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:2000; align-items:center; justify-content:center;">
         <div style="text-align:center;">
-            <div
-                style="width:40px; height:40px; border:4px solid var(--slate-200); border-top-color:var(--primary-600); border-radius:50%; animation:spin 1s linear infinite;">
-            </div>
+            <div class="loading-spinner" style="width:40px; height:40px; border:4px solid var(--slate-200); border-top-color:var(--primary-600); border-radius:50%; animation:spin 1s linear infinite;"></div>
             <div class="loading-text" style="margin-top:1rem; font-weight:500; color:var(--slate-600);">Đang xử lý...</div>
         </div>
     </div>
+
     <style>
         @keyframes spin {
-            100% {
-                transform: rotate(360deg);
-            }
+            100% { transform: rotate(360deg); }
         }
     </style>
 

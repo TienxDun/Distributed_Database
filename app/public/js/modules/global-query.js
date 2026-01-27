@@ -67,7 +67,7 @@ function createSimpleTable(data) {
 
     const showSiteColumn = getSiteColumnVisibility();
     const headers = Object.keys(data[0]);
-    let table = '<table class="table"><thead><tr>';
+    let table = '<div class="table-responsive"><table class="table"><thead><tr>';
 
     // Create headers
     headers.forEach(h => {
@@ -88,6 +88,7 @@ function createSimpleTable(data) {
 
             const value = row[h] !== null && row[h] !== undefined ? row[h] : '';
             let cellClass = '';
+            let cellStyle = '';
 
             // Add class for Site column
             if (h === 'Site') {
@@ -96,11 +97,16 @@ function createSimpleTable(data) {
                 else if (value === 'Site C') cellClass = ' class="site-c"';
             }
 
-            table += `<td${cellClass}>${value}</td>`;
+            // Add style for hoten column in query 4
+            if (h === 'hoten') {
+                cellClass += ' hoten-column';
+            }
+
+            table += `<td${cellClass}${cellStyle}>${value}</td>`;
         });
         table += '</tr>';
     });
 
-    table += '</tbody></table>';
+    table += '</tbody></table></div>';
     return table;
 }
