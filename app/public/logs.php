@@ -9,6 +9,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
@@ -106,12 +109,29 @@
                         </div>
                         <div class="card-body" style="padding: 0;">
                             <div id="logsContent">
-                                <div style="padding: 2rem; text-align: center; color: var(--slate-500);">
-                                    Vui lòng chọn bộ lọc để xem dữ liệu.
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="empty-state-title">Chưa có dữ liệu logs</h3>
+                                    <p class="empty-state-description">
+                                        Vui lòng chọn các bộ lọc bên trên để xem nhật ký hoạt động của hệ thống phân tán.
+                                    </p>
+                                    <div class="empty-state-actions">
+                                        <button class="empty-state-action primary" onclick="document.querySelector('.tab-btn').click()">
+                                            <i class="fas fa-filter"></i>
+                                            Áp dụng bộ lọc
+                                        </button>
+                                        <button class="empty-state-action secondary" onclick="loadAllLogs()">
+                                            <i class="fas fa-list"></i>
+                                            Xem tất cả
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                            <div id="pagination"
-                                style="padding: 1rem; border-top: 1px solid var(--border-color); display: flex; justify-content: center; gap: 0.5rem;">
+                            <div id="pagination" class="pagination-container">
                                 <!-- Pagination will be injected here -->
                             </div>
                         </div>

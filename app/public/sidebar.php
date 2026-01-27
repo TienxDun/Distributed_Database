@@ -75,14 +75,11 @@ function renderSidebar($page)
         </div>
 
         <div class="sidebar-footer">
-            <div class="user-profile" style="display: flex; align-items: center; gap: 0.5rem;">
-                <div
-                    style="width: 32px; height: 32px; background: var(--primary-100); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary-700); font-weight: bold;">
-                    A
-                </div>
-                <div>
-                    <div style="font-size: 0.875rem; font-weight: 500;">Admin User</div>
-                    <div style="font-size: 0.75rem; color: var(--slate-500);">System Admin</div>
+            <div class="user-profile">
+                <div class="user-avatar">A</div>
+                <div class="user-info">
+                    <div class="user-name">Admin User</div>
+                    <div class="user-role">System Admin</div>
                 </div>
             </div>
         </div>

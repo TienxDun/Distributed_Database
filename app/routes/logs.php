@@ -39,6 +39,10 @@ function handleLogs($method, $query) {
         $page = isset($query['page']) ? (int)$query['page'] : 1;
         $skip = ($page - 1) * $limit;
         
+        // Get total count for pagination
+        $total = MongoHelper::countAuditLogs($filter);
+        $totalPages = ceil($total / $limit);
+        
         $logs = MongoHelper::getAuditLogs($filter, $limit, $skip);
         
         // Convert to array and format
@@ -60,7 +64,9 @@ function handleLogs($method, $query) {
             'success' => true,
             'data' => $result,
             'page' => $page,
-            'limit' => $limit
+            'limit' => $limit,
+            'total' => $total,
+            'totalPages' => $totalPages
         ]);
         
     } catch (Exception $e) {

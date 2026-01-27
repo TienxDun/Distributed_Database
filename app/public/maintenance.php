@@ -97,30 +97,24 @@
                             <div
                                 style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
                                 <!-- Site A -->
-                                <div class="site-card" id="site-card-a"
-                                    style="border: 1px solid var(--primary-200); background: var(--primary-50); border-radius: var(--radius-md); padding: 1rem;">
-                                    <div
-                                        style="font-weight: 700; color: var(--primary-700); margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between;">
+                                <div class="site-card a" id="site-card-a">
+                                    <div class="site-card-header">
                                         SITE A
                                     </div>
                                     <div id="site-a-table" style="font-size: 0.85rem; overflow-x: auto;"></div>
                                 </div>
 
                                 <!-- Site B -->
-                                <div class="site-card" id="site-card-b"
-                                    style="border: 1px solid #fbcfe8; background: #fdf2f8; border-radius: var(--radius-md); padding: 1rem;">
-                                    <div
-                                        style="font-weight: 700; color: #be185d; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between;">
+                                <div class="site-card b" id="site-card-b">
+                                    <div class="site-card-header">
                                         SITE B
                                     </div>
                                     <div id="site-b-table" style="font-size: 0.85rem; overflow-x: auto;"></div>
                                 </div>
 
                                 <!-- Site C -->
-                                <div class="site-card" id="site-card-c"
-                                    style="border: 1px solid #a7f3d0; background: #ecfdf5; border-radius: var(--radius-md); padding: 1rem;">
-                                    <div
-                                        style="font-weight: 700; color: #047857; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between;">
+                                <div class="site-card c" id="site-card-c">
+                                    <div class="site-card-header">
                                         SITE C
                                     </div>
                                     <div id="site-c-table" style="font-size: 0.85rem; overflow-x: auto;"></div>
