@@ -5,7 +5,9 @@ services:
     plan: free
     region: singapore
     dockerfilePath: Dockerfile
-    startCommand: php -S 0.0.0.0:80 -t public public/router.php
+    # startCommand không bắt buộc nếu đã có CMD trong Dockerfile, 
+    # nhưng nếu để thì nên dùng biến $PORT để Render map chính xác
+    startCommand: php -S 0.0.0.0:$PORT -t public public/router.php
     envVars:
       - key: DB_HOST
         sync: false
