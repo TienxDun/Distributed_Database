@@ -5,17 +5,17 @@
     left: 1.5rem;
     top: 1.5rem;
     bottom: 1.5rem;
-    width: 300px;
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 32px;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+    width: 280px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    box-shadow: var(--glass-shadow);
     z-index: 1000;
     transition: var(--transition-normal);
     overflow-y: auto;
-    padding: 2rem 1rem;
+    padding: 2rem 1.5rem;
 }
 
 .sidebar.collapsed {
@@ -26,25 +26,34 @@
     width: 4px;
 }
 
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
 .sidebar-header {
-    padding: 1rem 0 2rem;
+    padding: 1rem 0 3rem;
     text-align: center;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 2rem;
 }
 
 .sidebar-header h2 {
     font-size: 1.5rem;
-    margin-bottom: 0.25rem;
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--primary), #fff);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px var(--primary-glow);
 }
 
 .sidebar-header p {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
-    letter-spacing: 0.1rem;
+    letter-spacing: 0.2rem;
     color: var(--text-muted);
+    opacity: 0.8;
 }
 
 .sidebar-section {
@@ -53,10 +62,12 @@
 
 .sidebar-section-title {
     padding: 0 1rem;
-    margin-bottom: 1rem;
-    font-size: 0.75rem;
-    letter-spacing: 0.05rem;
-    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.1rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    font-weight: 700;
 }
 
 .sidebar-nav {
@@ -70,27 +81,37 @@
     align-items: center;
     gap: 1rem;
     padding: 1rem 1.25rem;
-    border-radius: 20px;
-    color: var(--text-main);
+    border-radius: 16px;
+    color: var(--text-muted);
     font-weight: 500;
     transition: var(--transition-fast);
     margin-bottom: 0.5rem;
+    border: 1px solid transparent;
 }
 
 .sidebar-link:hover {
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.1);
     transform: translateX(5px);
-    color: var(--primary);
 }
 
 .sidebar-link.active {
-    background: var(--primary);
-    color: white;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    background: linear-gradient(90deg, rgba(var(--primary-h), var(--primary-s), var(--primary-l), 0.15), transparent);
+    color: var(--primary);
+    border-left: 3px solid var(--primary);
+    border-radius: 4px 16px 16px 4px;
+    box-shadow: none;
+    /* Removed heavy shadow */
+}
+
+.sidebar-link.active .sidebar-icon {
+    filter: drop-shadow(0 0 8px var(--primary));
 }
 
 .sidebar-icon {
     font-size: 1.25rem;
+    transition: transform 0.3s ease;
 }
 
 /* ==================== MAIN CONTENT ==================== */
@@ -108,22 +129,26 @@
 
 /* ==================== TOPBAR ==================== */
 
+/* ==================== TOPBAR ==================== */
+
 .topbar {
     display: flex;
     align-items: center;
     padding: 1rem 2rem;
-    background: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: var(--glass-bg);
+    /* Use shared glass variable */
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
     border-radius: 24px;
     margin-bottom: 2rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    box-shadow: var(--glass-shadow);
 }
 
 .sidebar-toggle {
-    background: white;
-    border: none;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
     width: 44px;
     height: 44px;
     border-radius: 12px;
@@ -132,13 +157,15 @@
     align-items: center;
     justify-content: center;
     font-size: 1.2rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     transition: var(--transition-fast);
 }
 
 .sidebar-toggle:hover {
     transform: scale(1.05);
     color: var(--primary);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 15px var(--primary-glow);
 }
 
 .topbar-title {

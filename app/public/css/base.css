@@ -1,30 +1,51 @@
 /* ==================== BASE STYLES ==================== */
 
 :root {
-    /* Modern Palette (HSL for better control) */
-    --primary-h: 221;
-    --primary-s: 83%;
-    --primary-l: 53%;
+    /* Modern Tech Dark Palette */
+    --primary-h: 210;
+    --primary-s: 100%;
+    --primary-l: 60%;
+    /* Neon Blue */
+
+    --accent-h: 280;
+    --accent-s: 100%;
+    --accent-l: 65%;
+    /* Neon Purple */
+
     --primary: hsl(var(--primary-h), var(--primary-s), var(--primary-l));
-    --primary-dark: hsl(var(--primary-h), var(--primary-s), 40%);
-    --primary-light: hsl(var(--primary-h), var(--primary-s), 90%);
+    --primary-glow: hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.5);
 
-    --success: #10b981;
-    --danger: #ef4444;
-    --warning: #f59e0b;
-    --info: #3b82f6;
+    --accent: hsl(var(--accent-h), var(--accent-s), var(--accent-l));
+    --accent-glow: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.5);
 
-    --bg-color: #f8fafc;
-    --card-bg: #ffffff;
-    --text-main: #0f172a;
-    --text-muted: #64748b;
-    --border-color: #e2e8f0;
+    --success: #00f0ff;
+    /* Cyber Cyan */
+    --danger: #ff0055;
+    /* Cyber Red */
+    --warning: #ffcc00;
+    /* Cyber Yellow */
+    --info: #0099ff;
 
-    /* Premium Glassmorphism */
-    --glass-bg: rgba(255, 255, 255, 0.4);
-    --glass-border: rgba(255, 255, 255, 0.5);
-    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    /* Dark Theme Backgrounds */
+    --bg-color: #030712;
+    /* Deepest Blue/Black */
+    --bg-gradient-Start: #0f172a;
+    --bg-gradient-end: #020617;
+
+    --card-bg: rgba(15, 23, 42, 0.6);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-color: rgba(148, 163, 184, 0.1);
+
+    /* Advanced Glassmorphism */
+    --glass-bg: rgba(15, 23, 42, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    /* Subtle white shine */
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
     --glass-blur: blur(20px);
+
+    /* Neon Glows */
+    --neon-shadow: 0 0 10px var(--primary-glow), 0 0 20px rgba(0, 0, 0, 0.5);
 
     /* Typography */
     --font-heading: 'Outfit', sans-serif;
@@ -35,31 +56,8 @@
     --transition-normal: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ==================== THEMES ==================== */
-
-body.theme-blue {
-    --primary-h: 217;
-    --primary-s: 91%;
-    --primary-l: 60%;
-    --bg-color: #eff6ff;
-    background: radial-gradient(circle at top right, #dbeafe, #eff6ff);
-}
-
-body.theme-pink {
-    --primary-h: 330;
-    --primary-s: 81%;
-    --primary-l: 60%;
-    --bg-color: #fdf2f8;
-    background: radial-gradient(circle at top right, #fce7f3, #fdf2f8);
-}
-
-body.theme-green {
-    --primary-h: 160;
-    --primary-s: 84%;
-    --primary-l: 39%;
-    --bg-color: #f0fdf4;
-    background: radial-gradient(circle at top right, #dcfce7, #f0fdf4);
-}
+/* ==================== DISABLE LIGHT THEMES TEMPORARILY OR OVERRIDE ==================== */
+/* For this upgrade, we stick to the Tech Dark theme as the base */
 
 * {
     margin: 0;
@@ -71,9 +69,8 @@ body {
     font-family: var(--font-body);
     background-color: var(--bg-color);
     background-image:
-        radial-gradient(at 0% 0%, hsla(221, 83%, 93%, 1) 0, transparent 50%),
-        radial-gradient(at 50% 0%, hsla(160, 84%, 93%, 1) 0, transparent 50%),
-        radial-gradient(at 100% 0%, hsla(330, 81%, 93%, 1) 0, transparent 50%);
+        radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.08) 0%, transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.08) 0%, transparent 25%);
     background-attachment: fixed;
     color: var(--text-main);
     line-height: 1.6;
@@ -91,23 +88,32 @@ h4,
 h5,
 h6 {
     font-family: var(--font-heading);
-    color: #1e293b;
+    color: var(--text-main);
+    /* Changed from hardcoded dark color */
     font-weight: 700;
     margin-bottom: 0.75rem;
+    letter-spacing: -0.01em;
 }
 
 h1 {
     font-size: clamp(2rem, 5vw, 2.75rem);
     letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
 }
 
 h2 {
     font-size: 1.75rem;
-    color: var(--primary-dark);
+    color: var(--primary);
+    /* Use primary neon */
+    text-shadow: 0 0 20px var(--primary-glow);
 }
 
 h3 {
     font-size: 1.5rem;
+    color: var(--text-main);
 }
 
 p {
