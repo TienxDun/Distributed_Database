@@ -12,7 +12,7 @@ services:
       - key: DB_PORT
         value: 5432
       - key: DB_NAME
-        value: huflit
+        value: neondb
       - key: DB_USER
         sync: false
       - key: DB_PASS

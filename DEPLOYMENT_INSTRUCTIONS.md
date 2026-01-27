@@ -36,7 +36,7 @@ Hệ thống của bạn đã được tối ưu hóa để chạy mượt mà t
 | `DB_NAME` | Thường là `neondb` |
 | `DB_USER` | Username từ Neon |
 | `DB_PASS` | Password từ Neon |
-| `MONGODB_URI` | Connection String từ Atlas |
+| `MONGO_URI` | Connection String từ Atlas |
 
 5. Nhấn **Deploy Web Service** và đợi khoảng 2-3 phút.
 
