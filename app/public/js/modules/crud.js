@@ -190,6 +190,7 @@ export async function updateRecord(module, id, formData) {
  * @param {string} tabName - Tab name
  */
 export function showTab(tabName) {
+    console.log('📑 Button clicked: Show Tab -', tabName);
     // Get current active tab
     const currentActiveTab = document.querySelector('.tab-content.active');
 

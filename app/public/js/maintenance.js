@@ -8,6 +8,7 @@ import { showLoading, hideLoading, showAlert } from './utils/dom.js';
  * Reset all data in the database
  */
 async function resetDatabase() {
+    console.log('🔄 Button clicked: Reset Database');
     if (!confirm('CẢNH BÁO: Hành động này sẽ xóa TOÀN BỘ dữ liệu trong database. Bạn có chắc chắn muốn tiếp tục?')) {
         return;
     }
@@ -28,6 +29,7 @@ async function resetDatabase() {
  * Seed database with sample data
  */
 async function seedDatabase() {
+    console.log('🌱 Button clicked: Seed Database');
     showLoading('Đang nạp dữ liệu mẫu...');
     try {
         const result = await apiPost('/maintenance?action=seed');
@@ -66,18 +68,25 @@ function renderSiteTable(containerId, rows) {
     const container = document.getElementById(`${containerId}-table`);
 
     if (!rows || rows.length === 0) {
-        container.innerHTML = '<p style="text-align:center; opacity:0.5; font-style:italic;">Trống</p>';
+        container.innerHTML = '<div style="text-align:center; padding: 1rem; color: var(--slate-500); font-style:italic; background: var(--slate-50); border-radius: var(--radius-sm);">Không có dữ liệu</div>';
         return;
     }
 
     const headers = Object.keys(rows[0]);
-    let html = '<table><thead><tr>';
-    headers.forEach(h => html += `<th>${h}</th>`);
+    let html = '<table class="table">';
+    html += '<thead><tr>';
+    headers.forEach(h => {
+        const displayHeader = h.charAt(0).toUpperCase() + h.slice(1);
+        html += `<th>${displayHeader}</th>`;
+    });
     html += '</tr></thead><tbody>';
 
     rows.forEach(row => {
         html += '<tr>';
-        headers.forEach(h => html += `<td>${row[h]}</td>`);
+        headers.forEach(h => {
+            const value = row[h] !== null && row[h] !== undefined ? row[h] : '';
+            html += `<td>${value}</td>`;
+        });
         html += '</tr>';
     });
 

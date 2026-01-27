@@ -10,6 +10,7 @@ import { showLoading, hideLoading, getLoadingState, showAlert, renderResult, sho
  * @param {string} module - Module name
  */
 export async function loadDataById(module) {
+    console.log('🔍 Button clicked: Load Data By ID -', module);
     if (getLoadingState()) return;
     
     const idInput = document.getElementById(`${module}-id`);
@@ -40,6 +41,7 @@ export async function loadDataById(module) {
  * Load CTDaoTao by filter (khoa and/or khoahoc)
  */
 export async function loadCTDaoTaoByFilter() {
+    console.log('🔍 Button clicked: Load CTDaoTao By Filter');
     if (getLoadingState()) return;
     
     const khoaInput = document.getElementById('ctdaotao-khoa');
@@ -75,6 +77,7 @@ export async function loadCTDaoTaoByFilter() {
  * Load DangKy by MaSV
  */
 export async function loadDangKyByMaSV() {
+    console.log('Button clicked: loadDangKyByMaSV');
     if (getLoadingState()) return;
     
     const masvInput = document.getElementById('dangky-masv');

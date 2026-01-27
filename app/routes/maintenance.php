@@ -22,6 +22,16 @@ function handleMaintenance($method, $query)
 
                     sendResponse(['message' => 'Toàn bộ dữ liệu đã được xóa sạch!']);
                 } elseif ($action === 'seed') {
+                    // Reset dữ liệu trước khi seed
+                    $schemas = ['site_a', 'site_b', 'site_c'];
+                    $tables = ['DangKy', 'SinhVien', 'CTDaoTao', 'Khoa', 'MonHoc'];
+
+                    foreach ($schemas as $schema) {
+                        foreach ($tables as $table) {
+                            $pdo->exec("TRUNCATE TABLE {$schema}.{$table} CASCADE");
+                        }
+                    }
+
                     // Execute the Postgres seed script
                     $seedFile = __DIR__ . '/../db/seed_postgres.sql';
                     if (!file_exists($seedFile)) {
@@ -29,8 +39,6 @@ function handleMaintenance($method, $query)
                     }
 
                     $sql = file_get_contents($seedFile);
-                    // Standard PDO exec doesn't like multi-statement with GO or comments sometimes
-                    // But our seed_postgres.sql doesn't have GO (it was cleaned for Postgres)
                     $pdo->exec($sql);
 
                     sendResponse(['message' => 'Dữ liệu mẫu đã được nạp thành công!']);

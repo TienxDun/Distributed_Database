@@ -87,18 +87,19 @@ function displayLogs(logs) {
     }
 
     let html = `
-        <table class="logs-table">
-            <thead>
-                <tr>
-                    <th>⏰ Thời gian</th>
-                    <th>🗂️ Bảng</th>
-                    <th>⚡ Thao tác</th>
-                    <th>🗺️ Site</th>
-                    <th>📝 Dữ liệu mới</th>
-                    <th>📄 Dữ liệu cũ</th>
-                </tr>
-            </thead>
-            <tbody>
+        <div class="table-responsive">
+            <table class="logs-table">
+                <thead>
+                    <tr>
+                        <th>⏰ Thời gian</th>
+                        <th>🗂️ Bảng</th>
+                        <th>⚡ Thao tác</th>
+                        <th>🗺️ Site</th>
+                        <th>📝 Dữ liệu mới</th>
+                        <th>📄 Dữ liệu cũ</th>
+                    </tr>
+                </thead>
+                <tbody>
     `;
 
     logs.forEach(log => {
@@ -116,8 +117,9 @@ function displayLogs(logs) {
     });
 
     html += `
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     `;
 
     document.getElementById('logsContent').innerHTML = html;
@@ -139,6 +141,7 @@ function updateStats(logs) {
     const deletes = logs.filter(l => l.operation === 'DELETE').length;
 
     document.getElementById('statsBar').innerHTML = `
+    <div class="stats-grid cols-4"> <!-- Use cols-4 for Logs page (4 cards) -->
         <div class="stat-card">
             <div class="stat-card-header">
                 <div class="stat-icon blue">📊</div>
@@ -175,6 +178,7 @@ function updateStats(logs) {
                 </div>
             </div>
         </div>
+    </div>
     `;
 }
 
@@ -185,11 +189,13 @@ function changePage(page) {
 }
 
 function applyFilters() {
+    console.log('Button clicked: applyFilters');
     currentPage = 1;
     loadLogs();
 }
 
 function resetFilters() {
+    console.log('Button clicked: resetFilters');
     document.getElementById('filterTable').value = '';
     document.getElementById('filterOperation').value = '';
     document.getElementById('filterSite').value = '';

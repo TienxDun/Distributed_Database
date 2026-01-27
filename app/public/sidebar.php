@@ -1,93 +1,92 @@
 <?php
 /**
  * Shared Sidebar Component
- * @param string $page - Current page ('ui', 'logs', 'stats')
+ * Updated for Modern UI Redesign
  */
 
 function renderSidebar($page)
 {
-    $headers = [
-        'ui' => ['title' => 'HUFLIT', 'subtitle' => 'Distributed DB'],
-        'logs' => ['title' => '📋 Logs', 'subtitle' => 'Audit System'],
-        'stats' => ['title' => '📊 Stats', 'subtitle' => 'Analytics Dashboard'],
-        'maintenance' => ['title' => '⚙️ Admin', 'subtitle' => 'System Control']
-    ];
-
-    $navLinks = [
+    $navConfig = [
         'ui' => [
-            ['href' => 'logs.php', 'icon' => '📋', 'text' => 'Audit Logs'],
-            ['href' => 'stats.php', 'icon' => '📊', 'text' => 'Statistics'],
-            ['href' => 'maintenance.php', 'icon' => '⚙️', 'text' => 'Quản trị']
+            'label' => 'Main Navigation',
+            'items' => [
+                ['href' => 'ui.php', 'icon' => '🏠', 'text' => 'Trang chủ', 'active' => true],
+                ['href' => 'logs.php', 'icon' => '📋', 'text' => 'Logs Hệ thống', 'active' => false],
+                ['href' => 'stats.php', 'icon' => '📊', 'text' => 'Thống kê', 'active' => false],
+                ['href' => 'maintenance.php', 'icon' => '⚙️', 'text' => 'Quản trị Admin', 'active' => false],
+            ]
         ],
         'logs' => [
-            ['href' => 'ui.php', 'icon' => '🏠', 'text' => 'Home'],
-            ['href' => 'stats.php', 'icon' => '📊', 'text' => 'Statistics'],
-            ['href' => 'maintenance.php', 'icon' => '⚙️', 'text' => 'Quản trị']
+            'label' => 'Main Navigation',
+            'items' => [
+                ['href' => 'ui.php', 'icon' => '🏠', 'text' => 'Trang chủ', 'active' => false],
+                ['href' => 'logs.php', 'icon' => '📋', 'text' => 'Logs Hệ thống', 'active' => true],
+                ['href' => 'stats.php', 'icon' => '📊', 'text' => 'Thống kê', 'active' => false],
+                ['href' => 'maintenance.php', 'icon' => '⚙️', 'text' => 'Quản trị Admin', 'active' => false],
+            ]
         ],
         'stats' => [
-            ['href' => 'ui.php', 'icon' => '🏠', 'text' => 'Home'],
-            ['href' => 'logs.php', 'icon' => '📋', 'text' => 'Audit Logs'],
-            ['href' => 'maintenance.php', 'icon' => '⚙️', 'text' => 'Quản trị']
+            'label' => 'Main Navigation',
+            'items' => [
+                ['href' => 'ui.php', 'icon' => '🏠', 'text' => 'Trang chủ', 'active' => false],
+                ['href' => 'logs.php', 'icon' => '📋', 'text' => 'Logs Hệ thống', 'active' => false],
+                ['href' => 'stats.php', 'icon' => '📊', 'text' => 'Thống kê', 'active' => true],
+                ['href' => 'maintenance.php', 'icon' => '⚙️', 'text' => 'Quản trị Admin', 'active' => false],
+            ]
         ],
         'maintenance' => [
-            ['href' => 'ui.php', 'icon' => '🏠', 'text' => 'Home'],
-            ['href' => 'logs.php', 'icon' => '📋', 'text' => 'Audit Logs'],
-            ['href' => 'stats.php', 'icon' => '📊', 'text' => 'Statistics']
+            'label' => 'Main Navigation',
+            'items' => [
+                ['href' => 'ui.php', 'icon' => '🏠', 'text' => 'Trang chủ', 'active' => false],
+                ['href' => 'logs.php', 'icon' => '📋', 'text' => 'Logs Hệ thống', 'active' => false],
+                ['href' => 'stats.php', 'icon' => '📊', 'text' => 'Thống kê', 'active' => false],
+                ['href' => 'maintenance.php', 'icon' => '⚙️', 'text' => 'Quản trị Admin', 'active' => true],
+            ]
         ]
     ];
 
-    $header = $headers[$page];
-    $links = $navLinks[$page];
+    $currentNav = $navConfig[$page] ?? $navConfig['ui'];
     ?>
-    <nav class="sidebar">
+    <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h2><?php echo $header['title']; ?></h2>
-            <p><?php echo $header['subtitle']; ?></p>
+            <div class="brand">
+                <span style="font-size: 1.5rem;">🎓</span>
+                <span>HUFLIT DB</span>
+            </div>
         </div>
 
-        <div class="sidebar-section">
-            <h3 class="sidebar-section-title">📊 Navigation</h3>
-            <ul class="sidebar-nav">
-                <?php foreach ($links as $link): ?>
-                    <li><a href="<?php echo $link['href']; ?>" class="sidebar-link">
-                            <span class="sidebar-icon"><?php echo $link['icon']; ?></span>
-                            <span class="sidebar-text"><?php echo $link['text']; ?></span>
-                        </a></li>
+        <div class="sidebar-content">
+            <div class="nav-section-title"><?php echo $currentNav['label']; ?></div>
+            <nav class="nav-list">
+                <?php foreach ($currentNav['items'] as $item): ?>
+                    <a href="<?php echo $item['href']; ?>" class="nav-item <?php echo $item['active'] ? 'active' : ''; ?>">
+                        <span class="nav-icon"><?php echo $item['icon']; ?></span>
+                        <span class="nav-text"><?php echo $item['text']; ?></span>
+                    </a>
                 <?php endforeach; ?>
-            </ul>
-        </div>
+            </nav>
 
-        <div class="sidebar-section">
-            <h3 class="sidebar-section-title">🗺️ Data Sites</h3>
-            <div class="site-toggle-container">
-                <label class="site-toggle-label" for="toggleSiteColumn">
-                    <input type="checkbox" id="toggleSiteColumn" checked onchange="toggleSiteColumnVisibility()"
-                        class="site-toggle-checkbox">
-                    <div class="site-toggle-slider">
-                        <span class="site-toggle-icon">🗺️</span>
-                    </div>
-                    <span class="site-toggle-text">
-                        <div class="site-toggle-main-text">Show Site Column</div>
-                        <div class="site-toggle-sub-text">Distributed data</div>
-                    </span>
-                </label>
+            <div class="nav-section-title">System Info</div>
+            <div style="padding: 0.5rem 0.75rem; font-size: 0.75rem; color: var(--slate-500);">
+                <p>Distributed Database</p>
+                <p>Version 2.0.0</p>
+                <p><?php echo date('Y-m-d'); ?></p>
             </div>
         </div>
 
-        <div class="sidebar-section">
-            <h3 class="sidebar-section-title">🎨 Theme</h3>
-            <div class="theme-selector">
-                <input type="radio" id="theme-blue" name="theme" value="blue">
-                <label for="theme-blue" class="theme-option" data-theme="blue" title="Xanh đại dương"></label>
-
-                <input type="radio" id="theme-pink" name="theme" value="pink">
-                <label for="theme-pink" class="theme-option" data-theme="pink" title="Hồng đào"></label>
-
-                <input type="radio" id="theme-green" name="theme" value="green" checked>
-                <label for="theme-green" class="theme-option" data-theme="green" title="Xanh rừng"></label>
+        <div class="sidebar-footer">
+            <div class="user-profile" style="display: flex; align-items: center; gap: 0.5rem;">
+                <div
+                    style="width: 32px; height: 32px; background: var(--primary-100); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary-700); font-weight: bold;">
+                    A
+                </div>
+                <div>
+                    <div style="font-size: 0.875rem; font-weight: 500;">Admin User</div>
+                    <div style="font-size: 0.75rem; color: var(--slate-500);">System Admin</div>
+                </div>
             </div>
         </div>
-    </nav>
+    </aside>
     <?php
 }
 ?>

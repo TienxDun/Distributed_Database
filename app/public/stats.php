@@ -4,200 +4,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="HUFLIT Distributed Database - Statistics Dashboard with analytics and performance metrics">
-    <title>Statistics Dashboard - HUFLIT MongoDB</title>
-    <link rel="icon" type="image/x-icon" href="css/favicon.ico">
-    <!-- Google Fonts for Vietnamese support -->
+    <title>Statistics Dashboard - HUFLIT Distributed Database</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/pages.css">
     <link rel="stylesheet" href="css/responsive.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4"></script>
-    <script src="js/sidebar.js"></script>
-    <script type="module" src="js/stats.js"></script>
-    <style>
-        /* Toggle Button Styles */
-        .toggle-btn {
-            position: relative;
-            width: 50px;
-            height: 26px;
-            border-radius: 13px;
-            background: #ccc;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            outline: none;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
-        }
-
-        .toggle-btn.active {
-            background: var(--primary, #2563eb);
-        }
-
-        .toggle-btn .toggle-slider {
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 22px;
-            height: 22px;
-            background: white;
-            border-radius: 50%;
-            transition: transform 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .toggle-btn.active .toggle-slider {
-            transform: translateX(24px);
-        }
-
-        .toggle-btn:hover {
-            box-shadow: 0 0 8px rgba(37, 99, 235, 0.3);
-        }
-
-        .toggle-btn.active:hover {
-            box-shadow: 0 0 8px rgba(37, 99, 235, 0.5);
-        }
-    </style>
-    <style>
-        /* Sidebar Button Styles */
-        .sidebar-btn {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            padding: 0.75rem 1rem;
-            background: none;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: left;
-            font-family: inherit;
-            font-size: 0.95rem;
-            color: var(--text, #1f2937);
-        }
-
-        .sidebar-btn:hover {
-            background: rgba(37, 99, 235, 0.1);
-            transform: translateX(4px);
-        }
-
-        .sidebar-btn.active {
-            background: rgba(37, 99, 235, 0.15);
-            border-left: 3px solid var(--primary, #2563eb);
-        }
-
-        .sidebar-btn.active .sidebar-status {
-            color: var(--primary, #2563eb);
-            font-weight: 600;
-        }
-
-        .sidebar-status {
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: var(--secondary, #6b7280);
-            background: rgba(255, 255, 255, 0.8);
-            padding: 0.25rem 0.5rem;
-            border-radius: 12px;
-            min-width: 32px;
-            text-align: center;
-        }
-    </style>
 </head>
 
 <body>
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay">
-        <div class="loading-spinner">
-            <div class="spinner"></div>
-            <div class="loading-text">Đang xử lý...</div>
-        </div>
-    </div>
 
-    <?php include 'sidebar.php';
-    renderSidebar('stats'); ?>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <?php include 'sidebar.php';
+        renderSidebar('stats'); ?>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="topbar">
-            <button class="sidebar-toggle" onclick="toggleSidebar()">
-                <span class="hamburger-icon">☰</span>
-            </button>
-            <div class="topbar-title">
-                <h1>📊 Statistics Dashboard</h1>
-                <p>Thống kê và phân tích - HUFLIT Distributed Database</p>
-            </div>
-        </div>
-
-        <div class="content-wrapper">
-            <div class="stats-overview" id="statsOverview">
-                <div class="loading-container">
-                    <div class="spinner"></div>
-                    <div class="loading-text">Đang tải thống kê...</div>
+        <!-- Main Wrapper -->
+        <main class="main-wrapper">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="toggle-sidebar-btn" id="toggleSidebarBtn">☰</button>
+                    <h1 class="page-title">Statistics & Analytics</h1>
                 </div>
-            </div>
+            </header>
 
-            <div class="charts-grid">
-                <div class="chart-container">
-                    <h3>📊 Thao tác theo loại</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="operationsChart"></canvas>
-                    </div>
-                </div>
+            <!-- Content Body -->
+            <div class="content-body">
+                <div class="container">
 
-                <div class="chart-container">
-                    <h3>📋 Thao tác theo bảng</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="tablesChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div class="charts-grid">
-                <div class="chart-container">
-                    <h3>🗺️ Thao tác theo Site</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="sitesChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="chart-container">
-                    <h3>🔗 Truy vấn theo Endpoint</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="endpointsChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div class="charts-grid">
-                <div class="chart-container">
-                    <h3>⚡ Thời gian phản hồi trung bình (ms)</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="responseTimeChart" style="width: 100%; height: 100%;"></canvas>
-                        <div id="responseTimeMessage"
-                            style="text-align: center; padding: 20px; color: #666; display: none;">
-                            Đang tải dữ liệu...
+                    <!-- Stats Overview -->
+                    <div id="statsOverview" style="margin-bottom: 2rem;">
+                        <div class="card">
+                            <div class="card-body" style="text-align: center; color: var(--slate-500);">
+                                <div class="spinner"
+                                    style="border-width: 3px; width: 30px; height: 30px; display: inline-block;"></div>
+                                <p style="margin-top: 0.5rem;">Đang tải tổng quan hệ thống...</p>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- Charts Grid -->
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+                        <!-- Operations Chart -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">📊 Thao tác theo loại</h2>
+                            </div>
+                            <div class="card-body">
+                                <div style="position: relative; height: 300px;">
+                                    <canvas id="operationsChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tables Chart -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">📋 Thao tác theo bảng</h2>
+                            </div>
+                            <div class="card-body">
+                                <div style="position: relative; height: 300px;">
+                                    <canvas id="tablesChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+                        <!-- Sites Chart -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">🗺️ Hoạt động theo Site</h2>
+                            </div>
+                            <div class="card-body">
+                                <div style="position: relative; height: 300px;">
+                                    <canvas id="sitesChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Endpoints Chart -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">🔗 Truy vấn Endpoint</h2>
+                            </div>
+                            <div class="card-body">
+                                <div style="position: relative; height: 300px;">
+                                    <canvas id="endpointsChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Response Time Chart -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">⚡ Thời gian phản hồi (ms)</h2>
+                        </div>
+                        <div class="card-body">
+                            <div style="position: relative; height: 300px;">
+                                <canvas id="responseTimeChart"></canvas>
+                                <div id="responseTimeMessage"
+                                    style="text-align: center; padding: 20px; color: #666; display: none;">
+                                    Chưa có dữ liệu phản hồi.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="lastUpdated"
+                        style="text-align: right; font-size: 0.75rem; color: var(--slate-400); margin-top: 1rem;"></div>
+
                 </div>
             </div>
-
-            <div class="last-updated" id="lastUpdated"></div>
-        </div>
+        </main>
     </div>
 
+    <!-- LOADING OVERLAY -->
+    <div id="loadingOverlay"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:2000; align-items:center; justify-content:center;">
+        <div style="text-align:center;">
+            <div
+                style="width:40px; height:40px; border:4px solid var(--slate-200); border-top-color:var(--primary-600); border-radius:50%; animation:spin 1s linear infinite;">
+            </div>
+            <div class="loading-text" style="margin-top:1rem; font-weight:500; color:var(--slate-600);">Đang xử lý...
+            </div>
+        </div>
+    </div>
+    <style>
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
 
-
-
-
-
-
+    <script src="js/sidebar.js"></script>
+    <script type="module" src="js/stats.js"></script>
 </body>
 
 </html>

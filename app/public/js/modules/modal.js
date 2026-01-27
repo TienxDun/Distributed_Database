@@ -42,18 +42,19 @@ function removeEscapeKeyListener() {
  * @param {string} module - Module name
  */
 export async function openCreateModal(module) {
+    console.log('➕ Button clicked: Open Create Modal -', module);
     currentModule = module;
     currentAction = 'create';
     editingId = null;
-    
+
     document.getElementById('modalTitle').textContent = MODAL_TITLES[module].create;
     document.getElementById('formFields').innerHTML = buildFormFields(module, {});
     hideModalAlert();
     document.getElementById('crudModal').classList.add('show');
-    
+
     // Load options for select fields
     await populateSelectOptions();
-    
+
     // Add Escape key listener
     addEscapeKeyListener();
 }
@@ -64,9 +65,10 @@ export async function openCreateModal(module) {
  * @param {Object} data - Record data
  */
 export async function openEditModal(module, data) {
+    console.log('✏️ Button clicked: Open Edit Modal -', module, data);
     currentModule = module;
     currentAction = 'edit';
-    
+
     // Set editing ID based on primary key
     const primaryKey = PRIMARY_KEYS[module];
     if (Array.isArray(primaryKey)) {
@@ -77,15 +79,15 @@ export async function openEditModal(module, data) {
     } else {
         editingId = data[primaryKey];
     }
-    
+
     document.getElementById('modalTitle').textContent = MODAL_TITLES[module].edit;
     document.getElementById('formFields').innerHTML = buildFormFields(module, data);
     hideModalAlert();
     document.getElementById('crudModal').classList.add('show');
-    
+
     // Load options for select fields
     await populateSelectOptions();
-    
+
     // Add Escape key listener
     addEscapeKeyListener();
 }
@@ -97,7 +99,7 @@ export function closeModal() {
     document.getElementById('crudModal').classList.remove('show');
     document.getElementById('crudForm').reset();
     hideModalAlert();
-    
+
     // Remove Escape key listener
     removeEscapeKeyListener();
 }
@@ -112,7 +114,7 @@ export function showModalAlert(message, type = 'error') {
     alertDiv.textContent = message;
     alertDiv.className = 'alert alert-' + type;
     alertDiv.style.display = 'block';
-    
+
     // Scroll to top of modal to see alert
     const modalContent = document.querySelector('.modal-content');
     if (modalContent) {
@@ -135,34 +137,34 @@ export function hideModalAlert() {
  */
 async function populateSelectOptions() {
     const selectElements = document.querySelectorAll('select[data-options-from]');
-    
+
     if (selectElements.length === 0) {
         return; // No select fields to populate
     }
-    
+
     console.log(`[populateSelectOptions] Found ${selectElements.length} select fields to populate`);
-    
+
     // Populate all selects in parallel
     const promises = Array.from(selectElements).map(async (selectEl) => {
         const endpoint = selectEl.dataset.optionsFrom;
         const valueField = selectEl.dataset.optionValue;
         const labelFields = JSON.parse(selectEl.dataset.optionLabel);
         const selectedValue = selectEl.dataset.selectedValue || '';
-        
+
         try {
             // Fetch options from API
             const options = await fetchOptionsForField(endpoint, valueField, labelFields);
-            
+
             // Clear loading option
             selectEl.innerHTML = '';
             selectEl.classList.remove('select-loading');
-            
+
             // Add empty option
             const emptyOption = document.createElement('option');
             emptyOption.value = '';
             emptyOption.textContent = `-- Chọn ${selectEl.previousElementSibling.textContent.replace(' *', '')} --`;
             selectEl.appendChild(emptyOption);
-            
+
             // Add options
             options.forEach(opt => {
                 const option = document.createElement('option');
@@ -173,7 +175,7 @@ async function populateSelectOptions() {
                 }
                 selectEl.appendChild(option);
             });
-            
+
             console.log(`[populateSelectOptions] Populated ${options.length} options for ${endpoint}`);
         } catch (error) {
             console.error(`[populateSelectOptions] Error loading options from ${endpoint}:`, error);
@@ -182,7 +184,7 @@ async function populateSelectOptions() {
             selectEl.classList.add('select-error');
         }
     });
-    
+
     await Promise.all(promises);
     console.log('[populateSelectOptions] All selects populated');
 }
@@ -195,27 +197,35 @@ async function populateSelectOptions() {
  */
 function buildFormFields(module, data = {}) {
     let fieldsConfig = FIELDS_CONFIG[module];
-    
+
     // Handle special case for dangky (different fields for create/edit)
     if (module === 'dangky') {
         fieldsConfig = FIELDS_CONFIG[module][currentAction];
     }
-    
+
     let html = '';
-    
+
     for (const field of fieldsConfig) {
-        const value = data[field.name] || '';
-        const isReadonly = (field.readonly === true) || 
-                          (field.readonly === 'edit' && currentAction === 'edit') || 
-                          (field.readonly === 'create' && currentAction === 'create');
-        
+        // Helper to get value case-insensitively
+        const getVal = (obj, key) => {
+            if (obj[key] !== undefined) return obj[key];
+            const lowerKey = key.toLowerCase();
+            const foundKey = Object.keys(obj).find(k => k.toLowerCase() === lowerKey);
+            return foundKey ? obj[foundKey] : undefined;
+        };
+
+        const value = getVal(data, field.name) || '';
+        const isReadonly = (field.readonly === true) ||
+            (field.readonly === 'edit' && currentAction === 'edit') ||
+            (field.readonly === 'create' && currentAction === 'create');
+
         html += '<div class="form-group">';
         html += `<label>${field.label}`;
         if (field.required) {
             html += ' <span class="required">*</span>';
         }
         html += '</label>';
-        
+
         // Check if field is a select dropdown
         if (field.type === 'select') {
             // Build select element
@@ -229,14 +239,14 @@ function buildFormFields(module, data = {}) {
             html += '>';
             html += `<option value="">⏳ ${field.placeholder || 'Đang tải...'}</option>`;
             html += '</select>';
-            
+
             // Add helper text
             if (isReadonly && field.lockMessage) {
-                html += `<small style="color: #64748b;">${field.lockMessage}</small>`;
+                html += `<small>${field.lockMessage}</small>`;
             } else if (currentAction === 'edit' && field.readonly === 'edit') {
-                html += `<small style="color: #64748b;">🔒 ${field.label} không thể chỉnh sửa</small>`;
+                html += `<small>🔒 Chi tiết bản ghi này không thể chỉnh sửa</small>`;
             } else if (field.placeholder) {
-                html += `<small style="color: #64748b;">${field.placeholder}</small>`;
+                html += `<small>${field.placeholder}</small>`;
             }
         } else {
             // Build regular input element
@@ -244,29 +254,29 @@ function buildFormFields(module, data = {}) {
             attrs.push(`type="${field.type || 'text'}"`);
             attrs.push(`id="field-${field.name}"`);
             attrs.push(`value="${value}"`);
-            
+
             if (field.maxlength) attrs.push(`maxlength="${field.maxlength}"`);
             if (field.min !== undefined) attrs.push(`min="${field.min}"`);
             if (field.max !== undefined) attrs.push(`max="${field.max}"`);
             if (field.step) attrs.push(`step="${field.step}"`);
             if (field.required) attrs.push('required');
             if (isReadonly) attrs.push('readonly');
-            
+
             html += `<input ${attrs.join(' ')}>`;
-            
+
             // Add helper text
             if (isReadonly && field.lockMessage) {
-                html += `<small style="color: #64748b;">${field.lockMessage}</small>`;
+                html += `<small>${field.lockMessage}</small>`;
             } else if (currentAction === 'edit' && field.readonly === 'edit') {
-                html += `<small style="color: #64748b;">🔒 ${field.label} không thể chỉnh sửa</small>`;
+                html += `<small>🔒 Mã ${field.label} không thể chỉnh sửa</small>`;
             } else if (field.placeholder) {
-                html += `<small style="color: #64748b;">${field.placeholder}</small>`;
+                html += `<small>${field.placeholder}</small>`;
             }
         }
-        
+
         html += '</div>';
     }
-    
+
     return html;
 }
 
@@ -275,10 +285,10 @@ function buildFormFields(module, data = {}) {
  */
 export async function submitForm() {
     if (getLoadingState()) return;
-    
+
     // Collect form data
     const formData = collectFormData('#formFields', 'field-');
-    
+
     // Special handling for dangky: prioritize MaSV_input over MaSV dropdown
     if (currentModule === 'dangky' && currentAction === 'create') {
         if (formData['MaSV_input'] && formData['MaSV_input'].trim() !== '') {
@@ -291,60 +301,60 @@ export async function submitForm() {
         }
         // If both are empty, validation will catch it
     }
-    
+
     // Validate required fields
     const requiredFields = [];
     document.querySelectorAll('#formFields input[required]').forEach(input => {
         if (input.id.startsWith('field-')) {
             const fieldName = input.id.replace('field-', '');
-            
+
             // Special validation for dangky MaSV fields
             if (currentModule === 'dangky' && currentAction === 'create' && fieldName === 'MaSV') {
                 // Skip validation for MaSV dropdown since we have MaSV_input as alternative
                 return;
             }
-            
+
             if (!formData[fieldName] || formData[fieldName].trim() === '') {
                 requiredFields.push(fieldName);
             }
         }
     });
-    
+
     // Special validation for dangky: ensure at least one MaSV field is filled
     if (currentModule === 'dangky' && currentAction === 'create') {
         const hasMaSV = formData['MaSV'] && formData['MaSV'].trim() !== '';
         const hasMaSVInput = formData['MaSV_input'] && formData['MaSV_input'].trim() !== '';
-        
+
         if (!hasMaSV && !hasMaSVInput) {
             showModalAlert('⚠️ Vui lòng chọn sinh viên từ danh sách hoặc nhập mã sinh viên', 'error');
             return;
         }
     }
-    
+
     if (requiredFields.length > 0) {
         showModalAlert(`⚠️ Vui lòng nhập ${requiredFields.join(', ')}`, 'error');
         return;
     }
-    
+
     // Hide any previous alerts
     hideModalAlert();
-    
+
     const submitBtn = document.getElementById('submitBtn');
     setButtonLoading(submitBtn, true);
-    
+
     try {
         let result;
-        
+
         if (currentAction === 'create') {
             result = await createRecord(currentModule, formData);
         } else {
             result = await updateRecord(currentModule, editingId, formData);
         }
-        
+
         // Import showAlert dynamically to avoid circular dependency
         const { showAlert } = await import('../utils/dom.js');
         showAlert(currentModule, result.message || 'Thành công!', 'success');
-        
+
         closeModal();
         loadData(currentModule);
     } catch (error) {
