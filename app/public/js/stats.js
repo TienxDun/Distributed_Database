@@ -37,6 +37,8 @@ function initializePage() {
 }
 
 // Initialize when DOM is ready
+import { API_BASE } from './config.js';
+
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializePage);
 } else {
@@ -46,15 +48,15 @@ if (document.readyState === 'loading') {
 async function loadStatistics() {
     try {
         // Load overview stats
-        const overviewResponse = await fetch('http://localhost:8080/stats?type=overview');
+        const overviewResponse = await fetch(`${API_BASE}/stats?type=overview`);
         const overview = await overviewResponse.json();
 
         // Load query stats
-        const queryResponse = await fetch('http://localhost:8080/stats?type=query_stats');
+        const queryResponse = await fetch(`${API_BASE}/stats?type=query_stats`);
         const queryStats = await queryResponse.json();
 
         // Load performance stats
-        const perfResponse = await fetch('http://localhost:8080/stats?type=performance');
+        const perfResponse = await fetch(`${API_BASE}/stats?type=performance`);
         const perfStats = await perfResponse.json();
 
         displayOverview(overview.data, queryStats.data);

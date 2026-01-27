@@ -1,3 +1,5 @@
+import { API_BASE } from './config.js';
+
 // Logs page JavaScript
 
 // Module variables
@@ -55,7 +57,7 @@ async function loadLogs() {
     try {
         document.getElementById('logsContent').innerHTML = '<div class="loading">Đang tải dữ liệu</div>';
 
-        const response = await fetch(`http://localhost:8080/logs?${params}`);
+        const response = await fetch(`${API_BASE}/logs?${params}`);
         const result = await response.json();
 
         if (result.success) {

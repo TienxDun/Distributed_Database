@@ -2,7 +2,12 @@
  * Configuration and constants for the application
  */
 
-export const API_BASE = 'http://localhost:8080';
+// Dynamically determine API base URL
+// On Render, both UI and API share the same origin
+// On Local Docker, UI (port 8081) needs to talk to API (port 8080)
+export const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? (window.location.port === '8081' ? 'http://localhost:8080' : '')
+    : window.location.origin;
 
 export const MODULES = {
     KHOA: 'khoa',
