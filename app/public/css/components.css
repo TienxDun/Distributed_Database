@@ -242,7 +242,7 @@
     right: 0;
     width: 20px;
     height: 20px;
-    background: linear-gradient(135deg, transparent, rgba(0,0,0,0.1));
+    background: linear-gradient(135deg, transparent, rgba(0, 0, 0, 0.1));
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -1136,10 +1136,13 @@
 }
 
 @keyframes pulseGlow {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 0.3;
         transform: translate(-50%, -50%) scale(1);
     }
+
     50% {
         opacity: 0.6;
         transform: translate(-50%, -50%) scale(1.1);
@@ -1163,9 +1166,12 @@
 }
 
 @keyframes floatIcon {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: translateY(0px);
     }
+
     50% {
         transform: translateY(-10px);
     }
@@ -1308,6 +1314,7 @@
         font-size: 1.125rem;
     }
 }
+
 .pagination-container {
     padding: var(--space-lg);
     border-top: 1px solid var(--glass-border);
@@ -1457,6 +1464,7 @@
         margin-left: 0;
         align-self: center;
     }
+}
 
 /* Responsive adjustments for site table containers */
 @media (max-width: 768px) {
@@ -1470,18 +1478,21 @@
         height: 15px;
     }
 
-    .site-table td, .site-table th {
+    .site-table td,
+    .site-table th {
         padding: 0.75rem 1rem;
         font-size: 0.8rem;
         min-width: 60px;
     }
 
-    .site-table td:nth-child(1), .site-table th:nth-child(1) {
+    .site-table td:nth-child(1),
+    .site-table th:nth-child(1) {
         min-width: 100px;
         max-width: 120px;
     }
 
-    .site-table td:nth-child(2), .site-table th:nth-child(2) {
+    .site-table td:nth-child(2),
+    .site-table th:nth-child(2) {
         min-width: 120px;
         max-width: 160px;
     }
@@ -1492,13 +1503,15 @@
         padding: 0.125rem;
     }
 
-    .site-table td, .site-table th {
+    .site-table td,
+    .site-table th {
         padding: 0.5rem 0.75rem;
         font-size: 0.75rem;
     }
 
     /* Ẩn cột Khoahoc trên mobile rất nhỏ */
-    .site-table th:nth-child(4), .site-table td:nth-child(4) {
+    .site-table th:nth-child(4),
+    .site-table td:nth-child(4) {
         display: none;
     }
 }
@@ -1589,15 +1602,20 @@
 }
 
 @keyframes float {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: translateY(0px) rotate(0deg);
     }
+
     25% {
         transform: translateY(-3px) rotate(1deg);
     }
+
     50% {
         transform: translateY(-6px) rotate(0deg);
     }
+
     75% {
         transform: translateY(-3px) rotate(-1deg);
     }
