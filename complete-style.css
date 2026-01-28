@@ -604,6 +604,7 @@ select {
     border-color: var(--glass-border-light);
     color: var(--text-main);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 .btn-secondary:hover {
@@ -768,6 +769,7 @@ select {
     background: var(--glass-bg-light);
     color: var(--text-main);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 .form-group input::placeholder,
@@ -860,6 +862,7 @@ select {
     align-items: center;
     gap: 0.75rem;
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 .alert-success {
@@ -1603,6 +1606,7 @@ select {
     transition: var(--transition);
     border: 1px solid var(--glass-border);
     background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     color: var(--text-main);
     position: relative;
@@ -1697,6 +1701,7 @@ select {
     border: 1px solid var(--glass-border);
     background: var(--glass-bg-light);
     color: var(--text-secondary);
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     position: relative;
     overflow: hidden;
@@ -1751,6 +1756,7 @@ select {
     color: var(--dark-400);
     font-size: 1.25rem;
     font-weight: 600;
+    -webkit-user-select: none;
     user-select: none;
 }
 
@@ -1764,6 +1770,7 @@ select {
     border-radius: var(--radius-sm);
     border: 1px solid var(--glass-border);
     backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
 }
 
 /* ==================== 6. RESPONSIVE ==================== */
@@ -1808,6 +1815,7 @@ select {
         height: 100%;
         background: rgba(3, 7, 18, 0.7);
         backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
         z-index: 45;
         display: none;
     }
