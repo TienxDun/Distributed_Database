@@ -19,17 +19,17 @@
     <!-- FontAwesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
 
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/layout.css">
-    <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/layout.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
 </head>
 
 <body>
 
     <div class="app-container">
         <!-- Sidebar -->
-        <?php include 'sidebar.php';
+        <?php include 'Components/sidebar.php';
         renderSidebar('logs'); ?>
 
         <!-- Main Wrapper -->
@@ -166,8 +166,8 @@
         }
     </style>
 
-    <script src="js/sidebar.js"></script>
-    <script type="module" src="js/logs.js"></script>
+    <script src="assets/js/sidebar.js"></script>
+    <script type="module" src="assets/js/logs.js"></script>
 </body>
 
 </html>

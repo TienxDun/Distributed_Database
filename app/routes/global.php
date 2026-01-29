@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../common.php';
+require_once __DIR__ . '/../Core/common.php';
 
 function handleGlobal($method, $query) {
     try {

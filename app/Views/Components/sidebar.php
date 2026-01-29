@@ -7,10 +7,10 @@
 function renderSidebar($activePage = 'ui')
 {
     $navItems = [
-        ['href' => 'ui.php', 'icon' => '🏠', 'text' => 'Trang chủ'],
-        ['href' => 'logs.php', 'icon' => '📋', 'text' => 'Logs Hệ thống'],
-        ['href' => 'stats.php', 'icon' => '📊', 'text' => 'Thống kê'],
-        ['href' => 'maintenance.php', 'icon' => '⚙️', 'text' => 'Quản trị Admin'],
+        ['href' => '/', 'icon' => '🏠', 'text' => 'Trang chủ'],
+        ['href' => '/logs-ui', 'icon' => '📋', 'text' => 'Logs Hệ thống'],
+        ['href' => '/stats-ui', 'icon' => '📊', 'text' => 'Thống kê'],
+        ['href' => '/maintenance-ui', 'icon' => '⚙️', 'text' => 'Quản trị Admin'],
     ];
 
     ?>
@@ -26,8 +26,12 @@ function renderSidebar($activePage = 'ui')
             <div class="nav-section-title">Main Navigation</div>
             <nav class="nav-list">
                 <?php foreach ($navItems as $item): ?>
+                    <?php 
+                        $isActive = ($item['href'] === '/' && $activePage === 'ui') || 
+                                   (strpos($item['href'], $activePage) !== false);
+                    ?>
                     <a href="<?php echo htmlspecialchars($item['href']); ?>"
-                       class="nav-item <?php echo basename($item['href'], '.php') === $activePage ? 'active' : ''; ?>">
+                       class="nav-item <?php echo $isActive ? 'active' : ''; ?>">
                         <span class="nav-icon"><?php echo $item['icon']; ?></span>
                         <span class="nav-text"><?php echo htmlspecialchars($item['text']); ?></span>
                     </a>

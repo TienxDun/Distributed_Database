@@ -10,7 +10,7 @@ Hệ thống của bạn đã được tối ưu hóa để chạy mượt mà t
 1. Đăng ký tài khoản tại **Neon.tech**.
 2. Tạo project mới (Ví dụ: `huflit-distributed-db`).
 3. Trong tab **Dashboard**, sao chép các thông tin kết nối (Host, User, Password, Database).
-4. **Quan trọng**: Truy cập vào mục **SQL Editor** trên Neon và chạy lần lượt nội dung 3 file SQL (có trong thư mục `app/db/` của project):
+4. **Quan trọng**: Truy cập vào mục **SQL Editor** trên Neon và chạy lần lượt nội dung 3 file SQL (có trong thư mục `database/global/` của project):
    - `init_postgres.sql`: Khởi tạo cấu trúc bảng và view.
    - `triggers_postgres.sql`: Cài đặt bộ não (Trigger) xử lý phân tán.
    - `seed_postgres.sql`: Nạp dữ liệu mẫu để demo.

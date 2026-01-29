@@ -1,6 +1,6 @@
 services: 
   api_php: 
-    build: ./app
+    build: .
     command: php -S 0.0.0.0:8080 -t public public/router.php
     container_name: api_php
     networks:
@@ -18,14 +18,14 @@ services:
     ports: 
       - "8080:8080"
     volumes:
-      - ./app:/var/www/html
+      - .:/var/www/html
     depends_on: 
       - postgres
       - mongodb
 
   app_php:
-    build: ./app
-    command: php -S 0.0.0.0:8081 -t public
+    build: .
+    command: php -S 0.0.0.0:8081 -t public public/router.php
     container_name: app_php
     networks:
       - huflit-network
@@ -42,7 +42,7 @@ services:
     ports:
       - "8081:8081"
     volumes:
-      - ./app:/var/www/html
+      - .:/var/www/html
     depends_on: 
       - postgres
       - mongodb
@@ -59,9 +59,9 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./db/global/init_postgres.sql:/docker-entrypoint-initdb.d/01_init.sql
-      - ./db/global/triggers_postgres.sql:/docker-entrypoint-initdb.d/02_triggers.sql
-      - ./db/global/seed_postgres.sql:/docker-entrypoint-initdb.d/03_seed.sql
+      - ./database/global/init_postgres.sql:/docker-entrypoint-initdb.d/01_init.sql
+      - ./database/global/triggers_postgres.sql:/docker-entrypoint-initdb.d/02_triggers.sql
+      - ./database/global/seed_postgres.sql:/docker-entrypoint-initdb.d/03_seed.sql
       - postgres_data:/var/lib/postgresql/data
 
   mongodb:
@@ -76,7 +76,7 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - ./db/mongodb/init:/docker-entrypoint-initdb.d
+      - ./database/mongodb/init:/docker-entrypoint-initdb.d
       - mongodb_data:/data/db
       - mongodb_config:/data/configdb
 

@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../mongo_helper.php';
+require_once __DIR__ . '/../Core/mongo_helper.php';
 
 function handleLogs($method, $query) {
     if ($method !== 'GET') {

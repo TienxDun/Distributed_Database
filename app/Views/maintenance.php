@@ -16,11 +16,11 @@
         <path d='M80 20 L83 28 L91 31 L83 34 L80 42 L77 34 L69 31 L77 28 Z' fill='%23fef08a'/>
     </svg>">
 
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/layout.css">
-    <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/responsive.css">
-    <link rel="stylesheet" href="css/maintenance.css">
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/layout.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+    <link rel="stylesheet" href="assets/css/maintenance.css">
 </head>
 
 <body>
@@ -28,8 +28,8 @@
     <div class="app-container">
         <!-- Sidebar -->
         <?php
-        include 'sidebar.php';
-        include 'maintenance_components.php';
+        include 'Components/sidebar.php';
+        include 'Components/maintenance_components.php';
         renderSidebar('maintenance');
         ?>
 
@@ -156,8 +156,8 @@
         }
     </style>
 
-    <script src="js/sidebar.js"></script>
-    <script type="module" src="js/maintenance.js"></script>
+    <script src="assets/js/sidebar.js"></script>
+    <script type="module" src="assets/js/maintenance.js"></script>
 </body>
 
 </html>

@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../common.php';
+require_once __DIR__ . '/../Core/common.php';
 
 function handleMaintenance($method, $query)
 {
@@ -33,7 +33,7 @@ function handleMaintenance($method, $query)
                     }
 
                     // Execute the Postgres seed script
-                    $seedFile = __DIR__ . '/../db/seed_postgres.sql';
+                    $seedFile = __DIR__ . '/../../database/global/seed_postgres.sql';
                     if (!file_exists($seedFile)) {
                         throw new Exception('Không tìm thấy file seed_postgres.sql tại: ' . $seedFile);
                     }
@@ -50,7 +50,7 @@ function handleMaintenance($method, $query)
                     }
 
                     // Execute the Postgres init script
-                    $initFile = __DIR__ . '/../db/init_postgres.sql';
+                    $initFile = __DIR__ . '/../../database/global/init_postgres.sql';
                     if (!file_exists($initFile)) {
                         throw new Exception('Không tìm thấy file init_postgres.sql tại: ' . $initFile);
                     }
@@ -59,7 +59,7 @@ function handleMaintenance($method, $query)
                     $pdo->exec($sql);
 
                     // Execute the Postgres triggers script
-                    $triggersFile = __DIR__ . '/../db/triggers_postgres.sql';
+                    $triggersFile = __DIR__ . '/../../database/global/triggers_postgres.sql';
                     if (!file_exists($triggersFile)) {
                         throw new Exception('Không tìm thấy file triggers_postgres.sql tại: ' . $triggersFile);
                     }

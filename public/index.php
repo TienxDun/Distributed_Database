@@ -10,8 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     exit(0);
 }
 
-require_once __DIR__ . '/../common.php';
-require_once __DIR__ . '/../request_logger.php';
+require_once __DIR__ . '/../app/Core/common.php';
+require_once __DIR__ . '/../app/Core/request_logger.php';
 
 // Start logging
 RequestLogger::start();
@@ -34,7 +34,7 @@ $routes = [
 $method = $_SERVER['REQUEST_METHOD'];
 
 if (array_key_exists($path, $routes)) {
-    $routeFile = '/var/www/html/routes/' . $routes[$path] . '.php';
+    $routeFile = __DIR__ . '/../app/Routes/' . $routes[$path] . '.php';
     if (is_file($routeFile)) {
         try {
             require_once $routeFile;
@@ -52,7 +52,7 @@ if (array_key_exists($path, $routes)) {
         sendResponse(['error' => 'Route file not found'], 500);
     }
 } else {
-    require_once '../routes/default.php';
+    require_once __DIR__ . '/../app/Routes/default.php';
     handleDefault($method, $query);
 }
 ?>

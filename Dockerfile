@@ -19,13 +19,12 @@ RUN pecl install mongodb \
 # Thiết lập thư mục làm việc
 WORKDIR /var/www/html
 
-# Copy toàn bộ nội dung thư mục app vào root của container
-# Điều này giúp các lệnh trong render.yaml (như -t public) chạy chính xác
-COPY app/ .
+# Copy toàn bộ dự án vào container
+COPY . .
 
-# Copy file .env vào để ứng dụng có thể đọc cấu hình (nếu cần dùng file thay vì env vars)
+# Copy file .env vào để ứng dụng có thể đọc cấu hình
 # Lưu ý: Trên Render nên ưu tiên dùng Environment Variables trong Dashboard
-COPY .env .env
+# COPY .env .env (Already copied by COPY . .)
 
 # Expose port (Render sẽ tự động phát hiện port từ EXPOSE hoặc dùng biến $PORT)
 EXPOSE 80

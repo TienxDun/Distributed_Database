@@ -16,10 +16,10 @@
         <path d='M80 20 L83 28 L91 31 L83 34 L80 42 L77 34 L69 31 L77 28 Z' fill='%23fef08a'/>
     </svg>">
 
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/layout.css">
-    <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/layout.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4"></script>
 </head>
 
@@ -27,7 +27,7 @@
 
     <div class="app-container">
         <!-- Sidebar -->
-        <?php include 'sidebar.php';
+        <?php include 'Components/sidebar.php';
         renderSidebar('stats'); ?>
 
         <!-- Main Wrapper -->
@@ -153,8 +153,8 @@
         }
     </style>
 
-    <script src="js/sidebar.js"></script>
-    <script type="module" src="js/stats.js"></script>
+    <script src="assets/js/sidebar.js"></script>
+    <script type="module" src="assets/js/stats.js"></script>
 </body>
 
 </html>

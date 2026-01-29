@@ -56,9 +56,10 @@ Sử dụng **PostgreSQL Triggers & Functions** trên lớp View hợp nhất. K
 ```powershell
 docker-compose up --build -d
 ```
-1. **Giao diện quản lý**: [http://localhost:8081/ui.php](http://localhost:8081/ui.php)
-2. **Hệ thống Audit**: [http://localhost:8081/logs.php](http://localhost:8081/logs.php)
-3. **Công cụ bảo trì**: [http://localhost:8081/maintenance.php](http://localhost:8081/maintenance.php)
+1. **Giao diện Dashboard**: [http://localhost:8081/](http://localhost:8081/)
+2. **Hệ thống Audit Logs**: [http://localhost:8081/logs-ui](http://localhost:8081/logs-ui)
+3. **Thống kê & Analytics**: [http://localhost:8081/stats-ui](http://localhost:8081/stats-ui)
+4. **Quản trị Admin**:    [http://localhost:8081/maintenance-ui](http://localhost:8081/maintenance-ui)
 
 ### Import Dữ liệu Mẫu
 Sau khi khởi động Docker, bạn cần import dữ liệu mẫu để UI hiển thị đầy đủ:
@@ -99,7 +100,7 @@ docker-compose exec postgres psql -U admin -d huflit -f /docker-entrypoint-initd
 
 ## 📊 Demo & Screenshots
 
-*(Người dùng có thể thêm ảnh chụp màn hình UI tại đây để tăng độ ấn tượng)*
+![alt text](image.png)
 
 - **Site Explorer**: Tính năng cho phép so sánh dữ liệu vật lý giữa các Site để kiểm chứng tính phân tán.
 - **Real-time Audit**: Mọi thao tác đều được ghi lại vào MongoDB Atlas ngay lập tức.
@@ -107,8 +108,8 @@ docker-compose exec postgres psql -U admin -d huflit -f /docker-entrypoint-initd
 ---
 
 ## 👨‍💻 Tác giả
-- **Phát triển bởi**: [Tên của bạn] - Sinh viên HUFLIT.
-- **Liên hệ**: [Email của bạn] | [LinkedIn của bạn]
+- **Phát triển bởi**: Lều Tiến Dũng - Sinh viên HUFLIT.
+- **Liên hệ**: [leutiendung.hht@gmail.com](mailto:leutiendung.hht@gmail.com) | [LinkedIn](https://www.linkedin.com/in/leutiendung/)
 
 ---
 © 2026 - HUFLIT Distributed Database Project | [LICENSE](LICENSE.md)
