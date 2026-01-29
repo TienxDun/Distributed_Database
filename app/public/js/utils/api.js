@@ -138,9 +138,17 @@ export async function fetchOptionsForField(endpoint, valueField, labelFields) {
 
         // Format data into {value, label} format
         const options = data.map(item => {
-            const value = item[valueField];
+            // Helper to get value case-insensitively
+            const getVal = (obj, key) => {
+                if (obj[key] !== undefined) return obj[key];
+                const lowerKey = key.toLowerCase();
+                const foundKey = Object.keys(obj).find(k => k.toLowerCase() === lowerKey);
+                return foundKey ? obj[foundKey] : undefined;
+            };
+
+            const value = getVal(item, valueField);
             // Build label from multiple fields (e.g., "CNTT - Công nghệ thông tin")
-            const label = labelFields.map(field => item[field]).filter(Boolean).join(' - ');
+            const label = labelFields.map(field => getVal(item, field)).filter(val => val !== undefined && val !== null).join(' - ');
             return { value, label };
         });
 

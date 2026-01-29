@@ -2,15 +2,10 @@
 require_once __DIR__ . '/../common.php';
 require_once __DIR__ . '/../mongo_helper.php';
 
-function determineSite($maKhoa) {
-    if ($maKhoa < 'M') return 'Site_A';
-    if ($maKhoa >= 'M' && $maKhoa < 'S') return 'Site_B';
-    return 'Site_C';
-}
-
 function handleCTDaoTao($method, $query) {
     try {
         $pdo = getDBConnection();
+
         switch ($method) {
             case 'GET':
                 if (isset($query['khoa']) && isset($query['khoahoc'])) {

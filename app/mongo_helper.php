@@ -130,6 +130,35 @@ class MongoHelper
         }
     }
 
+    // Count audit logs with filters
+    public static function countAuditLogs($filter = [])
+    {
+        try {
+            $manager = self::getClient();
+            if (!$manager)
+                return 0;
+
+            $query = empty($filter) ? new stdClass() : json_decode(json_encode($filter), false);
+
+            $commandArray = [
+                'count' => 'audit_logs'
+            ];
+            if (!empty($filter)) {
+                $commandArray['query'] = $query;
+            }
+
+            $command = new MongoDB\Driver\Command($commandArray);
+
+            $cursor = $manager->executeCommand('huflit_logs', $command);
+            $result = $cursor->toArray();
+
+            return $result[0]->n;
+        } catch (Exception $e) {
+            error_log("Count audit logs failed: " . $e->getMessage());
+            return 0;
+        }
+    }
+
     // Query history with filters
     public static function getQueryHistory($filter = [], $limit = 50, $skip = 0)
     {

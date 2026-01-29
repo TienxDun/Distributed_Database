@@ -19,6 +19,7 @@ import { callGlobalQuery } from './modules/global-query.js';
  * Refresh current active tab
  */
 function refreshCurrentTab() {
+    console.log('🔄 Button clicked: Refresh Current Tab');
     const activeTab = document.querySelector('.tab-btn.active');
     if (activeTab) {
         const tabId = activeTab.onclick.toString().match(/'([^']+)'/)[1];

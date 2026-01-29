@@ -1,61 +1,45 @@
 /**
- * Shared Sidebar JavaScript
+ * sidebar.js
+ * Handles sidebar toggling for mobile and desktop
  */
 
-// Toggle sidebar visibility
-window.toggleSidebar = function() {
-    const sidebar = document.querySelector('.sidebar');
-    const mainContent = document.querySelector('.main-content');
+document.addEventListener('DOMContentLoaded', () => {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('toggleSidebarBtn');
 
-    sidebar.classList.toggle('collapsed');
-    mainContent.classList.toggle('sidebar-collapsed');
+    if (toggleBtn && sidebar) {
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
 
-    // Save preference to localStorage
-    const isCollapsed = sidebar.classList.contains('collapsed');
-    localStorage.setItem('sidebarCollapsed', isCollapsed);
-};
-
-// Theme management
-function initializeTheme() {
-    let savedTheme = localStorage.getItem('selectedTheme') || 'green';
-    // Fallback if dark theme was selected (removed)
-    if (savedTheme === 'dark') savedTheme = 'green';
-    applyTheme(savedTheme);
-    
-    // Set checked radio button
-    const radio = document.getElementById(`theme-${savedTheme}`);
-    if (radio) radio.checked = true;
-}
-
-function applyTheme(theme) {
-    document.body.className = document.body.className.replace(/theme-\w+/g, '').trim();
-    document.body.classList.add(`theme-${theme}`);
-    localStorage.setItem('selectedTheme', theme);
-}
-
-function handleThemeChange(event) {
-    if (event.target.name === 'theme') {
-        applyTheme(event.target.value);
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target) && sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
     }
-}
 
-// Initialize sidebar state on page load
-function initializeSidebar() {
-    const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-    if (sidebarCollapsed) {
-        document.querySelector('.sidebar').classList.add('collapsed');
-        document.querySelector('.main-content').classList.add('sidebar-collapsed');
-    }
-    
-    initializeTheme();
-    
-    // Add theme change listener
-    document.addEventListener('change', handleThemeChange);
-}
+    // Tab Handling Logic (moved from inline script if needed, or kept compatible)
+    // The main app.js likely handles data loading, but UI tab switching is often global
+});
 
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeSidebar);
-} else {
-    initializeSidebar();
+// Helper to set active tab UI (if not handled by React/App logic)
+function setActiveTab(tabId) {
+    // Hide all contents
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    // Show target content
+    const target = document.getElementById(tabId);
+    if (target) target.classList.add('active');
+
+    // Update buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+        // Simple check: if button onclick contains the tabId
+        if (btn.getAttribute('onclick').includes(`'${tabId}'`)) {
+            btn.classList.add('active');
+        }
+    });
 }

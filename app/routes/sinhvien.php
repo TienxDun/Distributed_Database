@@ -2,21 +2,17 @@
 require_once __DIR__ . '/../common.php';
 require_once __DIR__ . '/../mongo_helper.php';
 
-function determineSite($maKhoa) {
-    if ($maKhoa < 'M') return 'Site_A';
-    if ($maKhoa >= 'M' && $maKhoa < 'S') return 'Site_B';
-    return 'Site_C';
-}
-
 function handleSinhVien($method, $query) {
     try {
         $pdo = getDBConnection();
         switch ($method) {
             case 'GET':
                 if (isset($query['id'])) {
+                    validateId($query['id']);
+
                     $stmt = $pdo->prepare("
                         SELECT MaSV, HoTen, MaKhoa, KhoaHoc,
-                            CASE 
+                            CASE
                                 WHEN MaKhoa < 'M' THEN 'Site A'
                                 WHEN MaKhoa >= 'M' AND MaKhoa < 'S' THEN 'Site B'
                                 ELSE 'Site C'
@@ -29,7 +25,7 @@ function handleSinhVien($method, $query) {
                 } else {
                     $stmt = $pdo->query("
                         SELECT MaSV, HoTen, MaKhoa, KhoaHoc,
-                            CASE 
+                            CASE
                                 WHEN MaKhoa < 'M' THEN 'Site A'
                                 WHEN MaKhoa >= 'M' AND MaKhoa < 'S' THEN 'Site B'
                                 ELSE 'Site C'
@@ -41,76 +37,90 @@ function handleSinhVien($method, $query) {
                 }
                 break;
             case 'POST':
-                // Create new SinhVien via trigger
-                $data = json_decode(file_get_contents('php://input'), true);
-                if (!isset($data['MaSV']) || !isset($data['HoTen']) || !isset($data['MaKhoa']) || !isset($data['KhoaHoc'])) {
-                    sendResponse(['error' => 'Missing required fields: MaSV, HoTen, MaKhoa, KhoaHoc'], 400);
-                    break;
-                }
+                $data = getJsonInput();
+                validateRequiredFields($data, ['MaSV', 'HoTen', 'MaKhoa', 'KhoaHoc']);
+                validateId($data['MaSV']);
+
+                $data['HoTen'] = sanitizeString($data['HoTen']);
+                $data['MaKhoa'] = sanitizeString($data['MaKhoa']);
+
                 $stmt = $pdo->prepare("INSERT INTO SinhVien_Global (MaSV, HoTen, MaKhoa, KhoaHoc) VALUES (?, ?, ?, ?)");
-                $stmt->execute([$data['MaSV'], $data['HoTen'], $data['MaKhoa'], $data['KhoaHoc']]);
-                
+                $stmt->execute([$data['MaSV'], $data['HoTen'], $data['MaKhoa'], (int)$data['KhoaHoc']]);
+
                 // Log to MongoDB
                 $site = determineSite($data['MaKhoa']);
                 MongoHelper::logAudit('SinhVien', 'INSERT', $data, null, $site);
-                
+
                 RequestLogger::end(1, 201);
                 sendResponse(['message' => 'SinhVien created successfully', 'MaSV' => $data['MaSV']], 201);
                 break;
             case 'PUT':
-                // Update SinhVien via trigger (allows MaKhoa change = move between sites)
                 if (!isset($query['id'])) {
                     sendResponse(['error' => 'Missing required parameter: id'], 400);
                     break;
                 }
-                
+
+                validateId($query['id']);
+
                 // Get old data first
                 $stmt = $pdo->prepare("SELECT * FROM SinhVien_Global WHERE MaSV = ?");
                 $stmt->execute([$query['id']]);
                 $oldData = $stmt->fetch(PDO::FETCH_ASSOC);
-                
-                $data = json_decode(file_get_contents('php://input'), true);
-                if (!isset($data['HoTen']) || !isset($data['MaKhoa']) || !isset($data['KhoaHoc'])) {
-                    sendResponse(['error' => 'Missing required fields: HoTen, MaKhoa, KhoaHoc'], 400);
-                    break;
+
+                if (!$oldData) {
+                    sendResponse(['error' => 'SinhVien not found'], 404);
                 }
+
+                $data = getJsonInput();
+                validateRequiredFields($data, ['HoTen', 'MaKhoa', 'KhoaHoc']);
+
+                $data['HoTen'] = sanitizeString($data['HoTen']);
+                $data['MaKhoa'] = sanitizeString($data['MaKhoa']);
+
                 $stmt = $pdo->prepare("UPDATE SinhVien_Global SET HoTen = ?, MaKhoa = ?, KhoaHoc = ? WHERE MaSV = ?");
-                $stmt->execute([$data['HoTen'], $data['MaKhoa'], $data['KhoaHoc'], $query['id']]);
-                
+                $stmt->execute([$data['HoTen'], $data['MaKhoa'], (int)$data['KhoaHoc'], $query['id']]);
+
                 // Log to MongoDB
                 $newData = ['MaSV' => $query['id'], 'HoTen' => $data['HoTen'], 'MaKhoa' => $data['MaKhoa'], 'KhoaHoc' => $data['KhoaHoc']];
                 $site = determineSite($data['MaKhoa']);
                 MongoHelper::logAudit('SinhVien', 'UPDATE', $newData, $oldData, $site);
-                
+
+                RequestLogger::end(1, 200);
                 sendResponse(['message' => 'SinhVien updated successfully']);
                 break;
             case 'DELETE':
-                // Delete SinhVien via trigger
                 if (!isset($query['id'])) {
                     sendResponse(['error' => 'Missing required parameter: id'], 400);
                     break;
                 }
-                
+
+                validateId($query['id']);
+
                 // Get data before delete
                 $stmt = $pdo->prepare("SELECT * FROM SinhVien_Global WHERE MaSV = ?");
                 $stmt->execute([$query['id']]);
                 $oldData = $stmt->fetch(PDO::FETCH_ASSOC);
-                
+
+                if (!$oldData) {
+                    sendResponse(['error' => 'SinhVien not found'], 404);
+                    return;
+                }
+
                 $stmt = $pdo->prepare("DELETE FROM SinhVien_Global WHERE MaSV = ?");
                 $stmt->execute([$query['id']]);
-                
+
                 // Log to MongoDB
-                if ($oldData) {
-                    $site = determineSite($oldData['MaKhoa']);
-                    MongoHelper::logAudit('SinhVien', 'DELETE', null, $oldData, $site);
-                }
-                
+                $site = isset($oldData['MaKhoa']) ? determineSite($oldData['MaKhoa']) : 'Unknown';
+                MongoHelper::logAudit('SinhVien', 'DELETE', null, $oldData, $site);
+
+                RequestLogger::end(1, 200);
                 sendResponse(['message' => 'SinhVien deleted successfully']);
                 break;
             default:
                 sendResponse(['error' => 'Method not allowed'], 405);
         }
     } catch (Exception $e) {
+        RequestLogger::end(0, 500);
         sendResponse(['error' => $e->getMessage()], 500);
     }
 }

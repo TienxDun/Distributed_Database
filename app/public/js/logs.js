@@ -61,75 +61,172 @@ async function loadLogs() {
         const result = await response.json();
 
         if (result.success) {
-            displayLogs(result.data);
-            updatePagination(result.page);
+            renderLogsData(result.data, result.page);
+            updatePagination(result.page, result.totalPages || 1);
             updateStats(result.data);
         } else {
-            document.getElementById('logsContent').innerHTML = `<div class="no-data">❌ Lỗi: ${result.error}</div>`;
+            document.getElementById('logsContent').innerHTML = `<div class="error-state">❌ Lỗi: ${result.error}</div>`;
         }
     } catch (error) {
-        document.getElementById('logsContent').innerHTML = `<div class="no-data">❌ Không thể kết nối đến server</div>`;
+        document.getElementById('logsContent').innerHTML = `<div class="error-state">❌ Không thể kết nối đến server</div>`;
     }
 }
 
-function displayLogs(logs) {
-    if (logs.length === 0) {
-        document.getElementById('logsContent').innerHTML = `
-            <div class="no-data">
+// Utility function to create pagination HTML - can be reused across pages
+function createPaginationHTML(currentPage, totalPages) {
+    // Don't show pagination if there's only 1 page or no pages
+    if (totalPages <= 1) {
+        return `<div class="pagination-info">Trang ${currentPage} / ${totalPages}</div>`;
+    }
+
+    let html = '<div class="pagination">';
+
+    // Previous button
+    if (currentPage > 1) {
+        html += `<button class="pagination-btn" onclick="changePage(${currentPage - 1})" title="Trang trước">
+                    <i class="fas fa-chevron-left"></i>
+                 </button>`;
+    } else {
+        html += `<button class="pagination-btn" disabled title="Trang đầu">
+                    <i class="fas fa-chevron-left"></i>
+                 </button>`;
+    }
+
+    // Page numbers
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(totalPages, currentPage + 2);
+
+    // First page + dots if needed
+    if (startPage > 1) {
+        html += `<button class="pagination-btn" onclick="changePage(1)">1</button>`;
+        if (startPage > 2) {
+            html += '<span class="pagination-dots">...</span>';
+        }
+    }
+
+    // Page range
+    for (let i = startPage; i <= endPage; i++) {
+        if (i === currentPage) {
+            html += `<button class="pagination-btn active" onclick="changePage(${i})">${i}</button>`;
+        } else {
+            html += `<button class="pagination-btn" onclick="changePage(${i})">${i}</button>`;
+        }
+    }
+
+    // Last page + dots if needed
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            html += '<span class="pagination-dots">...</span>';
+        }
+        html += `<button class="pagination-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+    }
+
+    // Next button
+    if (currentPage < totalPages) {
+        html += `<button class="pagination-btn" onclick="changePage(${currentPage + 1})" title="Trang sau">
+                    <i class="fas fa-chevron-right"></i>
+                 </button>`;
+    } else {
+        html += `<button class="pagination-btn" disabled title="Trang cuối">
+                    <i class="fas fa-chevron-right"></i>
+                 </button>`;
+    }
+
+    html += '</div>';
+
+    // Page info
+    html += `<div class="pagination-info">
+                Trang ${currentPage} / ${totalPages}
+             </div>`;
+
+    return html;
+}
+
+function updatePagination(page, totalPages = 1) {
+    // Use totalPages from API response
+    const html = createPaginationHTML(page, totalPages);
+    document.getElementById('pagination').innerHTML = html;
+}
+
+// Empty state functions
+function renderEmptyState() {
+    const html = `
+        <div class="empty-state">
+            <div class="empty-state-icon">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
-                <h3>Không có dữ liệu</h3>
-                <p>Chưa có log nào phù hợp với bộ lọc</p>
             </div>
-        `;
+            <h3 class="empty-state-title">Chưa có dữ liệu logs</h3>
+            <p class="empty-state-description">
+                Vui lòng chọn các bộ lọc bên trên để xem nhật ký hoạt động của hệ thống phân tán.
+            </p>
+            <div class="empty-state-actions">
+                <button class="empty-state-action primary" onclick="document.querySelector('.tab-btn').click()">
+                    <i class="fas fa-filter"></i>
+                    Áp dụng bộ lọc
+                </button>
+                <button class="empty-state-action secondary" onclick="loadAllLogs()">
+                    <i class="fas fa-list"></i>
+                    Xem tất cả
+                </button>
+            </div>
+        </div>
+    `;
+    document.getElementById('logsContent').innerHTML = html;
+    document.getElementById('pagination').innerHTML = '';
+}
+
+function renderLogsData(logs, page = 1) {
+    let html = '';
+
+    if (logs.length === 0) {
+        renderEmptyState();
         return;
     }
 
-    let html = `
-        <table class="logs-table">
-            <thead>
-                <tr>
-                    <th>⏰ Thời gian</th>
-                    <th>🗂️ Bảng</th>
-                    <th>⚡ Thao tác</th>
-                    <th>🗺️ Site</th>
-                    <th>📝 Dữ liệu mới</th>
-                    <th>📄 Dữ liệu cũ</th>
-                </tr>
-            </thead>
-            <tbody>
+    // Table header
+    html += `
+        <div class="table-responsive">
+            <table class="table logs-table">
+                <thead>
+                    <tr>
+                        <th>Thời gian</th>
+                        <th>Site</th>
+                        <th>Operation</th>
+                        <th>Table</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
     `;
 
+    // Table rows
     logs.forEach(log => {
-        const operationClass = log.operation.toLowerCase();
+        const operationClass = `badge-${log.operation.toLowerCase()}`;
+        const siteClass = `site-${log.site.toLowerCase().replace('_', '-')}`;
+
         html += `
             <tr>
-                <td><strong>${log.timestamp}</strong></td>
-                <td><span class="badge badge-table">${log.table}</span></td>
-                <td><span class="badge badge-${operationClass}">${log.operation}</span></td>
-                <td><span class="badge badge-site">${log.site}</span></td>
-                <td><div class="data-preview">${JSON.stringify(log.data, null, 2)}</div></td>
-                <td>${log.old_data ? `<div class="data-preview">${JSON.stringify(log.old_data, null, 2)}</div>` : '<em style="color: #94a3b8;">Không có</em>'}</td>
+                <td>${new Date(log.timestamp).toLocaleString('vi-VN')}</td>
+                <td><span class="site-badge ${siteClass}">${log.site}</span></td>
+                <td><span class="badge badge-table ${operationClass}">${log.operation}</span></td>
+                <td>${log.table_name}</td>
+                <td>
+                    <div class="data-preview">${log.data_preview || 'N/A'}</div>
+                </td>
             </tr>
         `;
     });
 
     html += `
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     `;
 
     document.getElementById('logsContent').innerHTML = html;
-}
-
-function updatePagination(page) {
-    const html = `
-        <button onclick="changePage(${page - 1})" ${page <= 1 ? 'disabled' : ''}>← Trang trước</button>
-        <span>Trang ${page}</span>
-        <button onclick="changePage(${page + 1})">Trang sau →</button>
-    `;
-    document.getElementById('pagination').innerHTML = html;
+    updatePagination(page);
 }
 
 function updateStats(logs) {
@@ -139,6 +236,7 @@ function updateStats(logs) {
     const deletes = logs.filter(l => l.operation === 'DELETE').length;
 
     document.getElementById('statsBar').innerHTML = `
+    <div class="stats-grid cols-4"> <!-- Use cols-4 for Logs page (4 cards) -->
         <div class="stat-card">
             <div class="stat-card-header">
                 <div class="stat-icon blue">📊</div>
@@ -175,6 +273,7 @@ function updateStats(logs) {
                 </div>
             </div>
         </div>
+    </div>
     `;
 }
 
@@ -185,11 +284,13 @@ function changePage(page) {
 }
 
 function applyFilters() {
+    console.log('Button clicked: applyFilters');
     currentPage = 1;
     loadLogs();
 }
 
 function resetFilters() {
+    console.log('Button clicked: resetFilters');
     document.getElementById('filterTable').value = '';
     document.getElementById('filterOperation').value = '';
     document.getElementById('filterSite').value = '';
@@ -201,3 +302,22 @@ function resetFilters() {
 
 // Load logs on page load
 loadLogs();
+
+// Utility function to load all logs without filters
+function loadAllLogs() {
+    // Reset all filters
+    document.getElementById('filterTable').value = '';
+    document.getElementById('filterOperation').value = '';
+    document.getElementById('filterSite').value = '';
+    document.getElementById('filterDateFrom').value = '';
+    document.getElementById('filterDateTo').value = '';
+
+    // Reset to page 1
+    currentPage = 1;
+
+    // Load logs without filters
+    loadLogs();
+}
+
+// Expose loadAllLogs to global scope
+window.loadAllLogs = loadAllLogs;

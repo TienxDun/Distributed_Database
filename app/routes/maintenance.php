@@ -22,6 +22,16 @@ function handleMaintenance($method, $query)
 
                     sendResponse(['message' => 'Toàn bộ dữ liệu đã được xóa sạch!']);
                 } elseif ($action === 'seed') {
+                    // Reset dữ liệu trước khi seed
+                    $schemas = ['site_a', 'site_b', 'site_c'];
+                    $tables = ['DangKy', 'SinhVien', 'CTDaoTao', 'Khoa', 'MonHoc'];
+
+                    foreach ($schemas as $schema) {
+                        foreach ($tables as $table) {
+                            $pdo->exec("TRUNCATE TABLE {$schema}.{$table} CASCADE");
+                        }
+                    }
+
                     // Execute the Postgres seed script
                     $seedFile = __DIR__ . '/../db/seed_postgres.sql';
                     if (!file_exists($seedFile)) {
@@ -29,11 +39,35 @@ function handleMaintenance($method, $query)
                     }
 
                     $sql = file_get_contents($seedFile);
-                    // Standard PDO exec doesn't like multi-statement with GO or comments sometimes
-                    // But our seed_postgres.sql doesn't have GO (it was cleaned for Postgres)
                     $pdo->exec($sql);
 
                     sendResponse(['message' => 'Dữ liệu mẫu đã được nạp thành công!']);
+                } elseif ($action === 'init') {
+                    // Drop existing schemas
+                    $schemas = ['site_a', 'site_b', 'site_c'];
+                    foreach ($schemas as $schema) {
+                        $pdo->exec("DROP SCHEMA IF EXISTS {$schema} CASCADE");
+                    }
+
+                    // Execute the Postgres init script
+                    $initFile = __DIR__ . '/../db/init_postgres.sql';
+                    if (!file_exists($initFile)) {
+                        throw new Exception('Không tìm thấy file init_postgres.sql tại: ' . $initFile);
+                    }
+
+                    $sql = file_get_contents($initFile);
+                    $pdo->exec($sql);
+
+                    // Execute the Postgres triggers script
+                    $triggersFile = __DIR__ . '/../db/triggers_postgres.sql';
+                    if (!file_exists($triggersFile)) {
+                        throw new Exception('Không tìm thấy file triggers_postgres.sql tại: ' . $triggersFile);
+                    }
+
+                    $sql = file_get_contents($triggersFile);
+                    $pdo->exec($sql);
+
+                    sendResponse(['message' => 'Database schema đã được khởi tạo thành công!']);
                 } else {
                     sendResponse(['error' => 'Action không hợp lệ'], 400);
                 }

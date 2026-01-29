@@ -9,7 +9,7 @@ let charts = {};
 
 // Expose stats functions to global scope
 window.loadStats = loadStatistics;
-window.resetCharts = function() {
+window.resetCharts = function () {
     // Reset all charts by destroying them and clearing containers
     Object.keys(charts).forEach(chartId => {
         if (charts[chartId]) {
@@ -96,7 +96,7 @@ function displayOverview(overviewData, queryData) {
     }
 
     container.innerHTML = `
-        <div class="stats-grid">
+        <div class="stats-grid cols-3">
             <div class="stat-card">
                 <div class="stat-card-header">
                     <div class="stat-icon blue">📝</div>

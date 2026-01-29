@@ -11,7 +11,7 @@ import { showLoading, hideLoading, getLoadingState, getSiteColumnVisibility } fr
  */
 export async function callGlobalQuery(type) {
     if (getLoadingState()) return;
-    
+
     const resultDiv = document.getElementById(`global-result-${type}`);
     resultDiv.innerHTML = '<div class="loading"></div> Đang truy vấn...';
     resultDiv.className = 'result show';
@@ -36,16 +36,16 @@ export async function callGlobalQuery(type) {
         }
         params.query = query;
     }
-    
+
     showLoading('Đang thực hiện truy vấn toàn cục...');
 
     try {
         const queryString = buildQueryString(params);
         const data = await apiGet(`/global${queryString}`);
-        
+
         const count = Array.isArray(data) ? data.length : 0;
         const countText = `<div style="background: #e0f2fe; color: #1e293b; padding: 0.5rem 1rem; border-radius: 6px; margin-bottom: 1rem; display: inline-block; font-weight: 600;">📊 Kết quả: ${count} bản ghi</div>`;
-        
+
         resultDiv.innerHTML = countText + createSimpleTable(data);
     } catch (error) {
         resultDiv.innerHTML = `<strong>Lỗi:</strong> ${error.message}`;
@@ -67,8 +67,8 @@ function createSimpleTable(data) {
 
     const showSiteColumn = getSiteColumnVisibility();
     const headers = Object.keys(data[0]);
-    let table = '<table><thead><tr>';
-    
+    let table = '<div class="table-responsive"><table class="table"><thead><tr>';
+
     // Create headers
     headers.forEach(h => {
         // Skip Site column if toggle is off
@@ -78,29 +78,35 @@ function createSimpleTable(data) {
         table += `<th${headerClass}>${h}</th>`;
     });
     table += '</tr></thead><tbody>';
-    
+
     // Create rows
     data.forEach(row => {
         table += '<tr>';
         headers.forEach(h => {
             // Skip Site column if toggle is off
             if (h === 'Site' && !showSiteColumn) return;
-            
+
             const value = row[h] !== null && row[h] !== undefined ? row[h] : '';
             let cellClass = '';
-            
+            let cellStyle = '';
+
             // Add class for Site column
             if (h === 'Site') {
                 if (value === 'Site A') cellClass = ' class="site-a"';
                 else if (value === 'Site B') cellClass = ' class="site-b"';
                 else if (value === 'Site C') cellClass = ' class="site-c"';
             }
-            
-            table += `<td${cellClass}>${value}</td>`;
+
+            // Add style for hoten column in query 4
+            if (h === 'hoten') {
+                cellClass += ' hoten-column';
+            }
+
+            table += `<td${cellClass}${cellStyle}>${value}</td>`;
         });
         table += '</tr>';
     });
-    
-    table += '</tbody></table>';
+
+    table += '</tbody></table></div>';
     return table;
 }

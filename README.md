@@ -60,6 +60,41 @@ docker-compose up --build -d
 2. **Hệ thống Audit**: [http://localhost:8081/logs.php](http://localhost:8081/logs.php)
 3. **Công cụ bảo trì**: [http://localhost:8081/maintenance.php](http://localhost:8081/maintenance.php)
 
+### Import Dữ liệu Mẫu
+Sau khi khởi động Docker, bạn cần import dữ liệu mẫu để UI hiển thị đầy đủ:
+
+**Windows (Batch Script):**
+```batch
+.\seed_postgres_data.bat
+```
+
+**Linux/Mac (Bash Script):**
+```bash
+chmod +x seed_postgres_data.sh
+./seed_postgres_data.sh
+```
+
+**PowerShell:**
+```powershell
+.\seed_postgres_data_v2.ps1
+```
+
+**Hoặc chạy thủ công:**
+```bash
+# Reset dữ liệu
+docker-compose exec postgres psql -U admin -d huflit -c "TRUNCATE TABLE site_a.DangKy, site_a.SinhVien, site_a.CTDaoTao, site_a.Khoa, site_a.MonHoc CASCADE;"
+docker-compose exec postgres psql -U admin -d huflit -c "TRUNCATE TABLE site_b.DangKy, site_b.SinhVien, site_b.CTDaoTao, site_b.Khoa, site_b.MonHoc CASCADE;"
+docker-compose exec postgres psql -U admin -d huflit -c "TRUNCATE TABLE site_c.DangKy, site_c.SinhVien, site_c.CTDaoTao, site_c.Khoa, site_c.MonHoc CASCADE;"
+
+# Import dữ liệu mẫu
+docker-compose exec postgres psql -U admin -d huflit -f /docker-entrypoint-initdb.d/03_seed.sql
+```
+
+**Dữ liệu mẫu bao gồm:**
+- **Site A**: 4 khoa, 32 sinh viên, 18 môn học (Khoa CNTT, DLKS, KTTC, LLCT)
+- **Site B**: 4 khoa, 32 sinh viên, 20 môn học (Khoa NN, NVPD, QHQT, QTKD)
+- **Site C**: 3 khoa, 24 sinh viên, 15 môn học (Khoa SLCT, SUAT, TLKS)
+
 ---
 
 ## 📊 Demo & Screenshots
