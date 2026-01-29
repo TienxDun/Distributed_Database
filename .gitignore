@@ -2,16 +2,23 @@
 .env
 .env.local
 .env.production
+*.env.local
+*.env
 
 # Docker volumes (local development)
 sqlserver_data_*/
 mongodb_data/
 mongodb_config/
+postgres_data/
+mysql_data/
 
 # Logs
 *.log
 logs/
 app/public/logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # OS generated files
 .DS_Store
@@ -27,18 +34,37 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+*.sublime-project
+*.sublime-workspace
+.project
+.settings/
 
 # Temporary files
 tmp/
 temp/
 *.tmp
-
-# Database backups
 *.bak
 *.sql.bak
 
-# Node modules (if any)
-node_modules/
+# Database backups or data
+*.sql.gz
+*.sql.tar
+dump.rdb
 
-# Composer (if any)
+# Node / JS
+node_modules/
+dist/
+build/
+.npm
+.eslintcache
+
+# PHP / Composer
 vendor/
+composer.phar
+.php-cs-fixer.cache
+.phpunit.result.cache
+
+# Misc
+.cache/
+.serverless/
+.terraform/
