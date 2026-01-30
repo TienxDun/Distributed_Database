@@ -26,8 +26,12 @@ export async function apiGet(endpoint) {
         try {
             const errorData = await response.json();
             throw new Error(errorData.detail || errorData.error || `Lỗi hệ thống (${response.status})`);
-        } catch (e) {
-            // If body is not JSON, throw status code
+        } catch (parseError) {
+            // If the first error was thrown by us (from line above), re-throw it
+            if (parseError.message && !parseError.message.includes('JSON')) {
+                throw parseError;
+            }
+            // Otherwise it's a JSON parse error, throw generic message
             throw new Error(`Lỗi hệ thống (${response.status})`);
         }
     }

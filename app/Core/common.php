@@ -14,7 +14,12 @@ function getDBConnection()
     $dbUser = getenv('DB_USER');
     $dbPass = getenv('DB_PASS');
 
-    $dsn = "pgsql:host={$dbHost};port={$dbPort};dbname={$dbName};sslmode=require";
+    $dsn = "pgsql:host={$dbHost};port={$dbPort};dbname={$dbName}";
+    
+    // Only require SSL for remote databases (Neon.tech), not local Docker ('postgres')
+    if ($dbHost !== 'postgres') {
+        $dsn .= ";sslmode=require";
+    }
 
     try {
         $pdo = new PDO($dsn, $dbUser, $dbPass, [
