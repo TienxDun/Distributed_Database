@@ -3,9 +3,9 @@
  * Xử lý chuyển đổi giữa Dark Theme và Light Theme
  */
 
-// Lấy theme hiện tại từ localStorage hoặc mặc định là dark
+// Lấy theme hiện tại từ localStorage hoặc mặc định là light
 const getTheme = () => {
-    return localStorage.getItem('theme') || 'dark';
+    return localStorage.getItem('theme') || 'light';
 };
 
 // Lưu theme vào localStorage
@@ -20,7 +20,7 @@ const applyTheme = (theme) => {
     } else {
         document.body.classList.remove('light-theme');
     }
-    
+
     // Cập nhật icon của nút toggle
     updateThemeToggleIcon(theme);
 };
@@ -29,7 +29,7 @@ const applyTheme = (theme) => {
 const updateThemeToggleIcon = (theme) => {
     const themeToggle = document.getElementById('themeToggle');
     if (!themeToggle) return;
-    
+
     const icon = themeToggle.querySelector('i');
     if (theme === 'light') {
         icon.className = 'fas fa-moon';
@@ -44,10 +44,10 @@ const updateThemeToggleIcon = (theme) => {
 const toggleTheme = () => {
     const currentTheme = getTheme();
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    
+
     saveTheme(newTheme);
     applyTheme(newTheme);
-    
+
     console.log(`🎨 Theme switched to: ${newTheme}`);
 };
 

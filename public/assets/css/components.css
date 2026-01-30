@@ -26,7 +26,7 @@
 
 .card:hover {
     border-color: var(--glass-border-light);
-    box-shadow: var(--shadow-lg), var(--shadow-glow);
+    box-shadow: var(--shadow-lg);
     transform: translateY(-2px);
 }
 
@@ -90,7 +90,7 @@
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 25px rgba(139, 92, 246, 0.5);
+    box-shadow: 0 4px 18px rgba(139, 92, 246, 0.4);
 }
 
 .btn-secondary {
@@ -103,7 +103,6 @@
 .btn-secondary:hover {
     background: var(--glass-bg-lighter);
     border-color: var(--aurora-purple);
-    box-shadow: var(--glow-purple);
 }
 
 .btn-danger {
@@ -165,8 +164,6 @@
     border-radius: var(--radius-lg);
     border: 1px solid var(--glass-border);
     background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
 }
 
 .table {
@@ -1028,10 +1025,13 @@
     font-size: 0.75rem;
     font-weight: 700;
     color: white !important;
+    background: var(--dark-500);
+    /* Fallback background */
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     min-width: 80px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .site-badge.site-a {
@@ -1039,7 +1039,8 @@
     box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
 }
 
-.site-badge.site-b {
+.site-badge.site-b,
+.site-badge.site-site-b {
     background: linear-gradient(135deg, var(--aurora-pink) 0%, var(--aurora-rose) 100%);
     box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
 }
@@ -1538,12 +1539,11 @@
     width: 50px;
     height: 50px;
     background: linear-gradient(135deg, var(--aurora-purple), var(--aurora-blue));
-    opacity: 0.15;
+    opacity: 0.12;
     border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
     filter: blur(3px);
-    transition: var(--transition);
-    box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
-    animation: float 6s ease-in-out infinite;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    /* Removed continuous animation for performance */
 }
 
 .site-card::after {
@@ -1557,25 +1557,23 @@
     background: linear-gradient(135deg, var(--aurora-purple), var(--aurora-blue));
     opacity: 0.03;
     transform: translate(30%, -30%);
-    transition: var(--transition);
+    transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .site-card:hover {
     transform: translateY(-3px);
-    box-shadow: var(--shadow-lg), var(--shadow-glow);
+    box-shadow: var(--shadow-lg);
     border-color: var(--glass-border-light);
 }
 
 .site-card:hover::after {
-    transform: translate(20%, -20%) scale(1.1);
-    opacity: 0.08;
+    transform: translate(20%, -20%) scale(1.08);
+    opacity: 0.06;
 }
 
 .site-card:hover::before {
-    opacity: 0.25;
-    transform: scale(1.1);
-    filter: blur(2px);
-    animation-duration: 3s;
+    opacity: 0.2;
+    transform: scale(1.05);
 }
 
 /* Light Theme Fix for Site Cards */

@@ -136,9 +136,11 @@ export function createTableWithActions(data, module) {
             if (isSiteColumn(h)) {
                 cellClass = ' class="site-cell"';
                 let badgeClass = '';
-                if (value === 'Site A') badgeClass = 'site-a';
-                else if (value === 'Site B') badgeClass = 'site-b';
-                else if (value === 'Site C') badgeClass = 'site-c';
+                const cleanValue = value.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+                if (cleanValue.includes('sitea')) badgeClass = 'site-a';
+                else if (cleanValue.includes('siteb')) badgeClass = 'site-b';
+                else if (cleanValue.includes('sitec')) badgeClass = 'site-c';
 
                 table += `<td${cellClass}><span class="site-badge ${badgeClass}">${value}</span></td>`;
             } else {

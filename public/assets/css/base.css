@@ -78,7 +78,7 @@
     --radius-md: 12px;
     --radius-lg: 20px;
     --radius-xl: 28px;
-    
+
     /* --- Glass Shadows --- */
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
     --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
@@ -86,45 +86,47 @@
     --shadow-glow: 0 0 40px rgba(139, 92, 246, 0.15);
     --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 
-    /* --- Transitions --- */
-    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-fast: all 0.15s ease;
-    --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    /* --- Transitions - OPTIMIZED --- */
+    --transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease;
+    --transition-fast: transform 0.1s ease, opacity 0.1s ease;
+    --transition-slow: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
 
     /* --- Aurora Gradient --- */
-    --aurora-gradient: linear-gradient(
-        135deg,
-        var(--aurora-purple) 0%,
-        var(--aurora-blue) 25%,
-        var(--aurora-cyan) 50%,
-        var(--aurora-teal) 75%,
-        var(--aurora-purple) 100%
-    );
-    --aurora-gradient-vivid: linear-gradient(
-        135deg,
-        var(--aurora-pink) 0%,
-        var(--aurora-purple) 25%,
-        var(--aurora-blue) 50%,
-        var(--aurora-cyan) 75%,
-        var(--aurora-teal) 100%
-    );
+    --aurora-gradient: linear-gradient(135deg,
+            var(--aurora-purple) 0%,
+            var(--aurora-blue) 25%,
+            var(--aurora-cyan) 50%,
+            var(--aurora-teal) 75%,
+            var(--aurora-purple) 100%);
+    --aurora-gradient-vivid: linear-gradient(135deg,
+            var(--aurora-pink) 0%,
+            var(--aurora-purple) 25%,
+            var(--aurora-blue) 50%,
+            var(--aurora-cyan) 75%,
+            var(--aurora-teal) 100%);
 }
 
 /* ==================== LIGHT THEME ==================== */
 body.light-theme {
     /* --- Light Base Colors --- */
-    --dark-950: #ffffff;      /* Main Background */
-    --dark-900: #f8fafc;      /* Alt Background */
+    --dark-950: #ffffff;
+    /* Main Background */
+    --dark-900: #f8fafc;
+    /* Alt Background */
     --dark-850: #f1f5f9;
     --dark-800: #e2e8f0;
-    --dark-700: #cbd5e1;      /* Borders */
-    --dark-600: #94a3b8;      /* Muted Text */
+    --dark-700: #cbd5e1;
+    /* Borders */
+    --dark-600: #94a3b8;
+    /* Muted Text */
     --dark-500: #64748b;
     --dark-400: #475569;
     --dark-300: #334155;
-    --dark-200: #1e293b;      /* Secondary Text */
-    --dark-100: #0f172a;      /* Main Text */
-    --dark-50:  #020617;
+    --dark-200: #1e293b;
+    /* Secondary Text */
+    --dark-100: #0f172a;
+    /* Main Text */
+    --dark-50: #020617;
 
     /* --- Aurora Colors (Đậm hơn cho nền sáng) --- */
     --aurora-purple: #9333ea;
@@ -169,7 +171,7 @@ body.light-theme {
 
 /* Light Theme Background Animation */
 body.light-theme::before {
-    background: 
+    background:
         radial-gradient(ellipse 80% 50% at 20% 40%, rgba(147, 51, 234, 0.08) 0%, transparent 50%),
         radial-gradient(ellipse 60% 40% at 80% 20%, rgba(37, 99, 235, 0.06) 0%, transparent 50%),
         radial-gradient(ellipse 50% 60% at 70% 80%, rgba(8, 145, 178, 0.05) 0%, transparent 50%),
@@ -201,7 +203,7 @@ body {
     overflow-x: hidden;
 }
 
-/* Aurora Animated Background */
+/* Aurora Animated Background - OPTIMIZED */
 body::before {
     content: '';
     position: fixed;
@@ -209,64 +211,73 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: 
+    background:
         radial-gradient(ellipse 80% 50% at 20% 40%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
         radial-gradient(ellipse 60% 40% at 80% 20%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
         radial-gradient(ellipse 50% 60% at 70% 80%, rgba(6, 182, 212, 0.1) 0%, transparent 50%),
         radial-gradient(ellipse 40% 40% at 30% 90%, rgba(236, 72, 153, 0.08) 0%, transparent 50%);
-    animation: auroraMove 20s ease-in-out infinite alternate;
+    animation: auroraMove 30s ease-in-out infinite alternate;
+    will-change: transform;
     z-index: -1;
     pointer-events: none;
 }
 
+/* Optimized Aurora Animation - Simplified keyframes */
 @keyframes auroraMove {
     0% {
-        transform: translate(0, 0) rotate(0deg) scale(1);
+        transform: translate3d(0, 0, 0);
         opacity: 1;
     }
-    33% {
-        transform: translate(30px, -20px) rotate(1deg) scale(1.02);
-        opacity: 0.9;
-    }
-    66% {
-        transform: translate(-20px, 30px) rotate(-1deg) scale(0.98);
-        opacity: 1;
-    }
-    100% {
-        transform: translate(10px, 10px) rotate(0.5deg) scale(1.01);
+
+    50% {
+        transform: translate3d(20px, -15px, 0);
         opacity: 0.95;
+    }
+
+    100% {
+        transform: translate3d(0, 0, 0);
+        opacity: 1;
     }
 }
 
-/* Floating Orbs Animation */
+/* Floating Orbs Animation - OPTIMIZED */
 body::after {
     content: '';
     position: fixed;
     top: 10%;
     right: 10%;
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.06) 0%, transparent 70%);
     border-radius: 50%;
-    animation: floatOrb 15s ease-in-out infinite;
+    animation: floatOrb 20s ease-in-out infinite;
+    will-change: transform;
     z-index: -1;
     pointer-events: none;
 }
 
+/* Optimized Float Animation - Simplified */
 @keyframes floatOrb {
-    0%, 100% {
-        transform: translate(0, 0) scale(1);
+
+    0%,
+    100% {
+        transform: translate3d(0, 0, 0);
     }
-    25% {
-        transform: translate(-50px, 50px) scale(1.1);
-    }
+
     50% {
-        transform: translate(30px, -30px) scale(0.9);
-    }
-    75% {
-        transform: translate(-30px, -50px) scale(1.05);
+        transform: translate3d(30px, -30px, 0);
     }
 }
+
+/* Disable animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+    body::before,
+    body::after {
+        animation: none;
+    }
+}
+
 
 a {
     text-decoration: none;
@@ -276,6 +287,34 @@ a {
 
 a:hover {
     color: var(--aurora-purple);
+}
+
+body.light-theme .theme-toggle-btn:hover i {
+    color: var(--aurora-purple);
+}
+
+/* ==================== PERFORMANCE MODE ==================== */
+/* Disable heavy effects when performance mode is active */
+body.performance-mode body::before,
+body.performance-mode body::after {
+    animation: none !important;
+    opacity: 0.5 !important;
+}
+
+body.performance-mode .site-card::before,
+body.performance-mode .site-card::after {
+    display: none;
+}
+
+body.performance-mode * {
+    transition-duration: 0.1s !important;
+}
+
+body.performance-mode .card,
+body.performance-mode .modal-content,
+body.performance-mode .sidebar {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
 ul,
