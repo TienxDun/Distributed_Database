@@ -45,16 +45,6 @@ function renderSidebar($activePage = 'ui')
                 <p><?php echo date('Y-m-d'); ?></p>
             </div>
         </div>
-
-        <div class="sidebar-footer">
-            <div class="user-profile">
-                <div class="user-avatar">A</div>
-                <div class="user-info">
-                    <div class="user-name">Admin User</div>
-                    <div class="user-role">System Admin</div>
-                </div>
-            </div>
-        </div>
     </aside>
     <?php
 }

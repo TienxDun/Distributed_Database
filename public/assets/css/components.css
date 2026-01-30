@@ -1027,7 +1027,7 @@
     border-radius: 20px;
     font-size: 0.75rem;
     font-weight: 700;
-    color: white;
+    color: white !important;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     min-width: 80px;
     text-transform: uppercase;
@@ -1578,6 +1578,28 @@
     animation-duration: 3s;
 }
 
+/* Light Theme Fix for Site Cards */
+body.light-theme .site-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(0, 0, 0, 0.12);
+}
+
+body.light-theme .site-card::before {
+    opacity: 0.25;
+}
+
+body.light-theme .site-card::after {
+    opacity: 0.08;
+}
+
+body.light-theme .site-card:hover::before {
+    opacity: 0.35;
+}
+
+body.light-theme .site-card:hover::after {
+    opacity: 0.12;
+}
+
 .site-card-header {
     font-weight: 700;
     color: var(--text-main);
@@ -1665,4 +1687,71 @@
 .site-card.c .site-card-header::before {
     background: var(--aurora-cyan);
     box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+}
+
+/* ==================== THEME TOGGLE BUTTON ==================== */
+.theme-toggle-btn {
+    background: var(--glass-bg-light);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border-light);
+    border-radius: var(--radius-md);
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.theme-toggle-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--aurora-purple), var(--aurora-blue));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.theme-toggle-btn:hover::before {
+    opacity: 0.15;
+}
+
+.theme-toggle-btn i {
+    font-size: 1.1rem;
+    color: var(--aurora-purple);
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+.theme-toggle-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md), var(--glow-purple);
+    border-color: var(--aurora-purple);
+}
+
+.theme-toggle-btn:hover i {
+    transform: rotate(20deg) scale(1.1);
+    color: var(--aurora-blue);
+}
+
+.theme-toggle-btn:active {
+    transform: translateY(0) scale(0.95);
+}
+
+/* Light Theme Button State */
+body.light-theme .theme-toggle-btn i {
+    color: var(--aurora-violet);
+}
+
+body.light-theme .theme-toggle-btn:hover i {
+    color: var(--aurora-purple);
 }

@@ -40,6 +40,11 @@
                     <button class="toggle-sidebar-btn" id="toggleSidebarBtn">☰</button>
                     <h1 class="page-title">Audit Logs</h1>
                 </div>
+                <div class="header-right">
+                    <button class="theme-toggle-btn" id="themeToggle" onclick="toggleTheme()" title="Chuyển sang Light Mode">
+                        <i class="fas fa-sun"></i>
+                    </button>
+                </div>
             </header>
 
             <!-- Content Body -->
@@ -166,6 +171,7 @@
         }
     </style>
 
+    <script src="assets/js/theme.js"></script>
     <script src="assets/js/sidebar.js"></script>
     <script type="module" src="assets/js/logs.js"></script>
 </body>

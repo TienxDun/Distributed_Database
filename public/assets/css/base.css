@@ -110,6 +110,76 @@
     );
 }
 
+/* ==================== LIGHT THEME ==================== */
+body.light-theme {
+    /* --- Light Base Colors --- */
+    --dark-950: #ffffff;      /* Main Background */
+    --dark-900: #f8fafc;      /* Alt Background */
+    --dark-850: #f1f5f9;
+    --dark-800: #e2e8f0;
+    --dark-700: #cbd5e1;      /* Borders */
+    --dark-600: #94a3b8;      /* Muted Text */
+    --dark-500: #64748b;
+    --dark-400: #475569;
+    --dark-300: #334155;
+    --dark-200: #1e293b;      /* Secondary Text */
+    --dark-100: #0f172a;      /* Main Text */
+    --dark-50:  #020617;
+
+    /* --- Aurora Colors (Đậm hơn cho nền sáng) --- */
+    --aurora-purple: #9333ea;
+    --aurora-violet: #7c3aed;
+    --aurora-blue: #2563eb;
+    --aurora-cyan: #0891b2;
+    --aurora-teal: #0d9488;
+    --aurora-pink: #db2777;
+    --aurora-rose: #e11d48;
+    --aurora-orange: #ea580c;
+
+    /* --- Light Glass Properties --- */
+    --glass-bg: rgba(255, 255, 255, 0.75);
+    --glass-bg-light: rgba(255, 255, 255, 0.9);
+    --glass-bg-lighter: rgba(255, 255, 255, 0.5);
+    --glass-border: rgba(0, 0, 0, 0.08);
+    --glass-border-light: rgba(0, 0, 0, 0.12);
+
+    /* --- Light Shadows --- */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.12), 0 4px 6px -2px rgba(0, 0, 0, 0.08);
+    --shadow-glow: 0 0 25px rgba(139, 92, 246, 0.15);
+    --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+
+    /* --- Glow Effects (Nhẹ hơn) --- */
+    --glow-purple: 0 0 15px rgba(147, 51, 234, 0.25);
+    --glow-blue: 0 0 15px rgba(37, 99, 235, 0.25);
+    --glow-cyan: 0 0 15px rgba(8, 145, 178, 0.25);
+    --glow-pink: 0 0 15px rgba(219, 39, 119, 0.25);
+
+    /* --- Semantic Maps --- */
+    --bg-body: #f8fafc;
+    --bg-surface: rgba(255, 255, 255, 0.85);
+    --bg-sidebar: rgba(255, 255, 255, 0.9);
+    --text-main: #0f172a;
+    --text-secondary: #334155;
+    --text-muted: #64748b;
+    --border-color: rgba(0, 0, 0, 0.1);
+    --border-focus: var(--aurora-purple);
+}
+
+/* Light Theme Background Animation */
+body.light-theme::before {
+    background: 
+        radial-gradient(ellipse 80% 50% at 20% 40%, rgba(147, 51, 234, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 40% at 80% 20%, rgba(37, 99, 235, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 60% at 70% 80%, rgba(8, 145, 178, 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse 40% 40% at 30% 90%, rgba(219, 39, 119, 0.04) 0%, transparent 50%);
+}
+
+body.light-theme::after {
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.04) 0%, transparent 70%);
+}
+
 /* ==================== 2. RESET & BASE ==================== */
 *,
 *::before,

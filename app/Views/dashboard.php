@@ -20,6 +20,9 @@
     <link rel="stylesheet" href="assets/css/layout.css">
     <link rel="stylesheet" href="assets/css/components.css">
     <link rel="stylesheet" href="assets/css/responsive.css">
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
 <body>
@@ -38,7 +41,9 @@
                     <h1 class="page-title">Dashboard</h1>
                 </div>
                 <div class="header-right">
-                    <!-- Actions or Profile could go here -->
+                    <button class="theme-toggle-btn" id="themeToggle" onclick="toggleTheme()" title="Chuyển sang Light Mode">
+                        <i class="fas fa-sun"></i>
+                    </button>
                 </div>
             </header>
 
@@ -314,6 +319,7 @@
         }
     </style>
 
+    <script src="assets/js/theme.js"></script>
     <script src="assets/js/sidebar.js"></script>
     <script type="module" src="assets/js/app.js"></script>
 </body>

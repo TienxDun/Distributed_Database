@@ -116,15 +116,93 @@
     .site-card {
         min-height: 380px;
     }
+
     .site-card-header {
         padding: 1rem 1.5rem;
     }
+
     .site-table-container {
         padding: 1rem;
     }
+
     .site-table th,
     .site-table td {
         padding: 0.75rem 1rem;
         font-size: 0.8rem;
     }
+}
+
+/* ==================== LIGHT THEME OVERRIDE ==================== */
+body.light-theme .site-card {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme .site-card:hover {
+    border-color: rgba(0, 0, 0, 0.18);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 0 20px rgba(139, 92, 246, 0.15);
+}
+
+body.light-theme .site-card-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.02);
+}
+
+body.light-theme .site-card.a .site-card-header {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+}
+
+body.light-theme .site-card.b .site-card-header {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(6, 182, 212, 0.08) 100%);
+}
+
+body.light-theme .site-card.c .site-card-header {
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.08) 0%, rgba(20, 184, 166, 0.08) 100%);
+}
+
+/* Site Table - Light Theme */
+body.light-theme .site-table {
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    background: rgba(255, 255, 255, 0.8);
+}
+
+body.light-theme .site-table th {
+    background: rgba(139, 92, 246, 0.12);
+    color: #1e293b;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    font-weight: 700;
+}
+
+body.light-theme .site-table td {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    color: #334155;
+}
+
+body.light-theme .site-table tr:hover td {
+    background: rgba(139, 92, 246, 0.08);
+    color: #1e293b;
+}
+
+body.light-theme .site-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Site Card Header Title - Light Theme */
+body.light-theme .site-card-header>div:first-child {
+    color: #1e293b !important;
+    font-weight: 800;
+    text-shadow: none;
+}
+
+body.light-theme .site-card.a .site-card-header>div:first-child {
+    color: #7c3aed !important;
+}
+
+body.light-theme .site-card.b .site-card-header>div:first-child {
+    color: #2563eb !important;
+}
+
+body.light-theme .site-card.c .site-card-header>div:first-child {
+    color: #0891b2 !important;
 }
