@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     libcurl4-openssl-dev \
     pkg-config \
+    ca-certificates \
     git zip unzip \
     && rm -rf /var/lib/apt/lists/*
 

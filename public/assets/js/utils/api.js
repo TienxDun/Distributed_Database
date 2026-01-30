@@ -20,9 +20,16 @@ export async function apiGet(endpoint) {
 
     if (!response.ok) {
         if (response.status === 404) {
-            throw new Error('Không tìm thấy dữ liệu');
+            throw new Error('Không tìm thấy dữ liệu (404)');
         }
-        throw new Error(`HTTP ${response.status}`);
+
+        try {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || errorData.error || `Lỗi hệ thống (${response.status})`);
+        } catch (e) {
+            // If body is not JSON, throw status code
+            throw new Error(`Lỗi hệ thống (${response.status})`);
+        }
     }
 
     return await response.json();
