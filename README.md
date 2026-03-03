@@ -8,6 +8,14 @@
 
 **🌐 Live Demo:** [https://distributed-database-tienxdun.onrender.com/](https://distributed-database-tienxdun.onrender.com/)
 
+## 📊 Demo & Screenshots
+
+![alt text](docs/image.png)
+
+- **Site Explorer**: Tính năng cho phép so sánh dữ liệu vật lý giữa các Site để kiểm chứng tính phân tán.
+- **Real-time Audit**: Mọi thao tác đều được ghi lại vào MongoDB Atlas ngay lập tức.
+
+---
 ## 📌 Tổng quan dự án
 
 Dự án mô phỏng một **Hệ quản trị Cơ sở dữ liệu Phân tán** thực tế, giải quyết bài toán quản lý dữ liệu quy mô lớn thông qua các kỹ thuật phân mảnh (fragmentation) và nhân bản (replication). Phiên bản 2.0 chuyển đổi toàn bộ kiến trúc từ MSSQL truyền thống sang **PostgreSQL Schemas-based Distribution**, mang lại hiệu năng cao và khả năng triển khai linh hoạt trên môi trường Cloud.
@@ -95,15 +103,6 @@ docker-compose exec postgres psql -U admin -d huflit -f /docker-entrypoint-initd
 - **Site A**: 4 khoa, 32 sinh viên, 18 môn học (Khoa CNTT, DLKS, KTTC, LLCT)
 - **Site B**: 4 khoa, 32 sinh viên, 20 môn học (Khoa NN, NVPD, QHQT, QTKD)
 - **Site C**: 3 khoa, 24 sinh viên, 15 môn học (Khoa SLCT, SUAT, TLKS)
-
----
-
-## 📊 Demo & Screenshots
-
-![alt text](image.png)
-
-- **Site Explorer**: Tính năng cho phép so sánh dữ liệu vật lý giữa các Site để kiểm chứng tính phân tán.
-- **Real-time Audit**: Mọi thao tác đều được ghi lại vào MongoDB Atlas ngay lập tức.
 
 ---
 
